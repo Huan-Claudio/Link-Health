@@ -1,7 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.App" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <!-- O design do Link Health é escuro nos dois modos (igual a values/themes.xml). -->
+    <style name="Base.Theme.App" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/lh_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/lh_green</item>
+        <item name="colorSurface">@color/lh_surface</item>
+        <item name="colorOnSurface">@color/lh_text_primary</item>
+        <item name="android:colorBackground">@color/lh_background</item>
+        <item name="android:windowBackground">@color/lh_background</item>
+        <item name="android:textColorPrimary">@color/lh_text_primary</item>
+        <item name="android:textColorSecondary">@color/lh_text_secondary</item>
+        <item name="android:textColorHint">@color/lh_text_hint</item>
     </style>
 </resources>

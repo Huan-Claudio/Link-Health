@@ -1,3 +1,144 @@
 <resources>
-    <string name="app_name">App</string>
+    <string name="app_name">Link Health</string>
+    <!-- Nome exibido na tela de login (no Figma aparece "NutriApp") -->
+    <string name="brand_name">NutriApp</string>
+    <string name="brand_slogan">Acompanhamento nutricional descomplicado</string>
+
+    <!-- Geral -->
+    <string name="voltar">Voltar</string>
+    <string name="perfil_nutricionista">Nutricionista</string>
+    <string name="perfil_paciente">Paciente</string>
+    <string name="salvar">Salvar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="em_breve">Funcionalidade em desenvolvimento</string>
+    <string name="campo_obrigatorio">Campo obrigatório</string>
+
+    <!-- Login -->
+    <string name="label_email_cpf">E-mail ou CPF</string>
+    <string name="label_email_crm">E-mail ou CRM</string>
+    <string name="label_senha">Senha</string>
+    <string name="hint_email">seuemail@exemplo.com</string>
+    <string name="hint_senha">••••••••</string>
+    <string name="entrar_no_app">Entrar no App</string>
+    <string name="criar_nova_conta">Criar Nova Conta</string>
+
+    <!-- Cadastro / Editar informações -->
+    <string name="criar_conta">Criar Conta</string>
+    <string name="label_nome_completo">Nome Completo</string>
+    <string name="hint_nome">Nome e sobrenome</string>
+    <string name="label_data_nascimento">Data de Nascimento</string>
+    <string name="hint_data">dd/mm/aaaa</string>
+    <string name="label_email">E-mail</string>
+    <string name="label_telefone">Telefone</string>
+    <string name="hint_telefone">(DD) 9XXXX-XXXX</string>
+    <string name="label_crm">Código de CRM</string>
+    <string name="hint_crm">CRM-GO 000000</string>
+    <string name="label_cpf">CPF</string>
+    <string name="hint_cpf">000.000.000-00</string>
+    <string name="label_senha_acesso">Senha de Acesso</string>
+    <string name="finalizar_cadastro">Finalizar Cadastro</string>
+    <string name="cadastro_sucesso">Cadastro realizado com sucesso!</string>
+    <string name="editar_informacoes">Editar Informações</string>
+    <string name="informacoes_salvas">Informações salvas</string>
+
+    <!-- Dashboard paciente -->
+    <string name="resumo_de_hoje">Resumo de Hoje</string>
+    <string name="refeicoes_concluidas">%1$d de %2$d refeições concluídas</string>
+    <string name="meta_agua">Meta de água ingerida</string>
+    <string name="agua_valor">%1$s de %2$s</string>
+    <string name="agua_menos_500">500ml</string>
+    <string name="agua_menos_1l">1L</string>
+    <string name="agua_mais_500">500ml</string>
+    <string name="agua_mais_1l">1L</string>
+    <string name="nutricionista_de">Nutricionista: %1$s</string>
+    <string name="paciente_de">Paciente: %1$s</string>
+    <string name="menu_plano">Ver Plano Alimentar</string>
+    <string name="menu_plano_desc">Consulte seus horários</string>
+    <string name="menu_convites">Convites</string>
+    <string name="menu_convites_desc">Consulte seus convites</string>
+    <string name="menu_evolucao">Evolução Corporal</string>
+    <string name="menu_evolucao_desc">Fotos e histórico de peso</string>
+    <string name="menu_lista">Lista de Compras</string>
+    <string name="menu_lista_desc">Veja os produtos da lista de compras da sua dieta</string>
+    <string name="menu_perfil">Perfil</string>
+    <string name="menu_perfil_desc">Dados Pessoais</string>
+
+    <!-- Plano alimentar -->
+    <string name="meu_plano_alimentar">Meu Plano Alimentar</string>
+    <string name="plano_alimentar_de">Plano Alimentar - %1$s</string>
+    <string name="adicionar_alimento">+ Adicionar Alimento</string>
+    <string name="adicionar_refeicao">+ Adicionar Refeição</string>
+    <string name="hint_alimento">alimento</string>
+    <string name="hint_refeicao">Refeição (00:00)</string>
+    <string name="nova_refeicao">Nova refeição</string>
+
+    <!-- Evolução corporal -->
+    <string name="evolucao_corporal">Evolução Corporal</string>
+    <string name="tirar_foto">Tirar Foto com a Câmera do Celular</string>
+    <string name="tirar_foto_desc">Clique para abrir a câmera nativa</string>
+    <string name="historico_evolucao">Histórico de evolução</string>
+    <string name="peso_valor">Peso: %1$skg</string>
+    <string name="abrir_imagem">Abrir imagem</string>
+    <string name="informe_peso">Informe seu peso atual (kg)</string>
+    <string name="camera_indisponivel">Nenhum app de câmera encontrado</string>
+
+    <!-- Convites -->
+    <string name="convites">CONVITES</string>
+    <string name="ola_nome">Olá, %1$s</string>
+    <string name="convite_aceito">Convite de %1$s aceito!</string>
+    <string name="sem_convites">Você não tem convites pendentes.</string>
+
+    <!-- Lista de compras -->
+    <string name="lista_compras">Lista de Compras</string>
+    <string name="lista_compras_de">Lista de Compras - %1$s</string>
+    <string name="adicionar_item_lista">+ Adicionar Item à Lista</string>
+    <string name="novo_item">Novo item da lista</string>
+    <string name="hint_item">Ex.: 2 pacotes de aveia</string>
+    <string name="produtos_recomendados">Produtos Recomendados</string>
+    <string name="produtos_recomendados_de">Produtos Recomendados - %1$s</string>
+    <string name="produto_recomendado">Produto Recomendado</string>
+    <string name="recomendar_produto">Recomendar Produto</string>
+    <string name="label_nome_produto">Nome do Produto</string>
+    <string name="label_preco_produto">Preço do Produto</string>
+    <string name="label_link_compra">Link de Compra (URL Externa)</string>
+    <string name="hint_preco">R$</string>
+    <string name="hint_link">https://mercadolivre.com.br/…</string>
+    <string name="salvar_alteracoes">Salvar Alterações</string>
+    <string name="adicionar_produto">+ Adicionar Produto</string>
+    <string name="comprar_produto">Ver produto na loja</string>
+    <string name="produto_salvo">Produto salvo</string>
+    <string name="link_invalido">Link inválido</string>
+
+    <!-- Nutricionista -->
+    <string name="pacientes_ativos">%1$d Pacientes ativos</string>
+    <string name="meus_pacientes">Meus Pacientes</string>
+    <string name="novo_paciente">+ Novo Paciente</string>
+    <string name="buscar_paciente">Buscar paciente…</string>
+    <string name="cpf_email">CPF/EMAIL</string>
+    <string name="convite_enviado">Convite enviado para %1$s</string>
+    <string name="nenhum_paciente">Nenhum paciente encontrado</string>
+    <string name="edite_meta">Edite a meta</string>
+    <string name="nova_meta_agua">Nova meta de água (litros)</string>
+    <string name="menu_editar_plano">Editar Plano Alimentar</string>
+    <string name="menu_editar_plano_desc">Edite a rotina alimentar do paciente</string>
+    <string name="menu_editar_produtos">Editar Produtos Recomendados</string>
+    <string name="menu_editar_produtos_desc">Adicione ou altere produtos que achar relevante para o paciente</string>
+    <string name="menu_evolucao_nutri_desc">Fotos e histórico de peso do paciente</string>
+    <string name="menu_editar_lista">Editar Lista de Compras</string>
+    <string name="menu_editar_lista_desc">Adicione ou altere itens da dieta na lista de compras para o paciente</string>
+    <string name="menu_registros">Ver Registros diários</string>
+    <string name="menu_registros_desc">Acompanhe o dia a dia do paciente</string>
+    <string name="registro_diario">Registro diário do paciente</string>
+
+    <!-- Configurações -->
+    <string name="configuracoes">Configurações</string>
+    <string name="dados_pessoais">Dados Pessoais</string>
+    <string name="dados_contato">Dados de Contato</string>
+    <string name="alterar_dados_pessoais">Alterar Dados Pessoais</string>
+    <string name="endereco">Endereço</string>
+    <string name="preferencias">Preferencias</string>
+    <string name="notificacoes">Notificações</string>
+    <string name="sair_do_app">Sair do app</string>
+    <string name="tela_em_breve">Esta tela será adicionada em uma próxima etapa.</string>
+    <string name="nutricionista_em_breve">A área do nutricionista será adicionada em uma próxima etapa. Use o perfil Paciente.</string>
 </resources>
