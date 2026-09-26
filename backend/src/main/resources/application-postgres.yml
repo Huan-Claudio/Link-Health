@@ -1,0 +1,11 @@
+# Este perfil só será utilizado quando SPRING_PROFILES_ACTIVE=postgres for definido.
+# Nesta etapa não há JPA ou Flyway, portanto nenhuma conexão é aberta por padrão.
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: ${LINK_HEALTH_DB_URL}
+    username: ${LINK_HEALTH_DB_USERNAME}
+    password: ${LINK_HEALTH_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
