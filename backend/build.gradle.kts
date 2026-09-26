@@ -20,10 +20,13 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
+    implementation("org.flywaydb:flyway-core")
 
-    // Driver preparado para o perfil PostgreSQL; nenhuma conexão é ativada nesta etapa.
+    // Dependências de persistência são ativadas somente no perfil postgres.
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

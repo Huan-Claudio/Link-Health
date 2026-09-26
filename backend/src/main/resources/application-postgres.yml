@@ -1,5 +1,4 @@
 # Este perfil só será utilizado quando SPRING_PROFILES_ACTIVE=postgres for definido.
-# Nesta etapa não há JPA ou Flyway, portanto nenhuma conexão é aberta por padrão.
 spring:
   config:
     activate:
@@ -9,3 +8,9 @@ spring:
     username: ${LINK_HEALTH_DB_USERNAME}
     password: ${LINK_HEALTH_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
