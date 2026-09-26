@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Produto recomendado (visão do paciente, somente leitura + link de compra) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/LH.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/lh_space_m">
+
+    <TextView
+        style="@style/LH.Text.CardTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/produto_recomendado"
+        android:textSize="13sp" />
+
+    <TextView
+        style="@style/LH.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_nome_produto" />
+
+    <TextView
+        android:id="@+id/tvNomeProduto"
+        style="@style/LH.Value"
+        tools:text="Whey Protein Growth" />
+
+    <TextView
+        style="@style/LH.Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_preco_produto" />
+
+    <TextView
+        android:id="@+id/tvPrecoProduto"
+        style="@style/LH.Value"
+        tools:text="R$ 129,90" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnComprar"
+        style="@style/LH.Button.Small"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="@dimen/lh_space_m"
+        android:text="@string/comprar_produto"
+        app:icon="@drawable/ic_open_in_new"
+        app:iconGravity="textStart"
+        app:iconSize="16dp" />
+</LinearLayout>

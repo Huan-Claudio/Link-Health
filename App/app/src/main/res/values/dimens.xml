@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="lh_screen_padding">20dp</dimen>
+    <dimen name="lh_card_padding">14dp</dimen>
+    <dimen name="lh_radius">12dp</dimen>
+    <dimen name="lh_radius_small">8dp</dimen>
+    <dimen name="lh_input_height">48dp</dimen>
+    <dimen name="lh_button_height">52dp</dimen>
+    <dimen name="lh_space_s">8dp</dimen>
+    <dimen name="lh_space_m">12dp</dimen>
+    <dimen name="lh_space_l">20dp</dimen>
+</resources>

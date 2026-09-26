@@ -24,6 +24,9 @@
         <activity android:name=".ui.auth.LoginActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.auth.CadastroActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.paciente.HomePacienteActivity" android:exported="false" />
+        <activity android:name=".ui.paciente.PlanoAlimentarActivity" android:exported="false" />
+        <activity android:name=".ui.paciente.ListaComprasActivity" android:exported="false" />
+        <activity android:name=".ui.paciente.ConvitesActivity" android:exported="false" />
     </application>
 
 </manifest>

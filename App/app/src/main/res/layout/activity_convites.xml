@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Dietitian dashboard" (paciente) – convites recebidos de nutricionistas -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lh_background"
+    android:orientation="vertical"
+    android:padding="@dimen/lh_screen_padding"
+    tools:context=".ui.paciente.ConvitesActivity">
+
+    <include layout="@layout/view_header_saudacao" />
+
+    <TextView
+        style="@style/LH.Text.Section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/lh_space_m"
+        android:text="@string/convites" />
+
+    <TextView
+        android:id="@+id/tvVazio"
+        style="@style/LH.Text.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sem_convites"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+</LinearLayout>

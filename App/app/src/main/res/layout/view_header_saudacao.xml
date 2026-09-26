@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cabeçalho com avatar + "Olá, Nome" (+ subtítulo opcional) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="8dp"
+    android:paddingBottom="16dp">
+
+    <ImageButton
+        android:id="@+id/btnVoltar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="-8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/voltar"
+        android:src="@drawable/ic_arrow_back"
+        app:tint="@color/lh_primary_light" />
+
+    <TextView
+        android:id="@+id/tvAvatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/bg_circle_primary"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        tools:text="JL" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvOla"
+            style="@style/LH.Text.Section"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Olá, Jorge Luiz" />
+
+        <TextView
+            android:id="@+id/tvSubtitulo"
+            style="@style/LH.Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:text="24 Pacientes ativos" />
+    </LinearLayout>
+</LinearLayout>

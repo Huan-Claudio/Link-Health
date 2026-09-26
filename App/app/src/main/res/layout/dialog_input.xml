@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Campo de texto usado nos diálogos (novo item, meta de água, peso) -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="24dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="24dp">
+
+    <EditText
+        android:id="@+id/etDialog"
+        style="@style/LH.Input"
+        android:importantForAutofill="no" />
+</FrameLayout>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Home/Dashboard Paciente" -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lh_background"
+    tools:context=".ui.paciente.HomePacienteActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/lh_screen_padding">
+
+        <include
+            android:id="@+id/cardObjetivo"
+            layout="@layout/view_header_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <include
+            android:id="@+id/cardResumo"
+            layout="@layout/view_card_resumo" />
+
+        <include
+            android:id="@+id/cardAgua"
+            layout="@layout/view_card_agua" />
+
+        <include
+            android:id="@+id/menuPlano"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuConvites"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuEvolucao"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuLista"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuPerfil"
+            layout="@layout/item_menu_card" />
+    </LinearLayout>
+</ScrollView>

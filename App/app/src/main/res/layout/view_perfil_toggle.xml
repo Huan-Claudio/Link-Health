@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Seletor Nutricionista / Paciente (controlado pela classe PerfilToggle) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/togglePerfil"
+    android:layout_width="match_parent"
+    android:layout_height="44dp"
+    android:background="@drawable/bg_toggle_container"
+    android:orientation="horizontal"
+    android:padding="3dp">
+
+    <TextView
+        android:id="@+id/tvOpcaoNutricionista"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/perfil_nutricionista"
+        android:textColor="@color/lh_text_secondary"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvOpcaoPaciente"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/perfil_paciente"
+        android:textColor="@color/lh_text_secondary"
+        android:textSize="12sp" />
+</LinearLayout>

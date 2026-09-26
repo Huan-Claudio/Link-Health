@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Cadastro Paciente" e "Cadastro Nutricionista" (mesma tela, muda CPF/CRM) -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lh_background"
+    tools:context=".ui.auth.CadastroActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/lh_screen_padding">
+
+        <include layout="@layout/view_header" />
+
+        <include
+            layout="@layout/view_perfil_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="44dp" />
+
+        <LinearLayout
+            style="@style/LH.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_m">
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:text="@string/label_nome_completo" />
+
+            <EditText
+                android:id="@+id/etNome"
+                style="@style/LH.Input"
+                android:autofillHints="name"
+                android:hint="@string/hint_nome"
+                android:inputType="textPersonName|textCapWords" />
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_data_nascimento" />
+
+            <EditText
+                android:id="@+id/etDataNascimento"
+                style="@style/LH.Input"
+                android:drawableStart="@drawable/ic_calendar"
+                android:drawableTint="@color/lh_text_hint"
+                android:focusable="false"
+                android:hint="@string/hint_data"
+                android:importantForAutofill="no"
+                android:inputType="none" />
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_email" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                style="@style/LH.Input"
+                android:autofillHints="emailAddress"
+                android:hint="@string/hint_email"
+                android:inputType="textEmailAddress" />
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_telefone" />
+
+            <EditText
+                android:id="@+id/etTelefone"
+                style="@style/LH.Input"
+                android:autofillHints="phone"
+                android:hint="@string/hint_telefone"
+                android:inputType="phone" />
+
+            <!-- Campo que muda conforme o perfil: CRM (nutricionista) ou CPF (paciente) -->
+            <TextView
+                android:id="@+id/tvLabelDocumento"
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_cpf" />
+
+            <EditText
+                android:id="@+id/etDocumento"
+                style="@style/LH.Input"
+                android:hint="@string/hint_cpf"
+                android:importantForAutofill="no"
+                android:inputType="number" />
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_senha_acesso" />
+
+            <EditText
+                android:id="@+id/etSenha"
+                style="@style/LH.Input"
+                android:autofillHints="newPassword"
+                android:hint="@string/hint_senha"
+                android:inputType="textPassword" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFinalizar"
+                style="@style/LH.Button"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/lh_space_l"
+                android:text="@string/finalizar_cadastro" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
