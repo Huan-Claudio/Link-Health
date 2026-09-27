@@ -68,12 +68,12 @@
             android:layout_weight="1"
             android:background="@drawable/bg_chip_yellow"
             android:drawableStart="@drawable/ic_remove"
-            android:drawableTint="@color/lh_background"
+            android:drawableTint="@color/white"
             android:gravity="center"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="@string/agua_menos_500"
-            android:textColor="@color/lh_background"
+            android:textColor="@color/white"
             android:textSize="11sp"
             android:textStyle="bold" />
 
@@ -85,12 +85,12 @@
             android:layout_weight="1"
             android:background="@drawable/bg_chip_yellow"
             android:drawableStart="@drawable/ic_remove"
-            android:drawableTint="@color/lh_background"
+            android:drawableTint="@color/white"
             android:gravity="center"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="@string/agua_menos_1l"
-            android:textColor="@color/lh_background"
+            android:textColor="@color/white"
             android:textSize="11sp"
             android:textStyle="bold" />
 
