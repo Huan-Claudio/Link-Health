@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Editar Informações Paciente" / "Editar Informações Nutricionista" -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lh_background"
+    tools:context=".ui.comum.EditarInformacoesActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/lh_screen_padding">
+
+        <include layout="@layout/view_header" />
+
+        <LinearLayout
+            style="@style/LH.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:text="@string/label_nome_completo" />
+
+            <EditText
+                android:id="@+id/etNome"
+                style="@style/LH.Input"
+                android:autofillHints="name"
+                android:hint="@string/hint_nome"
+                android:inputType="textPersonName|textCapWords" />
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_data_nascimento" />
+
+            <EditText
+                android:id="@+id/etDataNascimento"
+                style="@style/LH.Input"
+                android:drawableStart="@drawable/ic_calendar"
+                android:drawableTint="@color/lh_text_hint"
+                android:focusable="false"
+                android:hint="@string/hint_data"
+                android:importantForAutofill="no"
+                android:inputType="none" />
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_email" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                style="@style/LH.Input"
+                android:autofillHints="emailAddress"
+                android:hint="@string/hint_email"
+                android:inputType="textEmailAddress" />
+
+            <TextView
+                style="@style/LH.Text.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_telefone" />
+
+            <EditText
+                android:id="@+id/etTelefone"
+                style="@style/LH.Input"
+                android:autofillHints="phone"
+                android:hint="@string/hint_telefone"
+                android:inputType="phone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSalvar"
+                style="@style/LH.Button"
+                android:layout_width="match_parent"
+                android:layout_marginTop="@dimen/lh_space_l"
+                android:text="@string/salvar" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
