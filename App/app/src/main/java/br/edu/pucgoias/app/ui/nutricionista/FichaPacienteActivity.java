@@ -48,7 +48,7 @@ public class FichaPacienteActivity extends BaseActivity {
         configurarMenu(R.id.menuEvolucao, R.drawable.ic_camera, R.string.menu_evolucao,
                 R.string.menu_evolucao_nutri_desc, v -> toast(R.string.tela_em_breve));
         configurarMenu(R.id.menuEditarLista, R.drawable.ic_cart, R.string.menu_editar_lista,
-                R.string.menu_editar_lista_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_editar_lista_desc, v -> abrir(EditarListaComprasActivity.class));
         configurarMenu(R.id.menuRegistros, R.drawable.ic_assignment, R.string.menu_registros,
                 R.string.menu_registros_desc, v -> toast(R.string.tela_em_breve));
     }

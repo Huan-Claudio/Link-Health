@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Botão azul "+ Adicionar ..." usado dentro de cards -->
+<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/LH.Button.Small"
+    android:layout_width="match_parent"
+    android:layout_marginTop="4dp" />
