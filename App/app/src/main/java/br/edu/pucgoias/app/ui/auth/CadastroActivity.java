@@ -33,11 +33,11 @@ public class CadastroActivity extends BaseActivity {
         String extra = getIntent().getStringExtra(EXTRA_PERFIL);
         Perfil inicial = extra != null ? Perfil.valueOf(extra) : Perfil.PACIENTE;
 
-        // Nutricionista informa o CRM; paciente informa o CPF.
+        // Nutricionista informa o CRN; paciente informa o CPF.
         toggle = new PerfilToggle(findViewById(R.id.togglePerfil), inicial, perfil -> {
             boolean nutri = perfil == Perfil.NUTRICIONISTA;
-            tvLabelDocumento.setText(nutri ? R.string.label_crm : R.string.label_cpf);
-            etDocumento.setHint(nutri ? R.string.hint_crm : R.string.hint_cpf);
+            tvLabelDocumento.setText(nutri ? R.string.label_crn : R.string.label_cpf);
+            etDocumento.setHint(nutri ? R.string.hint_crn : R.string.hint_cpf);
             etDocumento.setInputType(nutri
                     ? InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
                     : InputType.TYPE_CLASS_NUMBER);
@@ -58,10 +58,6 @@ public class CadastroActivity extends BaseActivity {
             }
         }
         if (!valido) return;
-        if (toggle.getPerfil() == Perfil.NUTRICIONISTA) {
-            toast(R.string.nutricionista_em_breve);
-            return;
-        }
 
         // TODO: enviar o cadastro para o back-end.
         toast(R.string.cadastro_sucesso);

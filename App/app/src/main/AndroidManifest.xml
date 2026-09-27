@@ -27,6 +27,7 @@
         <activity android:name=".ui.paciente.PlanoAlimentarActivity" android:exported="false" />
         <activity android:name=".ui.paciente.ListaComprasActivity" android:exported="false" />
         <activity android:name=".ui.paciente.ConvitesActivity" android:exported="false" />
+        <activity android:name=".ui.nutricionista.HomeNutricionistaActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

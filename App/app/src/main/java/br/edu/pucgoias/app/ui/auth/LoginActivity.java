@@ -31,7 +31,7 @@ public class LoginActivity extends BaseActivity {
         // O rótulo muda conforme o perfil: paciente entra com CPF, nutricionista com CRM.
         toggle = new PerfilToggle(findViewById(R.id.togglePerfil), Perfil.PACIENTE, perfil ->
                 tvLabelLogin.setText(perfil == Perfil.NUTRICIONISTA
-                        ? R.string.label_email_crm : R.string.label_email_cpf));
+                        ? R.string.label_email_crn : R.string.label_email_cpf));
 
         findViewById(R.id.btnEntrar).setOnClickListener(v -> entrar());
         findViewById(R.id.btnCriarConta).setOnClickListener(v -> {
@@ -52,10 +52,6 @@ public class LoginActivity extends BaseActivity {
             valido = false;
         }
         if (!valido) return;
-        if (toggle.getPerfil() == Perfil.NUTRICIONISTA) {
-            toast(R.string.nutricionista_em_breve);
-            return;
-        }
 
         // TODO: validar usuário e senha no back-end.
         Sessao.entrar(toggle.getPerfil());

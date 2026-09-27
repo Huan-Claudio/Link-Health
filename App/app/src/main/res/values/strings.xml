@@ -15,7 +15,7 @@
 
     <!-- Login -->
     <string name="label_email_cpf">E-mail ou CPF</string>
-    <string name="label_email_crm">E-mail ou CRM</string>
+    <string name="label_email_crn">E-mail ou CRN</string>
     <string name="label_senha">Senha</string>
     <string name="hint_email">seuemail@exemplo.com</string>
     <string name="hint_senha">••••••••</string>
@@ -31,8 +31,8 @@
     <string name="label_email">E-mail</string>
     <string name="label_telefone">Telefone</string>
     <string name="hint_telefone">(DD) 9XXXX-XXXX</string>
-    <string name="label_crm">Código de CRM</string>
-    <string name="hint_crm">CRM-GO 000000</string>
+    <string name="label_crn">Código de CRN</string>
+    <string name="hint_crn">CRN-0 00000</string>
     <string name="label_cpf">CPF</string>
     <string name="hint_cpf">000.000.000-00</string>
     <string name="label_senha_acesso">Senha de Acesso</string>
@@ -140,5 +140,4 @@
     <string name="notificacoes">Notificações</string>
     <string name="sair_do_app">Sair do app</string>
     <string name="tela_em_breve">Esta tela será adicionada em uma próxima etapa.</string>
-    <string name="nutricionista_em_breve">A área do nutricionista será adicionada em uma próxima etapa. Use o perfil Paciente.</string>
 </resources>
