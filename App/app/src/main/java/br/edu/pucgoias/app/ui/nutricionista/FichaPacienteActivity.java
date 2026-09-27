@@ -1,5 +1,6 @@
 package br.edu.pucgoias.app.ui.nutricionista;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -41,9 +42,9 @@ public class FichaPacienteActivity extends BaseActivity {
 
         // TODO: trocar os avisos pelas telas quando forem adicionadas.
         configurarMenu(R.id.menuEditarPlano, R.drawable.ic_restaurant, R.string.menu_editar_plano,
-                R.string.menu_editar_plano_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_editar_plano_desc, v -> abrir(EditarPlanoActivity.class));
         configurarMenu(R.id.menuEditarProdutos, R.drawable.ic_bag, R.string.menu_editar_produtos,
-                R.string.menu_editar_produtos_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_editar_produtos_desc, v -> abrir(EditarProdutosActivity.class));
         configurarMenu(R.id.menuEvolucao, R.drawable.ic_camera, R.string.menu_evolucao,
                 R.string.menu_evolucao_nutri_desc, v -> toast(R.string.tela_em_breve));
         configurarMenu(R.id.menuEditarLista, R.drawable.ic_cart, R.string.menu_editar_lista,
@@ -70,5 +71,12 @@ public class FichaPacienteActivity extends BaseActivity {
                     paciente.setMetaAgua(meta);
                     DashboardCards.atualizarAgua(cardAgua, paciente);
                 });
+    }
+
+    /** Abre uma tela do nutricionista passando qual paciente está sendo editado. */
+    private void abrir(Class<?> tela) {
+        Intent intent = new Intent(this, tela);
+        intent.putExtra(MockData.EXTRA_PACIENTE, indicePaciente);
+        startActivity(intent);
     }
 }

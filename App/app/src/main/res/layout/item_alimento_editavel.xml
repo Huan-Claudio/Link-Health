@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Linha editável de alimento (com lixeira) -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="44dp"
+    android:layout_marginBottom="6dp"
+    android:background="@drawable/bg_input"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingEnd="6dp">
+
+    <EditText
+        android:id="@+id/etAlimento"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:hint="@string/hint_alimento"
+        android:importantForAutofill="no"
+        android:inputType="textCapSentences"
+        android:maxLines="1"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+        android:textColor="@color/lh_text_primary"
+        android:textColorHint="@color/lh_text_hint"
+        android:textSize="13sp" />
+
+    <ImageButton
+        android:id="@+id/btnRemoverAlimento"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/hint_alimento"
+        android:padding="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_delete"
+        app:tint="@color/lh_text_secondary" />
+</LinearLayout>
