@@ -31,8 +31,6 @@ public class FichaPacienteActivity extends BaseActivity {
         cardAgua = findViewById(R.id.cardAgua);
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
-        // TODO: abrir Editar Informações quando a tela for adicionada.
-        findViewById(R.id.btnDadosPaciente).setOnClickListener(v -> toast(R.string.tela_em_breve));
 
         // Nutricionista não registra água: ele só ajusta a meta.
         cardAgua.findViewById(R.id.layoutBotoesAgua).setVisibility(View.GONE);
