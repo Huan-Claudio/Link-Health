@@ -1,5 +1,6 @@
 package br.edu.pucgoias.app.ui.nutricionista;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,9 +36,10 @@ public class HomeNutricionistaActivity extends BaseActivity {
         etBusca = findViewById(R.id.etBusca);
 
         ((TextView) findViewById(R.id.tvAvatar)).setText("DR.");
-        // TODO: abrir Configurações e Buscar Paciente quando essas telas forem adicionadas.
+        // TODO: abrir Configurações quando a tela for adicionada.
         findViewById(R.id.layoutPerfil).setOnClickListener(v -> toast(R.string.tela_em_breve));
-        findViewById(R.id.btnNovoPaciente).setOnClickListener(v -> toast(R.string.tela_em_breve));
+        findViewById(R.id.btnNovoPaciente).setOnClickListener(v ->
+                startActivity(new Intent(this, BuscarPacienteActivity.class)));
 
         etBusca.addTextChangedListener(new TextoAlterado(texto -> montarLista()));
     }
@@ -66,8 +68,12 @@ public class HomeNutricionistaActivity extends BaseActivity {
             ((TextView) item.findViewById(R.id.tvAvatar)).setText(p.getIniciais());
             ((TextView) item.findViewById(R.id.tvNome)).setText(p.getNome());
             ((TextView) item.findViewById(R.id.tvObjetivo)).setText(p.getObjetivo());
-            // TODO: abrir a Ficha do Paciente quando essa tela for adicionada.
-            item.setOnClickListener(v -> toast(R.string.tela_em_breve));
+            final int indice = i;
+            item.setOnClickListener(v -> {
+                Intent intent = new Intent(this, FichaPacienteActivity.class);
+                intent.putExtra(MockData.EXTRA_PACIENTE, indice);
+                startActivity(intent);
+            });
             container.addView(item);
             exibidos++;
         }

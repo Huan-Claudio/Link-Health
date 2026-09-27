@@ -117,6 +117,8 @@
     <string name="cpf_email">CPF/EMAIL</string>
     <string name="convite_enviado">Convite enviado para %1$s</string>
     <string name="nenhum_paciente">Nenhum paciente encontrado</string>
+    <string name="buscar_paciente_instrucao">Digite o CPF ou o e-mail do paciente.</string>
+    <string name="paciente_ja_vinculado">%1$s (já é seu paciente)</string>
     <string name="edite_meta">Edite a meta</string>
     <string name="nova_meta_agua">Nova meta de água (litros)</string>
     <string name="menu_editar_plano">Editar Plano Alimentar</string>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Ficha do Paciente (Tela do nutricionista)" -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lh_background"
+    tools:context=".ui.nutricionista.FichaPacienteActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/lh_screen_padding">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="12dp">
+
+            <ImageButton
+                android:id="@+id/btnVoltar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="-8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/voltar"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/lh_primary_light" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/btnDadosPaciente"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/dados_pessoais"
+                android:src="@drawable/ic_person"
+                app:tint="@color/lh_primary_light" />
+        </LinearLayout>
+
+        <include
+            android:id="@+id/cardObjetivo"
+            layout="@layout/view_header_card" />
+
+        <include
+            android:id="@+id/cardResumo"
+            layout="@layout/view_card_resumo" />
+
+        <include
+            android:id="@+id/cardAgua"
+            layout="@layout/view_card_agua" />
+
+        <include
+            android:id="@+id/menuEditarPlano"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuEditarProdutos"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuEvolucao"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuEditarLista"
+            layout="@layout/item_menu_card" />
+
+        <include
+            android:id="@+id/menuRegistros"
+            layout="@layout/item_menu_card" />
+    </LinearLayout>
+</ScrollView>

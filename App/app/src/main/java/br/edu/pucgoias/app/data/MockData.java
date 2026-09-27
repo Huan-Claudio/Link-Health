@@ -73,6 +73,30 @@ public final class MockData {
         return pacientesSemNutricionista;
     }
 
+    /**
+     * TODO: refazer esta busca no back-end (consulta no banco Postgress por CPF ou e-mail).
+     *       Hoje ela procura apenas nos dados de exemplo em memória desta classe.
+     */
+    public static List<Paciente> buscarPacientesPorCpfOuEmail(String busca) {
+        List<Paciente> encontrados = new ArrayList<>();
+        String texto = busca == null ? "" : busca.trim().toLowerCase();
+        if (texto.isEmpty()) return encontrados;
+
+        // Só números, pontos e traço: pode ser o começo de um CPF.
+        boolean pareceCpf = texto.matches("[0-9.\\-]+");
+        String cpf = texto.replaceAll("\\D", "");
+
+        List<Paciente> todos = new ArrayList<>(getPacientesSemNutricionista());
+        todos.addAll(getPacientes());
+        for (Paciente p : todos) {
+            boolean porEmail = p.getEmail().toLowerCase().startsWith(texto);
+            boolean porCpf = pareceCpf && !cpf.isEmpty()
+                    && p.getCpf().replaceAll("\\D", "").startsWith(cpf);
+            if (porEmail || porCpf) encontrados.add(p);
+        }
+        return encontrados;
+    }
+
     /** Convites recebidos pelo paciente logado (nomes dos nutricionistas). */
     public static List<String> getConvites() {
         if (convites == null) {
