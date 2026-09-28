@@ -38,7 +38,6 @@ public class FichaPacienteActivity extends BaseActivity {
         btnEditarMeta.setVisibility(View.VISIBLE);
         btnEditarMeta.setOnClickListener(v -> editarMeta());
 
-        // TODO: trocar os avisos pelas telas quando forem adicionadas.
         configurarMenu(R.id.menuEditarPlano, R.drawable.ic_restaurant, R.string.menu_editar_plano,
                 R.string.menu_editar_plano_desc, v -> abrir(EditarPlanoActivity.class));
         configurarMenu(R.id.menuEditarProdutos, R.drawable.ic_bag, R.string.menu_editar_produtos,
@@ -48,7 +47,7 @@ public class FichaPacienteActivity extends BaseActivity {
         configurarMenu(R.id.menuEditarLista, R.drawable.ic_cart, R.string.menu_editar_lista,
                 R.string.menu_editar_lista_desc, v -> abrir(EditarListaComprasActivity.class));
         configurarMenu(R.id.menuRegistros, R.drawable.ic_assignment, R.string.menu_registros,
-                R.string.menu_registros_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_registros_desc, v -> abrir(RegistroDiarioActivity.class));
     }
 
     @Override

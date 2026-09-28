@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Card de um dia no "Registro diário do paciente" -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/LH.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/lh_space_m"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvData"
+        style="@style/LH.Text.Body"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_input"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:textStyle="bold"
+        tools:text="11/09/2026" />
+
+    <LinearLayout
+        style="@style/LH.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="10dp">
+
+        <TextView
+            style="@style/LH.Text.CardTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/meta_agua"
+            android:textSize="13sp" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressAgua"
+            style="@style/LH.Progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:id="@+id/tvAgua"
+            style="@style/LH.Text.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            tools:text="2L de 5L" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/containerRefeicoes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+</LinearLayout>
