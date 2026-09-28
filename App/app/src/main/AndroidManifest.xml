@@ -27,6 +27,11 @@
         <activity android:name=".ui.paciente.PlanoAlimentarActivity" android:exported="false" />
         <activity android:name=".ui.paciente.ListaComprasActivity" android:exported="false" />
         <activity android:name=".ui.paciente.ConvitesActivity" android:exported="false" />
+        <activity android:name=".ui.nutricionista.HomeNutricionistaActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.nutricionista.BuscarPacienteActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.nutricionista.FichaPacienteActivity" android:exported="false" />
+        <activity android:name=".ui.nutricionista.EditarPlanoActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.nutricionista.EditarProdutosActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

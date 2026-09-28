@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 
 import br.edu.pucgoias.app.model.Perfil;
+import br.edu.pucgoias.app.ui.nutricionista.HomeNutricionistaActivity;
 import br.edu.pucgoias.app.ui.paciente.HomePacienteActivity;
 
 /** Atalhos de navegação usados por mais de uma tela. */
@@ -14,7 +15,9 @@ public final class Navegacao {
 
     /** Abre a Home do perfil e limpa a pilha (o botão voltar não retorna ao login). */
     public static void abrirHome(Activity origem, Perfil perfil) {
-        Class<?> destino = HomePacienteActivity.class;
+        Class<?> destino = perfil == Perfil.NUTRICIONISTA
+                ? HomeNutricionistaActivity.class
+                : HomePacienteActivity.class;
         Intent intent = new Intent(origem, destino);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         origem.startActivity(intent);
