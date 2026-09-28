@@ -9,6 +9,7 @@ Backend REST do Link Health, separado do aplicativo Android em `App/`.
 - documentação OpenAPI em `/swagger-ui.html` e contrato JSON em `/api-docs`;
 - perfil `postgres` preparado por variáveis de ambiente, sem conexão ativada por padrão;
 - lista de compras e produtos recomendados por paciente.
+- registros de água, refeições realizadas e peso por paciente.
 
 No perfil `local` (padrão), os dados ficam somente em memória para permitir a integração inicial sem banco. Ao ativar o perfil `postgres`, a API usa PostgreSQL e executa as migrações do Flyway.
 
@@ -27,6 +28,14 @@ As rotas usam o identificador do paciente até que a autenticação e o vínculo
 | `POST` | `/api/v1/patients/{patientId}/recommended-products` | Adiciona produto |
 | `PATCH` | `/api/v1/patients/{patientId}/recommended-products/{productId}` | Edita produto |
 | `DELETE` | `/api/v1/patients/{patientId}/recommended-products/{productId}` | Remove produto |
+| `GET/POST` | `/api/v1/patients/{patientId}/water-intakes` | Consulta/registra consumo de água |
+| `PATCH/DELETE` | `/api/v1/patients/{patientId}/water-intakes/{intakeId}` | Edita/remove registro de água |
+| `GET/POST` | `/api/v1/patients/{patientId}/meal-records` | Consulta/registra refeições realizadas |
+| `PATCH/DELETE` | `/api/v1/patients/{patientId}/meal-records/{recordId}` | Edita/remove registro de refeição |
+| `GET/POST` | `/api/v1/patients/{patientId}/weight-records` | Consulta/registra peso |
+| `PATCH/DELETE` | `/api/v1/patients/{patientId}/weight-records/{recordId}` | Edita/remove registro de peso |
+
+O endpoint de água aceita opcionalmente `?date=yyyy-MM-dd`, com a data interpretada em UTC.
 
 ## Executar localmente
 
