@@ -19,4 +19,14 @@ O cadastro impede e-mail ou documento duplicado e guarda a senha com bcrypt. A r
 
 Um convite começa como `PENDENTE` e muda para `ATIVO` ou `RECUSADO`. Só é possível responder uma vez. Após a recusa, o nutricionista pode enviar um novo convite. A checagem do `patientId` na resposta ainda não substitui autenticação.
 
+## Planos alimentares
+
+- `POST` e `GET /api/v1/follow-ups/{followUpId}/meal-plans`: cria um rascunho e lista os planos do acompanhamento.
+- `GET` e `DELETE /api/v1/meal-plans/{planId}`: consulta um plano ou exclui um rascunho.
+- `POST /api/v1/meal-plans/{planId}/activate`: ativa o plano.
+- `POST /api/v1/meal-plans/{planId}/meals`, `PUT` e `DELETE /api/v1/meal-plans/{planId}/meals/{mealId}`: adiciona, altera e remove refeições do rascunho.
+- `POST /api/v1/meal-plans/{planId}/meals/{mealId}/items`, `PUT` e `DELETE /api/v1/meal-plans/{planId}/meals/{mealId}/items/{itemId}`: adiciona, altera e remove itens de texto livre.
+
+O acompanhamento precisa estar ativo para criar ou editar planos. A ativação exige pelo menos três refeições e ao menos um item por refeição. Ao ativar outro plano do mesmo acompanhamento, o anterior deixa de ser ativo. Planos ativos não são editados nesta estrutura; para ajustar, cria-se um novo rascunho.
+
 Os identificadores novos são UUID para seguir as rotas que já existem no backend. O DER enviado pela equipe usa IDs numéricos; a decisão final sobre IDs e banco deve ser fechada antes das migrações da sua parte.
