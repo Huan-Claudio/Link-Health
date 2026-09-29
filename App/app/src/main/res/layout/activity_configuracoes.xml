@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma: "Perfil Paciente" / "Perfil Nutricionista" -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lh_background"
+    android:orientation="vertical"
+    android:padding="@dimen/lh_screen_padding"
+    tools:context=".ui.comum.ConfiguracoesActivity">
+
+    <include layout="@layout/view_header" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Avatar com botão de editar -->
+            <FrameLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/tvAvatar"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:background="@drawable/bg_circle_primary"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    tools:text="JL" />
+
+                <ImageButton
+                    android:id="@+id/btnEditarFoto"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_circle_white"
+                    android:contentDescription="@string/editar_informacoes"
+                    android:padding="6dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/lh_background" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvOlaNome"
+                style="@style/LH.Text.Section"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="14dp"
+                tools:text="Olá, Jorge Luiz" />
+
+            <TextView
+                android:id="@+id/tvPacientesAtivos"
+                style="@style/LH.Text.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
+                tools:text="24 Pacientes ativos"
+                tools:visibility="visible" />
+
+            <TextView
+                style="@style/LH.Text.Section"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/lh_space_l"
+                android:text="@string/dados_pessoais" />
+
+            <include
+                android:id="@+id/opcaoDados"
+                layout="@layout/item_config_opcao" />
+
+            <include
+                android:id="@+id/opcaoEndereco"
+                layout="@layout/item_config_opcao" />
+
+            <TextView
+                style="@style/LH.Text.Section"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/lh_space_l"
+                android:text="@string/preferencias" />
+
+            <include
+                android:id="@+id/opcaoNotificacoes"
+                layout="@layout/item_config_opcao" />
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSair"
+        style="@style/LH.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/lh_space_m"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:text="@string/sair_do_app"
+        android:textSize="12sp"
+        app:backgroundTint="@color/lh_surface"
+        app:icon="@drawable/ic_logout"
+        app:iconSize="18dp"
+        app:iconTint="@color/lh_red"
+        app:strokeColor="@color/lh_border"
+        app:strokeWidth="1dp" />
+</LinearLayout>

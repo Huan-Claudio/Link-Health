@@ -142,4 +142,5 @@
     <string name="notificacoes">Notificações</string>
     <string name="sair_do_app">Sair do app</string>
     <string name="tela_em_breve">Esta tela será adicionada em uma próxima etapa.</string>
+    <string name="email_invalido">Informe um e-mail válido.</string>
 </resources>
