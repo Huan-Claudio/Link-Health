@@ -68,7 +68,7 @@
     <string name="plano_alimentar_de">Plano Alimentar - %1$s</string>
     <string name="adicionar_alimento">+ Adicionar Alimento</string>
     <string name="adicionar_refeicao">+ Adicionar Refeição</string>
-    <string name="hint_alimento">alimento</string>
+    <string name="hint_alimento">Adicione um alimento</string>
     <string name="hint_refeicao">Refeição (00:00)</string>
     <string name="nova_refeicao">Nova refeição</string>
 
@@ -143,4 +143,17 @@
     <string name="sair_do_app">Sair do app</string>
     <string name="tela_em_breve">Esta tela será adicionada em uma próxima etapa.</string>
     <string name="email_invalido">Informe um e-mail válido.</string>
+    <string name="remover">Remover</string>
+    <string name="remover_refeicao">Remover refeição</string>
+    <string name="horario_refeicao">Horário da refeição</string>
+    <string name="refeicao_salva">Refeição salva</string>
+    <string name="lista_compras_salva">Lista de compras salva</string>
+    <string-array name="tipos_refeicao">
+        <item>Café da manhã</item>
+        <item>Colação</item>
+        <item>Almoço</item>
+        <item>Lanche</item>
+        <item>Jantar</item>
+        <item>Ceia</item>
+    </string-array>
 </resources>

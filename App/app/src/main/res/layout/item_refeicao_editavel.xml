@@ -2,33 +2,55 @@
 <!-- Card editável de refeição (tela "Editar Plano Alimentar" do nutricionista) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/LH.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/lh_space_m"
-    android:padding="10dp">
+    android:padding="16dp">
 
+    <!-- Dropdown do tipo de refeição + horário + lixeira -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/etNomeRefeicao"
+        <TextView
+            android:id="@+id/tvTipoRefeicao"
             android:layout_width="wrap_content"
-            android:layout_height="34dp"
+            android:layout_height="36dp"
             android:background="@drawable/bg_input"
-            android:hint="@string/hint_refeicao"
-            android:importantForAutofill="no"
-            android:inputType="textCapSentences"
+            android:clickable="true"
+            android:drawableEnd="@drawable/ic_arrow_drop_down"
+            android:drawablePadding="2dp"
+            android:drawableTint="@color/lh_text_secondary"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
             android:maxLines="1"
-            android:minWidth="140dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:textColor="@color/lh_text_primary"
-            android:textColorHint="@color/lh_text_hint"
-            android:textSize="12sp" />
+            android:minWidth="130dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="4dp"
+            android:textColor="@color/lh_text_secondary"
+            android:textSize="15sp"
+            tools:text="Café da manhã" />
+
+        <TextView
+            android:id="@+id/tvHorario"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_input"
+            android:clickable="true"
+            android:contentDescription="@string/horario_refeicao"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/lh_text_secondary"
+            android:textSize="15sp"
+            tools:text="00:00" />
 
         <View
             android:layout_width="0dp"
@@ -37,11 +59,13 @@
 
         <ImageButton
             android:id="@+id/btnRemoverRefeicao"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="-6dp"
+            android:layout_marginEnd="-6dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/hint_refeicao"
-            android:padding="5dp"
+            android:contentDescription="@string/remover_refeicao"
+            android:padding="3dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_delete"
             app:tint="@color/lh_text_secondary" />
@@ -51,13 +75,14 @@
         android:id="@+id/containerAlimentos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:orientation="vertical" />
 
-    <com.google.android.material.button.MaterialButton
+    <include
         android:id="@+id/btnAdicionarAlimento"
-        style="@style/LH.Button.Small"
-        android:layout_width="match_parent"
-        android:layout_marginTop="4dp"
-        android:text="@string/adicionar_alimento" />
+        layout="@layout/view_botao_adicionar" />
+
+    <include
+        android:id="@+id/btnSalvarRefeicao"
+        layout="@layout/view_botao_salvar" />
 </LinearLayout>

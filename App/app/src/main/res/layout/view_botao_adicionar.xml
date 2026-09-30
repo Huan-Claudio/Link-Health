@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Botão azul "+ Adicionar ..." usado dentro de cards -->
-<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/LH.Button.Small"
+<!-- Botão "+ Adicionar Alimento" com aparência de campo.
+     Usado igual nas telas Editar Plano Alimentar e Editar Lista de Compras. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_marginTop="4dp" />
+    android:layout_height="46dp"
+    android:background="@drawable/bg_input"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center"
+    android:text="@string/adicionar_alimento"
+    android:textColor="@color/lh_text_secondary"
+    android:textSize="15sp"
+    android:textStyle="bold" />
