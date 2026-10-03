@@ -4,6 +4,12 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
 }
 
+// O OneDrive pode bloquear arquivos compilados dentro de build/. Quando o clone
+// estiver nessa pasta, os arquivos temporários do Gradle ficam fora da nuvem.
+if (project.projectDir.absolutePath.contains("\\OneDrive\\", ignoreCase = true)) {
+    layout.buildDirectory.set(file(System.getProperty("java.io.tmpdir") + "link-health-backend-build"))
+}
+
 group = "br.edu.pucgoias"
 version = "0.0.1-SNAPSHOT"
 

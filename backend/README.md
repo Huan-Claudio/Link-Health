@@ -10,6 +10,7 @@ Backend REST do Link Health, separado do aplicativo Android em `App/`.
 - perfil `postgres` preparado por variáveis de ambiente, sem conexão ativada por padrão;
 - lista de compras e produtos recomendados por paciente.
 - registros de água, refeições realizadas e peso por paciente.
+- metadados de fotos de evolução corporal com status pendente de envio.
 
 No perfil `local` (padrão), os dados ficam somente em memória para permitir a integração inicial sem banco. Ao ativar o perfil `postgres`, a API usa PostgreSQL e executa as migrações do Flyway.
 
@@ -36,6 +37,10 @@ As rotas usam o identificador do paciente até que a autenticação e o vínculo
 | `PATCH/DELETE` | `/api/v1/patients/{patientId}/weight-records/{recordId}` | Edita/remove registro de peso |
 
 O endpoint de água aceita opcionalmente `?date=yyyy-MM-dd`, com a data interpretada em UTC.
+
+As fotos de evolução estão na primeira metade da etapa 4: a API registra os
+metadados e devolve o status PENDING_UPLOAD, mas ainda não recebe nem
+armazena o arquivo da imagem.
 
 ## Executar localmente
 
