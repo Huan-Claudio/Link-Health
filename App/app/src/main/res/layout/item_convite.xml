@@ -1,45 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Linha com avatar + nome + botão "+" (convites / busca de paciente) -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Item com avatar + nome + botão "+" (convites do paciente / busca de paciente) -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/LH.CardView"
     android:layout_width="match_parent"
     android:layout_height="56dp"
-    android:layout_marginBottom="@dimen/lh_space_s"
-    android:background="@drawable/bg_card"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp">
+    android:layout_marginBottom="@dimen/lh_space_s">
 
-    <TextView
-        android:id="@+id/tvAvatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/bg_circle_gray"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="10sp"
-        android:textStyle="bold" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
-    <TextView
-        android:id="@+id/tvNome"
-        style="@style/LH.Text.Body"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_weight="1"
-        android:textStyle="bold"
-        tools:text="Dr. Welington" />
+        <TextView
+            android:id="@+id/tvAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_circle_gray"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/btnAdicionar"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:background="@drawable/bg_small_button"
-        android:contentDescription="@string/adicionar_item_lista"
-        android:padding="6dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_add"
-        app:tint="@color/white" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvNome"
+            style="@style/LH.Text.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnAdicionar"
+            app:layout_constraintStart_toEndOf="@id/tvAvatar"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Dr. Welington" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAdicionar"
+            style="@style/LH.IconButton"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:contentDescription="@string/adicionar_item_lista"
+            app:backgroundTint="@color/lh_primary"
+            app:cornerRadius="6dp"
+            app:icon="@drawable/ic_add"
+            app:iconSize="16dp"
+            app:iconTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

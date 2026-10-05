@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Cabeçalho com avatar + "Olá, Nome" (+ subtítulo opcional) -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Cabeçalho com voltar + avatar + "Olá, Nome" (+ subtítulo opcional) -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
     android:paddingTop="8dp"
     android:paddingBottom="16dp">
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnVoltar"
+        style="@style/LH.IconButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="-8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/voltar"
-        android:src="@drawable/ic_arrow_back"
-        app:tint="@color/lh_primary_light" />
+        android:translationX="-8dp"
+        app:icon="@drawable/ic_arrow_back"
+        app:iconSize="24dp"
+        app:iconTint="@color/lh_primary_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvAvatar"
@@ -30,28 +32,34 @@
         android:textColor="@color/white"
         android:textSize="12sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnVoltar"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="JL" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tvOla"
+        style="@style/LH.Text.Section"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        app:layout_constraintBottom_toTopOf="@id/tvSubtitulo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvAvatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Olá, Jorge Luiz" />
 
-        <TextView
-            android:id="@+id/tvOla"
-            style="@style/LH.Text.Section"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Olá, Jorge Luiz" />
-
-        <TextView
-            android:id="@+id/tvSubtitulo"
-            style="@style/LH.Text.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:text="24 Pacientes ativos" />
-    </LinearLayout>
-</LinearLayout>
+    <TextView
+        android:id="@+id/tvSubtitulo"
+        style="@style/LH.Text.Caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvOla"
+        app:layout_constraintTop_toBottomOf="@id/tvOla"
+        tools:text="24 Pacientes ativos"
+        tools:visibility="visible" />
+</androidx.constraintlayout.widget.ConstraintLayout>

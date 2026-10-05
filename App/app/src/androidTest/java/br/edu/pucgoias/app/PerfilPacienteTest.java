@@ -39,7 +39,7 @@ public class PerfilPacienteTest {
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
             onView(withId(R.id.menuEvolucao)).perform(scrollTo(), click());
             onView(withId(R.id.tvTituloHeader)).check(matches(withText(R.string.evolucao_corporal)));
-            onView(withId(R.id.btnTirarFoto)).perform(scrollTo()).check(matches(isDisplayed()));
+            onView(withId(R.id.btnTirarFoto)).check(matches(isDisplayed()));
             onView(withId(R.id.btnVoltar)).perform(click());
             onView(withId(R.id.menuEvolucao)).check(matches(isDisplayed()));
         }

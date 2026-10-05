@@ -2,13 +2,12 @@ package br.edu.pucgoias.app.ui.nutricionista;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -16,69 +15,58 @@ import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.databinding.ActivityHomeNutricionistaBinding;
 import br.edu.pucgoias.app.model.Paciente;
+import br.edu.pucgoias.app.ui.adapter.PacienteAdapter;
 import br.edu.pucgoias.app.ui.comum.ConfiguracoesActivity;
+import br.edu.pucgoias.app.util.Navegacao;
 import br.edu.pucgoias.app.util.TextoAlterado;
 
-/** Figma: "Home Nutricionista" – lista de pacientes com busca. */
+/** Figma: "Home Nutricionista" – lista de pacientes (RecyclerView) com busca. */
 public class HomeNutricionistaActivity extends BaseActivity {
 
-    private LinearLayout container;
-    private TextView tvVazio;
-    private EditText etBusca;
+    private ActivityHomeNutricionistaBinding binding;
+    private PacienteAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_nutricionista);
+        if (sessaoExpirada()) return;
+        binding = ActivityHomeNutricionistaBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        container = findViewById(R.id.container);
-        tvVazio = findViewById(R.id.tvVazio);
-        etBusca = findViewById(R.id.etBusca);
-
-        ((TextView) findViewById(R.id.tvAvatar)).setText("DR.");
-        findViewById(R.id.layoutPerfil).setOnClickListener(v ->
+        binding.tvAvatar.setText("DR.");
+        binding.layoutPerfil.setOnClickListener(v ->
                 startActivity(new Intent(this, ConfiguracoesActivity.class)));
-        findViewById(R.id.btnNovoPaciente).setOnClickListener(v ->
+        binding.btnNovoPaciente.setOnClickListener(v ->
                 startActivity(new Intent(this, BuscarPacienteActivity.class)));
 
-        etBusca.addTextChangedListener(new TextoAlterado(texto -> montarLista()));
+        adapter = new PacienteAdapter(paciente -> startActivity(
+                Navegacao.comPaciente(this, FichaPacienteActivity.class, paciente)));
+        binding.listaPacientes.setLayoutManager(new LinearLayoutManager(this));
+        binding.listaPacientes.setHasFixedSize(true);
+        binding.listaPacientes.setAdapter(adapter);
+
+        binding.etBusca.addTextChangedListener(new TextoAlterado(texto -> filtrar()));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ((TextView) findViewById(R.id.tvOla)).setText(getString(R.string.ola_nome, Sessao.getNomeUsuario()));
-        ((TextView) findViewById(R.id.tvPacientesAtivos))
-                .setText(getString(R.string.pacientes_ativos, MockData.getPacientes().size()));
-        montarLista();
+        // Recarrega ao voltar: o nome ou a lista de pacientes podem ter mudado em outra tela.
+        binding.tvOla.setText(getString(R.string.ola_nome, Sessao.getNomeUsuario()));
+        binding.tvPacientesAtivos.setText(getString(R.string.pacientes_ativos, MockData.getPacientes().size()));
+        filtrar();
     }
 
-    private void montarLista() {
-        container.removeAllViews();
-        String filtro = normalizar(etBusca.getText().toString());
-        List<Paciente> pacientes = MockData.getPacientes();
-        LayoutInflater inflater = LayoutInflater.from(this);
-        int exibidos = 0;
-
-        for (int i = 0; i < pacientes.size(); i++) {
-            Paciente p = pacientes.get(i);
-            if (!filtro.isEmpty() && !normalizar(p.getNome()).contains(filtro)) continue;
-
-            View item = inflater.inflate(R.layout.item_paciente, container, false);
-            ((TextView) item.findViewById(R.id.tvAvatar)).setText(p.getIniciais());
-            ((TextView) item.findViewById(R.id.tvNome)).setText(p.getNome());
-            ((TextView) item.findViewById(R.id.tvObjetivo)).setText(p.getObjetivo());
-            final int indice = i;
-            item.setOnClickListener(v -> {
-                Intent intent = new Intent(this, FichaPacienteActivity.class);
-                intent.putExtra(MockData.EXTRA_PACIENTE, indice);
-                startActivity(intent);
-            });
-            container.addView(item);
-            exibidos++;
+    private void filtrar() {
+        String filtro = normalizar(binding.etBusca.getText().toString());
+        List<Paciente> exibidos = new ArrayList<>();
+        for (Paciente p : MockData.getPacientes()) {
+            if (filtro.isEmpty() || normalizar(p.getNome()).contains(filtro)) exibidos.add(p);
         }
-        tvVazio.setVisibility(exibidos == 0 ? View.VISIBLE : View.GONE);
+        adapter.atualizar(exibidos);
+        binding.tvVazio.setVisibility(exibidos.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     /** Remove acentos e deixa minúsculo para a busca ("José" encontra "jose"). */

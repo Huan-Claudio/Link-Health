@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Linha editável com lixeira (alimento do plano ou item da lista de compras) -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="46dp"
     android:layout_marginBottom="12dp"
     android:background="@drawable/bg_input"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
     android:paddingEnd="10dp">
 
     <EditText
         android:id="@+id/etAlimento"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:layout_height="0dp"
         android:background="@android:color/transparent"
         android:hint="@string/hint_alimento"
         android:importantForAutofill="no"
@@ -24,16 +22,20 @@
         android:paddingEnd="8dp"
         android:textColor="@color/lh_text_secondary"
         android:textColorHint="@color/lh_text_hint"
-        android:textSize="15sp" />
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnRemoverAlimento"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRemoverAlimento"
+        style="@style/LH.IconButton"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/remover"
-        android:padding="4dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_delete"
-        app:tint="@color/lh_text_secondary" />
-</LinearLayout>
+        app:icon="@drawable/ic_delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

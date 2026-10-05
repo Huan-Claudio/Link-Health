@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Card editável de refeição (tela "Editar Plano Alimentar" do nutricionista) -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Card editável de refeição (tela "Editar Plano Alimentar" do nutricionista, item de RecyclerView).
+     Os alimentos ficam numa RecyclerView interna. -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/LH.Card"
+    style="@style/LH.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/lh_space_m"
-    android:padding="16dp">
+    android:layout_marginBottom="@dimen/lh_space_m">
 
-    <!-- Dropdown do tipo de refeição + horário + lixeira -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:padding="16dp">
 
+        <!-- Dropdown do tipo de refeição -->
         <TextView
             android:id="@+id/tvTipoRefeicao"
             android:layout_width="wrap_content"
@@ -33,8 +33,11 @@
             android:paddingEnd="4dp"
             android:textColor="@color/lh_text_secondary"
             android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Café da manhã" />
 
+        <!-- Horário (abre o relógio nativo) -->
         <TextView
             android:id="@+id/tvHorario"
             android:layout_width="wrap_content"
@@ -50,39 +53,52 @@
             android:paddingEnd="12dp"
             android:textColor="@color/lh_text_secondary"
             android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@id/tvTipoRefeicao"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="00:00" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRemoverRefeicao"
+            style="@style/LH.IconButton"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginTop="-6dp"
-            android:layout_marginEnd="-6dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/remover_refeicao"
-            android:padding="3dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_delete"
-            app:tint="@color/lh_text_secondary" />
-    </LinearLayout>
+            android:translationX="6dp"
+            android:translationY="-6dp"
+            app:icon="@drawable/ic_delete"
+            app:iconSize="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/containerAlimentos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:orientation="vertical" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listaAlimentos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTipoRefeicao"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_alimento_editavel" />
 
-    <include
-        android:id="@+id/btnAdicionarAlimento"
-        layout="@layout/view_botao_adicionar" />
+        <include
+            android:id="@+id/btnAdicionarAlimento"
+            layout="@layout/view_botao_adicionar"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/listaAlimentos" />
 
-    <include
-        android:id="@+id/btnSalvarRefeicao"
-        layout="@layout/view_botao_salvar" />
-</LinearLayout>
+        <include
+            android:id="@+id/btnSalvarRefeicao"
+            layout="@layout/view_botao_salvar"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnAdicionarAlimento" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

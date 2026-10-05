@@ -1,5 +1,8 @@
 package br.edu.pucgoias.app;
 
+import org.junit.Before;
+import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.model.Perfil;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
@@ -14,13 +17,19 @@ import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class TelasPacienteTest {
+
+    @Before
+    public void entrarComoPaciente() {
+        Sessao.entrar(Perfil.PACIENTE);
+    }
+
     @Test public void planoAtualizaResumoAoVoltar() {
         MockData.getPacienteLogado().getPlano().forEach(r -> r.setConcluida(false));
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
             onView(withId(R.id.menuPlano)).perform(scrollTo(), click());
             onView(withText(MockData.getPacienteLogado().getPlano().get(0).getTitulo()))
-                    .perform(scrollTo(), click());
-            onView(withId(R.id.btnVoltar)).perform(scrollTo(), click());
+                    .perform(click());
+            onView(withId(R.id.btnVoltar)).perform(click());
             onView(withId(R.id.tvRefeicoesConcluidas)).check(matches(withText(
                     androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
                             .getTargetContext().getString(R.string.refeicoes_concluidas, 1, 4))));
@@ -32,12 +41,12 @@ public class TelasPacienteTest {
         String descricao = MockData.getPacienteLogado().getListaCompras().get(0).getDescricao();
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
             onView(withId(R.id.menuLista)).perform(scrollTo(), click());
-            onView(withText(descricao)).perform(scrollTo(), click());
+            onView(withText(descricao)).perform(click());
             assertTrue(MockData.getPacienteLogado().getListaCompras().get(0).isComprado());
-            onView(withId(R.id.btnVoltar)).perform(scrollTo(), click());
+            onView(withId(R.id.btnVoltar)).perform(click());
             onView(withId(R.id.menuLista)).perform(scrollTo(), click());
             assertTrue(MockData.getPacienteLogado().getListaCompras().get(0).isComprado());
-            onView(withText(descricao)).perform(scrollTo(), click());
+            onView(withText(descricao)).perform(click());
             assertFalse(MockData.getPacienteLogado().getListaCompras().get(0).isComprado());
         }
     }

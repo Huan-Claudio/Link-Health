@@ -1,51 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Figma: "Dietitian dashboard" (nutricionista) – busca de paciente por CPF/e-mail para enviar convite -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lh_background"
-    android:orientation="vertical"
-    android:padding="@dimen/lh_screen_padding"
+    android:paddingStart="@dimen/lh_screen_padding"
+    android:paddingTop="@dimen/lh_screen_padding"
+    android:paddingEnd="@dimen/lh_screen_padding"
     tools:context=".ui.nutricionista.BuscarPacienteActivity">
 
-    <include layout="@layout/view_header_saudacao" />
+    <include
+        android:id="@+id/headerSaudacao"
+        layout="@layout/view_header_saudacao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tvCpfEmail"
         style="@style/LH.Text.Section"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/lh_space_m"
-        android:text="@string/cpf_email" />
+        android:text="@string/cpf_email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerSaudacao" />
 
     <EditText
         android:id="@+id/etBusca"
         style="@style/LH.Input"
+        android:layout_width="0dp"
+        android:layout_marginTop="@dimen/lh_space_m"
         android:drawableStart="@drawable/ic_search"
         android:drawableTint="@color/lh_text_hint"
         android:hint="@string/hint_cpf"
         android:importantForAutofill="no"
-        android:imeOptions="actionSearch" />
+        android:imeOptions="actionSearch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCpfEmail" />
 
     <TextView
         android:id="@+id/tvVazio"
         style="@style/LH.Text.Caption"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/lh_space_m"
         android:text="@string/nenhum_paciente"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etBusca" />
 
-    <ScrollView
-        android:layout_width="match_parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaResultados"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/lh_screen_padding"
         android:layout_marginTop="@dimen/lh_space_m"
-        android:layout_weight="1">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvVazio"
+        tools:listitem="@layout/item_convite" />
 
-        <LinearLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

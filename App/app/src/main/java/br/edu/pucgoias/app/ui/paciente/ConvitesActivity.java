@@ -1,10 +1,9 @@
 package br.edu.pucgoias.app.ui.paciente;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.List;
 
@@ -12,45 +11,45 @@ import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.databinding.ActivityConvitesBinding;
 import br.edu.pucgoias.app.model.Paciente;
+import br.edu.pucgoias.app.ui.adapter.ConviteAdapter;
 
 /** Figma: "Dietitian dashboard" (paciente) – convites de nutricionistas. */
 public class ConvitesActivity extends BaseActivity {
 
-    private LinearLayout container;
-    private TextView tvVazio;
+    private ActivityConvitesBinding binding;
+    private List<String> convites;
+    private ConviteAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_convites);
+        if (sessaoExpirada()) return;
+        binding = ActivityConvitesBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         String nome = Sessao.getNomeUsuario();
-        ((TextView) findViewById(R.id.tvAvatar)).setText(Paciente.iniciais(nome));
-        ((TextView) findViewById(R.id.tvOla)).setText(getString(R.string.ola_nome, nome));
-        findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
+        binding.headerSaudacao.tvAvatar.setText(Paciente.iniciais(nome));
+        binding.headerSaudacao.tvOla.setText(getString(R.string.ola_nome, nome));
+        binding.headerSaudacao.btnVoltar.setOnClickListener(v -> finish());
 
-        container = findViewById(R.id.container);
-        tvVazio = findViewById(R.id.tvVazio);
-        montarLista();
+        convites = MockData.getConvites();
+        adapter = new ConviteAdapter(convites, this::aceitar);
+        binding.listaConvites.setLayoutManager(new LinearLayoutManager(this));
+        binding.listaConvites.setAdapter(adapter);
+        atualizarVazio();
     }
 
-    private void montarLista() {
-        container.removeAllViews();
-        List<String> convites = MockData.getConvites();
-        tvVazio.setVisibility(convites.isEmpty() ? View.VISIBLE : View.GONE);
+    private void aceitar(String nutricionista, int posicao) {
+        // TODO: registrar o aceite do convite no back-end.
+        convites.remove(posicao);
+        adapter.notifyItemRemoved(posicao);
+        toast(getString(R.string.convite_aceito, nutricionista));
+        atualizarVazio();
+    }
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-        for (String nutricionista : convites) {
-            View item = inflater.inflate(R.layout.item_convite, container, false);
-            ((TextView) item.findViewById(R.id.tvNome)).setText(nutricionista);
-            item.findViewById(R.id.btnAdicionar).setOnClickListener(v -> {
-                // TODO: registrar o aceite do convite no back-end.
-                convites.remove(nutricionista);
-                toast(getString(R.string.convite_aceito, nutricionista));
-                montarLista();
-            });
-            container.addView(item);
-        }
+    private void atualizarVazio() {
+        binding.tvVazio.setVisibility(convites.isEmpty() ? View.VISIBLE : View.GONE);
     }
 }

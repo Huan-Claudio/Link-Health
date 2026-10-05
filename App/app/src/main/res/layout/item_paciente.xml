@@ -1,50 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Linha da lista "Meus Pacientes" -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Item da lista "Meus Pacientes" (RecyclerView) -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/LH.CardView"
     android:layout_width="match_parent"
     android:layout_height="60dp"
     android:layout_marginBottom="@dimen/lh_space_s"
-    android:background="@drawable/bg_card"
     android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingStart="10dp"
-    android:paddingEnd="10dp">
+    android:focusable="true">
 
-    <TextView
-        android:id="@+id/tvAvatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/bg_circle_primary"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="10sp"
-        android:textStyle="bold"
-        tools:text="JS" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tvAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_circle_primary"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="JS" />
 
         <TextView
             android:id="@+id/tvNome"
             style="@style/LH.Text.Body"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/tvObjetivo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvAvatar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
             tools:text="João Silva" />
 
         <TextView
             android:id="@+id/tvObjetivo"
             style="@style/LH.Text.Caption"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvNome"
+            app:layout_constraintTop_toBottomOf="@id/tvNome"
             tools:text="Ganho de Massa Muscular" />
-    </LinearLayout>
-</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

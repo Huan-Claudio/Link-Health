@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Campo de texto usado nos diálogos (novo item, meta de água, peso) -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Campo de texto usado nos diálogos (meta de água, peso) -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="24dp"
@@ -10,5 +12,9 @@
     <EditText
         android:id="@+id/etDialog"
         style="@style/LH.Input"
-        android:importantForAutofill="no" />
-</FrameLayout>
+        android:layout_width="0dp"
+        android:importantForAutofill="no"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

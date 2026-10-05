@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Figma: "Home Nutricionista" -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Figma: "Home Nutricionista" – lista de pacientes (RecyclerView) com busca -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lh_background"
-    android:orientation="vertical"
     android:paddingStart="@dimen/lh_screen_padding"
     android:paddingTop="@dimen/lh_screen_padding"
     android:paddingEnd="@dimen/lh_screen_padding"
     tools:context=".ui.nutricionista.HomeNutricionistaActivity">
 
-    <LinearLayout
+    <!-- Cabeçalho clicável: abre o perfil (Configurações) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutPerfil"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
         android:paddingTop="8dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tvAvatar"
@@ -31,85 +32,95 @@
             android:textColor="@color/white"
             android:textSize="12sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="DR." />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvOla"
-                style="@style/LH.Text.Section"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Olá, Dr. Welington" />
-
-            <TextView
-                android:id="@+id/tvPacientesAtivos"
-                style="@style/LH.Text.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="24 Pacientes ativos" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
         <TextView
+            android:id="@+id/tvOla"
             style="@style/LH.Text.Section"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/meus_pacientes" />
+            android:layout_marginStart="12dp"
+            app:layout_constraintBottom_toTopOf="@id/tvPacientesAtivos"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvAvatar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Olá, Dr. Welington" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNovoPaciente"
-            style="@style/LH.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:minWidth="0dp"
-            android:text="@string/novo_paciente"
-            app:cornerRadius="6dp" />
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tvPacientesAtivos"
+            style="@style/LH.Text.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvOla"
+            app:layout_constraintTop_toBottomOf="@id/tvOla"
+            tools:text="24 Pacientes ativos" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/tvMeusPacientes"
+        style="@style/LH.Text.Section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/meus_pacientes"
+        app:layout_constraintBottom_toBottomOf="@id/btnNovoPaciente"
+        app:layout_constraintEnd_toStartOf="@id/btnNovoPaciente"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btnNovoPaciente" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNovoPaciente"
+        style="@style/LH.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:minWidth="0dp"
+        android:text="@string/novo_paciente"
+        app:cornerRadius="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutPerfil" />
 
     <EditText
         android:id="@+id/etBusca"
         style="@style/LH.Input"
+        android:layout_width="0dp"
         android:layout_marginTop="@dimen/lh_space_m"
         android:drawableStart="@drawable/ic_search"
         android:drawableTint="@color/lh_text_hint"
         android:hint="@string/buscar_paciente"
         android:importantForAutofill="no"
-        android:imeOptions="actionSearch" />
+        android:imeOptions="actionSearch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnNovoPaciente" />
 
     <TextView
         android:id="@+id/tvVazio"
         style="@style/LH.Text.Caption"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/lh_space_m"
         android:text="@string/nenhum_paciente"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etBusca" />
 
-    <ScrollView
-        android:layout_width="match_parent"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaPacientes"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/lh_space_m"
-        android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="@dimen/lh_screen_padding">
+        android:paddingBottom="@dimen/lh_screen_padding"
+        android:layout_marginTop="@dimen/lh_space_m"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvVazio"
+        tools:listitem="@layout/item_paciente" />
 
-        <LinearLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

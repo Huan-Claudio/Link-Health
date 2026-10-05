@@ -148,6 +148,9 @@
     <string name="horario_refeicao">Horário da refeição</string>
     <string name="refeicao_salva">Refeição salva</string>
     <string name="lista_compras_salva">Lista de compras salva</string>
+    <string name="paciente_nao_encontrado">Paciente não encontrado.</string>
+    <string name="sessao_expirada">Sua sessão expirou. Entre novamente.</string>
+    <string name="editar_foto">Editar foto</string>
     <string-array name="tipos_refeicao">
         <item>Café da manhã</item>
         <item>Colação</item>

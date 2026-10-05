@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Cabeçalho padrão: seta de voltar + título. Configurado pela BaseActivity#configurarHeader -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
     android:paddingTop="8dp"
     android:paddingBottom="16dp">
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnVoltar"
+        style="@style/LH.IconButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginStart="-8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/voltar"
-        android:src="@drawable/ic_arrow_back"
-        app:tint="@color/lh_primary_light" />
+        android:translationX="-8dp"
+        app:icon="@drawable/ic_arrow_back"
+        app:iconSize="24dp"
+        app:iconTint="@color/lh_primary_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvTituloHeader"
@@ -26,7 +29,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_weight="1"
         android:ellipsize="end"
-        android:maxLines="2" />
-</LinearLayout>
+        android:maxLines="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btnVoltar"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Título da tela" />
+</androidx.constraintlayout.widget.ConstraintLayout>

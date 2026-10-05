@@ -2,188 +2,138 @@ package br.edu.pucgoias.app.ui.nutricionista;
 
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ConcatAdapter;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import java.util.Locale;
-import java.util.Map;
 
 import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
-import br.edu.pucgoias.app.data.MockData;
+import br.edu.pucgoias.app.databinding.ActivityListaSimplesBinding;
 import br.edu.pucgoias.app.model.Paciente;
 import br.edu.pucgoias.app.model.Refeicao;
-import br.edu.pucgoias.app.util.TextoAlterado;
+import br.edu.pucgoias.app.ui.adapter.BotaoAdicionarRefeicaoAdapter;
+import br.edu.pucgoias.app.ui.adapter.RefeicaoEditavelAdapter;
+import br.edu.pucgoias.app.ui.nutricionista.edicao.EdicaoViewModel;
+import br.edu.pucgoias.app.ui.nutricionista.edicao.RascunhoRefeicao;
 
 /**
  * Figma: "Editar Plano Alimentar do paciente".
- * Cada card edita uma cópia da refeição (rascunho); as mudanças só vão para o plano
+ * Cada card edita um rascunho da refeição (guardado no ViewModel); as mudanças só vão para o plano
  * do paciente ao tocar em "Salvar Alterações" daquele card.
  */
-public class EditarPlanoActivity extends BaseActivity {
+public class EditarPlanoActivity extends BaseActivity implements RefeicaoEditavelAdapter.Acoes {
 
-    /** Cópia editável de uma refeição. */
-    private static class Rascunho {
-        String nome;
-        String horario;
-        final List<String> alimentos;
-
-        Rascunho(Refeicao refeicao, String nomePadronizado) {
-            nome = nomePadronizado;
-            horario = refeicao.getHorario();
-            alimentos = new ArrayList<>(refeicao.getAlimentos());
-        }
-    }
-
+    private ActivityListaSimplesBinding binding;
     private Paciente paciente;
-    private LinearLayout container;
+    private EdicaoViewModel viewModel;
+    private RefeicaoEditavelAdapter adapter;
     private String[] tiposRefeicao;
-    private final Map<Refeicao, Rascunho> rascunhos = new HashMap<>();
+    private PopupMenu popupTipo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lista_simples);
+        if (sessaoExpirada()) return;
+        paciente = pacienteDaIntent();
+        if (paciente == null) {
+            fecharPacienteNaoEncontrado();
+            return;
+        }
+        binding = ActivityListaSimplesBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        configurarHeader(binding.header, getString(R.string.plano_alimentar_de, paciente.getNome()));
 
-        paciente = MockData.getPaciente(getIntent().getIntExtra(MockData.EXTRA_PACIENTE, 0));
-        configurarHeader(getString(R.string.plano_alimentar_de, paciente.getNome()));
-        container = findViewById(R.id.container);
         tiposRefeicao = getResources().getStringArray(R.array.tipos_refeicao);
-
-        montarPlano();
-    }
-
-    private void montarPlano() {
-        container.removeAllViews();
-        LayoutInflater inflater = LayoutInflater.from(this);
-
-        for (Refeicao refeicao : paciente.getPlano()) {
-            container.addView(criarCard(inflater, refeicao));
+        viewModel = new ViewModelProvider(this).get(EdicaoViewModel.class);
+        if (viewModel.precisaCarregar()) {
+            for (Refeicao refeicao : paciente.getPlano()) {
+                viewModel.refeicoes.add(new RascunhoRefeicao(refeicao, tiposRefeicao));
+            }
         }
 
-        // "+ Adicionar Refeição" fica logo abaixo do último card.
-        View btnAdicionarRefeicao = inflater.inflate(R.layout.view_botao_adicionar_refeicao, container, false);
-        btnAdicionarRefeicao.setOnClickListener(v -> {
-            // TODO: criar a refeição no back-end.
-            paciente.getPlano().add(new Refeicao(tiposRefeicao[0], "00:00"));
-            montarPlano();
-        });
-        container.addView(btnAdicionarRefeicao);
+        adapter = new RefeicaoEditavelAdapter(viewModel.refeicoes, this);
+        // "+ Adicionar Refeição" fica logo abaixo do último card: é o último item da lista.
+        ConcatAdapter lista = new ConcatAdapter(adapter,
+                new BotaoAdicionarRefeicaoAdapter(v -> adicionarRefeicao()));
+        binding.lista.setLayoutManager(new LinearLayoutManager(this));
+        binding.lista.setAdapter(lista);
     }
 
-    private View criarCard(LayoutInflater inflater, Refeicao refeicao) {
-        Rascunho rascunho = rascunhos.get(refeicao);
-        if (rascunho == null) {
-            rascunho = new Rascunho(refeicao, padronizarTipo(refeicao.getNome()));
-            rascunhos.put(refeicao, rascunho);
-        }
-        final Rascunho r = rascunho;
-        View card = inflater.inflate(R.layout.item_refeicao_editavel, container, false);
+    @Override
+    protected void onDestroy() {
+        if (popupTipo != null) popupTipo.dismiss();
+        super.onDestroy();
+    }
 
-        TextView tvTipo = card.findViewById(R.id.tvTipoRefeicao);
-        tvTipo.setText(r.nome);
-        tvTipo.setOnClickListener(v -> escolherTipo(tvTipo, r));
-
-        TextView tvHorario = card.findViewById(R.id.tvHorario);
-        tvHorario.setText(r.horario);
-        tvHorario.setOnClickListener(v -> escolherHorario(tvHorario, r));
-
-        card.findViewById(R.id.btnRemoverRefeicao).setOnClickListener(v -> {
-            // TODO: remover a refeição no back-end.
-            paciente.getPlano().remove(refeicao);
-            rascunhos.remove(refeicao);
-            montarPlano();
-        });
-
-        LinearLayout containerAlimentos = card.findViewById(R.id.containerAlimentos);
-        montarAlimentos(containerAlimentos, r.alimentos);
-
-        card.findViewById(R.id.btnAdicionarAlimento).setOnClickListener(v -> {
-            r.alimentos.add("");
-            montarAlimentos(containerAlimentos, r.alimentos);
-            // Foca o novo campo para digitar direto.
-            View ultimo = containerAlimentos.getChildAt(containerAlimentos.getChildCount() - 1);
-            ultimo.findViewById(R.id.etAlimento).requestFocus();
-        });
-
-        card.findViewById(R.id.btnSalvarRefeicao).setOnClickListener(v -> salvar(refeicao, r));
-        return card;
+    private void adicionarRefeicao() {
+        // TODO: criar a refeição no back-end.
+        Refeicao nova = new Refeicao(tiposRefeicao[0], "00:00");
+        paciente.getPlano().add(nova);
+        viewModel.refeicoes.add(new RascunhoRefeicao(nova, tiposRefeicao));
+        int posicao = viewModel.refeicoes.size() - 1;
+        adapter.notifyItemInserted(posicao);
+        binding.lista.smoothScrollToPosition(posicao);
     }
 
     /** Dropdown com os tipos de refeição. */
-    private void escolherTipo(TextView tvTipo, Rascunho r) {
-        PopupMenu popup = new PopupMenu(this, tvTipo);
+    @Override
+    public void escolherTipo(int posicao, View ancora) {
+        if (popupTipo != null) popupTipo.dismiss();
+        popupTipo = new PopupMenu(this, ancora);
         for (int i = 0; i < tiposRefeicao.length; i++) {
-            popup.getMenu().add(0, i, i, tiposRefeicao[i]);
+            popupTipo.getMenu().add(0, i, i, tiposRefeicao[i]);
         }
-        popup.setOnMenuItemClickListener(item -> {
-            r.nome = tiposRefeicao[item.getItemId()];
-            tvTipo.setText(r.nome);
+        popupTipo.setOnMenuItemClickListener(item -> {
+            if (posicao < viewModel.refeicoes.size()) {
+                viewModel.refeicoes.get(posicao).nome = tiposRefeicao[item.getItemId()];
+                adapter.notifyItemChanged(posicao);
+            }
             return true;
         });
-        popup.show();
+        popupTipo.show();
     }
 
     /** Relógio nativo do Android (24h) para escolher o horário da refeição. */
-    private void escolherHorario(TextView tvHorario, Rascunho r) {
+    @Override
+    public void escolherHorario(int posicao) {
+        RascunhoRefeicao r = viewModel.refeicoes.get(posicao);
         int hora = 0;
         int minuto = 0;
         try {
             String[] partes = r.horario.split(":");
             hora = Integer.parseInt(partes[0].trim());
             minuto = Integer.parseInt(partes[1].trim());
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException ignorada) {
             // horário inválido: começa em 00:00
         }
-        new TimePickerDialog(this, (view, horaEscolhida, minutoEscolhido) -> {
+        TimePickerDialog relogio = new TimePickerDialog(this, (view, horaEscolhida, minutoEscolhido) -> {
             r.horario = String.format(Locale.ROOT, "%02d:%02d", horaEscolhida, minutoEscolhido);
-            tvHorario.setText(r.horario);
-        }, hora, minuto, true).show();
+            int atual = viewModel.refeicoes.indexOf(r);
+            if (atual >= 0) adapter.notifyItemChanged(atual);
+        }, hora, minuto, true);
+        registrarDialog(relogio);
+        relogio.show();
+    }
+
+    @Override
+    public void remover(int posicao) {
+        // TODO: remover a refeição no back-end.
+        RascunhoRefeicao r = viewModel.refeicoes.remove(posicao);
+        paciente.getPlano().remove(r.original);
+        adapter.notifyItemRemoved(posicao);
     }
 
     /** Aplica o rascunho do card na refeição do paciente. */
-    private void salvar(Refeicao refeicao, Rascunho r) {
+    @Override
+    public void salvar(int posicao) {
         // TODO: salvar a refeição no back-end.
-        refeicao.setNome(r.nome);
-        refeicao.setHorario(r.horario);
-        refeicao.getAlimentos().clear();
-        for (String alimento : r.alimentos) {
-            if (!alimento.trim().isEmpty()) refeicao.getAlimentos().add(alimento.trim());
-        }
-        rascunhos.remove(refeicao);
+        viewModel.refeicoes.get(posicao).aplicar(tiposRefeicao);
+        adapter.notifyItemChanged(posicao);
         toast(R.string.refeicao_salva);
-        montarPlano();
-    }
-
-    /** Usa a grafia da lista de tipos quando o nome bate (ex.: "Café da Manhã" -> "Café da manhã"). */
-    private String padronizarTipo(String nome) {
-        for (String tipo : tiposRefeicao) {
-            if (tipo.equalsIgnoreCase(nome.trim())) return tipo;
-        }
-        return nome;
-    }
-
-    private void montarAlimentos(LinearLayout containerAlimentos, List<String> alimentos) {
-        containerAlimentos.removeAllViews();
-        LayoutInflater inflater = LayoutInflater.from(this);
-        for (int i = 0; i < alimentos.size(); i++) {
-            final int indice = i;
-            View linha = inflater.inflate(R.layout.item_alimento_editavel, containerAlimentos, false);
-            EditText et = linha.findViewById(R.id.etAlimento);
-            et.setText(alimentos.get(i));
-            et.addTextChangedListener(new TextoAlterado(texto -> alimentos.set(indice, texto)));
-            linha.findViewById(R.id.btnRemoverAlimento).setOnClickListener(v -> {
-                alimentos.remove(indice);
-                montarAlimentos(containerAlimentos, alimentos);
-            });
-            containerAlimentos.addView(linha);
-        }
     }
 }

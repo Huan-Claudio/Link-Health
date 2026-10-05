@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Card de refeição da tela "Meu Plano Alimentar" -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Card de refeição da tela "Meu Plano Alimentar" (RecyclerView) -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/LH.Card"
+    style="@style/LH.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/lh_space_m">
+    android:layout_marginBottom="@dimen/lh_space_m"
+    android:clickable="true"
+    android:focusable="true">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:padding="@dimen/lh_card_padding">
 
         <TextView
             android:id="@+id/tvHorario"
@@ -24,28 +26,30 @@
             android:textColor="@color/white"
             android:textSize="11sp"
             android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="08:00 - Café da Manhã" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/ivCheck"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/resumo_de_hoje"
-            android:src="@drawable/bg_circle_unchecked" />
-    </LinearLayout>
+            android:src="@drawable/bg_circle_unchecked"
+            app:layout_constraintBottom_toBottomOf="@id/tvHorario"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvHorario" />
 
-    <TextView
-        android:id="@+id/tvAlimentos"
-        style="@style/LH.Text.Body"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:lineSpacingExtra="6dp"
-        tools:text="• 3 ovos cozidos\n• 2 fatias de pão integral" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvAlimentos"
+            style="@style/LH.Text.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvHorario"
+            tools:text="• 3 ovos cozidos\n• 2 fatias de pão integral" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

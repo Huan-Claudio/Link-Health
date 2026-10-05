@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Botão "+ Adicionar Refeição", logo abaixo dos cards do plano -->
+<!-- Botão "+ Adicionar Refeição": último item da lista do plano (ConcatAdapter) -->
 <com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="@style/LH.Button"
     android:layout_width="match_parent"
     android:layout_height="36dp"

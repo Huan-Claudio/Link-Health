@@ -38,13 +38,21 @@ public final class MockData {
         return pacienteLogado;
     }
 
-    /** Extra usado entre telas para indicar qual paciente abrir (-1 = paciente logado). */
-    public static final String EXTRA_PACIENTE = "extra_paciente";
-
-    /** Retorna o paciente pelo índice na lista do nutricionista, ou o paciente logado se -1. */
-    public static Paciente getPaciente(int indice) {
-        if (indice < 0 || indice >= getPacientes().size()) return getPacienteLogado();
-        return getPacientes().get(indice);
+    /**
+     * Procura um paciente pelo CPF (com ou sem pontuação) entre todos os cadastrados.
+     * Usado pelas telas que recebem o paciente pela Intent. Retorna null se não existir.
+     * TODO: buscar o paciente no back-end.
+     */
+    public static Paciente buscarPorCpf(String cpf) {
+        String digitos = cpf == null ? "" : cpf.replaceAll("\\D", "");
+        if (digitos.isEmpty()) return null;
+        List<Paciente> todos = new ArrayList<>(getPacientes());
+        todos.addAll(getPacientesSemNutricionista());
+        todos.add(getPacienteLogado());
+        for (Paciente p : todos) {
+            if (p.getCpf().replaceAll("\\D", "").equals(digitos)) return p;
+        }
+        return null;
     }
 
     /** Pacientes do nutricionista logado ("Meus Pacientes"). */

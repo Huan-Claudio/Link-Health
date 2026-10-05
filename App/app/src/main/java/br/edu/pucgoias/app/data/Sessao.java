@@ -4,10 +4,12 @@ import br.edu.pucgoias.app.model.Perfil;
 
 /**
  * Guarda quem está logado enquanto o app está aberto.
- * TODO: substituir pela autenticação real (API + MySQL) quando o back-end estiver pronto.
+ * Se o Android encerrar o processo, "logado" volta a ser false e a BaseActivity manda para o login.
+ * TODO: substituir pela autenticação real (API + banco) quando o back-end estiver pronto.
  */
 public final class Sessao {
 
+    private static boolean logado;
     private static Perfil perfil = Perfil.PACIENTE;
     private static String nomeUsuario = MockData.NOME_PACIENTE_LOGADO;
 
@@ -15,6 +17,7 @@ public final class Sessao {
     }
 
     public static void entrar(Perfil novoPerfil) {
+        logado = true;
         perfil = novoPerfil;
         nomeUsuario = novoPerfil == Perfil.NUTRICIONISTA
                 ? MockData.NOME_NUTRICIONISTA
@@ -22,10 +25,12 @@ public final class Sessao {
     }
 
     public static void sair() {
+        logado = false;
         perfil = Perfil.PACIENTE;
         nomeUsuario = MockData.NOME_PACIENTE_LOGADO;
     }
 
+    public static boolean isLogado() { return logado; }
     public static Perfil getPerfil() { return perfil; }
     public static String getNomeUsuario() { return nomeUsuario; }
     public static void setNomeUsuario(String nome) { nomeUsuario = nome; }

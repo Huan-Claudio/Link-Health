@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Card "Resumo de Hoje" (refeições concluídas) -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/LH.Card"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/LH.CardView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/lh_space_m">
+    android:layout_height="wrap_content">
 
-    <TextView
-        style="@style/LH.Text.CardTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/resumo_de_hoje" />
-
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/progressRefeicoes"
-        style="@style/LH.Progress"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp" />
+        android:padding="@dimen/lh_card_padding">
 
-    <TextView
-        android:id="@+id/tvRefeicoesConcluidas"
-        style="@style/LH.Text.Caption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/tvTituloResumo"
+            style="@style/LH.Text.CardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/resumo_de_hoje"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressRefeicoes"
+            style="@style/LH.Progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTituloResumo" />
+
+        <TextView
+            android:id="@+id/tvRefeicoesConcluidas"
+            style="@style/LH.Text.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/progressRefeicoes"
+            tools:text="1 de 4 refeições concluídas" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

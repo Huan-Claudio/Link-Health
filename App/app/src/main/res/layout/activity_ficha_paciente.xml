@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Figma: "Ficha do Paciente (Tela do nutricionista)" -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,61 +8,114 @@
     android:background="@color/lh_background"
     tools:context=".ui.nutricionista.FichaPacienteActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/lh_screen_padding">
+    <ScrollView
+        android:id="@+id/rolagem"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingTop="8dp"
-            android:paddingBottom="12dp">
+            android:padding="@dimen/lh_screen_padding">
 
-            <ImageButton
-                android:id="@+id/btnVoltar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="-8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/voltar"
-                android:src="@drawable/ic_arrow_back"
-                app:tint="@color/lh_primary_light" />
-        </LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVoltar"
+            style="@style/LH.IconButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/voltar"
+            android:translationX="-8dp"
+            app:icon="@drawable/ic_arrow_back"
+            app:iconSize="24dp"
+            app:iconTint="@color/lh_primary_light"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <include
             android:id="@+id/cardObjetivo"
-            layout="@layout/view_header_card" />
+            layout="@layout/view_header_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnVoltar" />
 
         <include
             android:id="@+id/cardResumo"
-            layout="@layout/view_card_resumo" />
+            layout="@layout/view_card_resumo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_m"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardObjetivo" />
 
         <include
             android:id="@+id/cardAgua"
-            layout="@layout/view_card_agua" />
+            layout="@layout/view_card_agua"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_m"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardResumo" />
 
         <include
             android:id="@+id/menuEditarPlano"
-            layout="@layout/item_menu_card" />
+            layout="@layout/item_menu_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_s"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardAgua" />
 
         <include
             android:id="@+id/menuEditarProdutos"
-            layout="@layout/item_menu_card" />
+            layout="@layout/item_menu_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_s"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/menuEditarPlano" />
 
         <include
             android:id="@+id/menuEvolucao"
-            layout="@layout/item_menu_card" />
+            layout="@layout/item_menu_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_s"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/menuEditarProdutos" />
 
         <include
             android:id="@+id/menuEditarLista"
-            layout="@layout/item_menu_card" />
+            layout="@layout/item_menu_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_s"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/menuEvolucao" />
 
         <include
             android:id="@+id/menuRegistros"
-            layout="@layout/item_menu_card" />
-    </LinearLayout>
-</ScrollView>
+            layout="@layout/item_menu_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/lh_space_s"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/menuEditarLista" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

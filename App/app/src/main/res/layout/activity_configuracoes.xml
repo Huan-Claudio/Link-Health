@@ -1,64 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Figma: "Perfil Paciente" / "Perfil Nutricionista" -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/lh_background"
-    android:orientation="vertical"
     android:padding="@dimen/lh_screen_padding"
     tools:context=".ui.comum.ConfiguracoesActivity">
 
-    <include layout="@layout/view_header" />
+    <include
+        android:id="@+id/header"
+        layout="@layout/view_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
-        android:layout_width="match_parent"
+        android:id="@+id/rolagem"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        app:layout_constraintBottom_toTopOf="@id/btnSair"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <!-- Avatar com botão de editar -->
-            <FrameLayout
+            <!-- Avatar com botão de editar foto -->
+            <TextView
+                android:id="@+id/tvAvatar"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_gravity="center_horizontal">
+                android:background="@drawable/bg_circle_primary"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="JL" />
 
-                <TextView
-                    android:id="@+id/tvAvatar"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:background="@drawable/bg_circle_primary"
-                    android:gravity="center"
-                    android:textColor="@color/white"
-                    android:textSize="32sp"
-                    android:textStyle="bold"
-                    tools:text="JL" />
-
-                <ImageButton
-                    android:id="@+id/btnEditarFoto"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_gravity="bottom|end"
-                    android:background="@drawable/bg_circle_white"
-                    android:contentDescription="@string/editar_informacoes"
-                    android:padding="6dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_edit"
-                    app:tint="@color/lh_background" />
-            </FrameLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditarFoto"
+                style="@style/LH.IconButton"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="@string/editar_foto"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="14dp"
+                app:icon="@drawable/ic_edit"
+                app:iconSize="16dp"
+                app:iconTint="@color/lh_background"
+                app:layout_constraintBottom_toBottomOf="@id/tvAvatar"
+                app:layout_constraintEnd_toEndOf="@id/tvAvatar" />
 
             <TextView
                 android:id="@+id/tvOlaNome"
                 style="@style/LH.Text.Section"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="14dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvAvatar"
                 tools:text="Olá, Jorge Luiz" />
 
             <TextView
@@ -66,37 +76,66 @@
                 style="@style/LH.Text.Caption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvOlaNome"
                 tools:text="24 Pacientes ativos"
                 tools:visibility="visible" />
 
             <TextView
+                android:id="@+id/tvSecaoDados"
                 style="@style/LH.Text.Section"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/lh_space_l"
-                android:text="@string/dados_pessoais" />
+                android:text="@string/dados_pessoais"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvPacientesAtivos" />
 
             <include
                 android:id="@+id/opcaoDados"
-                layout="@layout/item_config_opcao" />
+                layout="@layout/item_config_opcao"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="@dimen/lh_space_s"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSecaoDados" />
 
             <include
                 android:id="@+id/opcaoEndereco"
-                layout="@layout/item_config_opcao" />
+                layout="@layout/item_config_opcao"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="@dimen/lh_space_s"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/opcaoDados" />
 
             <TextView
+                android:id="@+id/tvSecaoPreferencias"
                 style="@style/LH.Text.Section"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/lh_space_l"
-                android:text="@string/preferencias" />
+                android:text="@string/preferencias"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/opcaoEndereco" />
 
             <include
                 android:id="@+id/opcaoNotificacoes"
-                layout="@layout/item_config_opcao" />
-        </LinearLayout>
+                layout="@layout/item_config_opcao"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="@dimen/lh_space_s"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvSecaoPreferencias" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
     <com.google.android.material.button.MaterialButton
@@ -104,7 +143,6 @@
         style="@style/LH.Button"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/lh_space_m"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
@@ -114,6 +152,9 @@
         app:icon="@drawable/ic_logout"
         app:iconSize="18dp"
         app:iconTint="@color/lh_red"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:strokeColor="@color/lh_border"
         app:strokeWidth="1dp" />
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
