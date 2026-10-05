@@ -6,8 +6,8 @@ import java.util.UUID;
 /**
  * Metadados de uma foto de evolução corporal.
  *
- * <p>Não contém bytes da imagem. A imagem será enviada e armazenada em uma
- * etapa posterior, depois da definição da estratégia de armazenamento.</p>
+ * <p>Não contém bytes da imagem. Quando a imagem já foi enviada, storageKey
+ * identifica o arquivo no armazenamento interno, sem expor seu caminho pela API.</p>
  */
 public record EvolutionPhotoRecord(
         UUID id,
@@ -17,6 +17,7 @@ public record EvolutionPhotoRecord(
         Instant capturedAt,
         String notes,
         PhotoUploadStatus uploadStatus,
+        String storageKey,
         Instant createdAt,
         Instant updatedAt) {
 }

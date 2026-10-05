@@ -30,6 +30,8 @@ public class EvolutionPhotoRecordEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "upload_status", nullable = false, length = 30)
     private PhotoUploadStatus uploadStatus;
+    @Column(name = "storage_key", length = 255)
+    private String storageKey;
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
     @Column(name = "updated_at", nullable = false)
@@ -46,6 +48,7 @@ public class EvolutionPhotoRecordEntity {
         this.capturedAt = record.capturedAt();
         this.notes = record.notes();
         this.uploadStatus = record.uploadStatus();
+        this.storageKey = record.storageKey();
         this.createdAt = record.createdAt();
         this.updatedAt = record.updatedAt();
     }
@@ -63,6 +66,7 @@ public class EvolutionPhotoRecordEntity {
                 capturedAt,
                 notes,
                 uploadStatus,
+                storageKey,
                 createdAt,
                 updatedAt);
     }

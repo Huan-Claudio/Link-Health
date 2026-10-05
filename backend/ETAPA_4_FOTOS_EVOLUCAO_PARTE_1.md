@@ -36,11 +36,7 @@ Exemplo para criar o registro:
   "notes": "Foto frontal para acompanhamento"
 }
 
-## O que fica para a segunda metade
+## Continuação
 
-- endpoint multipart/form-data para receber a imagem;
-- limite de tamanho e validação do conteúdo real do arquivo;
-- armazenamento seguro dos arquivos e URL protegida de consulta;
-- atualização do status PENDING_UPLOAD após o arquivo ser armazenado;
-- remoção coordenada do arquivo físico e de seus metadados;
-- integração da tela Android com essas rotas.
+A segunda metade foi entregue no documento ETAPA_4_FOTOS_EVOLUCAO_PARTE_2.md.
+Ela acrescenta o envio real do arquivo, consulta e exclusão coordenada.
