@@ -1,16 +1,35 @@
 server:
   port: ${PORT:8080}
+  forward-headers-strategy: framework
   error:
     include-message: never
     include-stacktrace: never
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: link-health-api
   profiles:
     default: local
   jackson:
     default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+link-health:
+  security:
+    enabled: ${LINK_HEALTH_SECURITY_ENABLED:true}
+    api-key: ${LINK_HEALTH_API_KEY:}
+    allowed-origins: ${LINK_HEALTH_ALLOWED_ORIGINS:}
+    require-https: ${LINK_HEALTH_REQUIRE_HTTPS:false}
+    rate-limit-per-minute: ${LINK_HEALTH_RATE_LIMIT_PER_MINUTE:120}
+  photos:
+    storage-directory: ${LINK_HEALTH_PHOTOS_DIRECTORY:${user.home}/AppData/Local/LinkHealth/evolution-photos}
+    max-size-bytes: 5242880
+    encryption-key: ${LINK_HEALTH_PHOTOS_ENCRYPTION_KEY:}
 
 springdoc:
   api-docs:
