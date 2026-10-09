@@ -1,6 +1,6 @@
 # Backend de contas, acompanhamentos e planos
 
-Esta etapa prepara a parte de Victor no mesmo projeto Spring Boot criado por Felipe. As rotas desta entrega ficam disponíveis somente no perfil `local`, com dados em memória. Elas ainda não se conectam ao Android nem ao PostgreSQL.
+Esta etapa prepara a parte de Victor no mesmo projeto Spring Boot criado por Felipe. Contas, login e busca estão disponíveis nos perfis `local` e `postgres`. Acompanhamentos e planos ainda ficam somente no perfil `local`, com dados em memória. A conexão com o Android será feita posteriormente.
 
 ## Contas e perfis
 
@@ -8,7 +8,9 @@ Esta etapa prepara a parte de Victor no mesmo projeto Spring Boot criado por Fel
 - `POST /api/v1/auth/login`: confere e-mail e senha e devolve os dados básicos da conta.
 - `GET /api/v1/patients/search?query=...`: procura pacientes por início de nome, e-mail ou CPF.
 
-O cadastro impede e-mail ou documento duplicado e guarda a senha com bcrypt. A resposta não inclui o hash. O login ainda não gera token ou sessão, e as rotas não têm autorização por usuário. Por isso, esta versão local serve apenas para desenvolvimento com dados de teste.
+O cadastro impede e-mail ou documento duplicado e guarda a senha com bcrypt. A resposta não inclui o hash. No PostgreSQL, a migração V6 cria `user_accounts` para os dados comuns, `patients` para o CPF e `nutritionists` para o registro profissional. Cada perfil usa o UUID da conta como chave e só pode ser ligado a uma conta do tipo correspondente. Conta e perfil são gravados na mesma transação.
+
+O perfil `postgres` usa as variáveis `LINK_HEALTH_DB_URL`, `LINK_HEALTH_DB_USERNAME` e `LINK_HEALTH_DB_PASSWORD` previstas no `.env.example`, além das chaves de segurança existentes. As rotas exigem `X-API-Key`. O login ainda não gera token ou sessão, e a API key não substitui autorização por usuário.
 
 ## Acompanhamentos
 
@@ -31,4 +33,8 @@ Um convite começa como `PENDENTE` e muda para `ATIVO` ou `RECUSADO`. Só é pos
 
 O acompanhamento precisa estar ativo para criar ou editar planos. A ativação exige pelo menos três refeições e ao menos um item por refeição. Ao ativar outro plano do mesmo acompanhamento, o anterior deixa de ser ativo. Planos ativos não são editados nesta estrutura; para ajustar, cria-se um novo rascunho.
 
-Os identificadores novos são UUID para seguir as rotas que já existem no backend. O DER enviado pela equipe usa IDs numéricos; a decisão final sobre IDs e banco deve ser fechada antes das migrações da sua parte.
+Os identificadores novos são UUID para seguir as rotas e tabelas que já existem no backend. Os perfis mantêm a relação 1:1 com a conta prevista no DER; o diagrama deve ser atualizado para representar UUID e os nomes usados nas migrações.
+
+## Verificação da persistência de contas
+
+`PostgresAccountPersistenceTest` só executa quando `LINK_HEALTH_TEST_DB_URL` está definida. Também utiliza `LINK_HEALTH_TEST_DB_USERNAME` e, se necessária, `LINK_HEALTH_TEST_DB_PASSWORD`. Use um banco dedicado a testes: o Spring aplica as migrações Flyway e o teste grava contas fictícias. A verificação cobre os dois perfis, login, busca e rollback quando a gravação do perfil falha. Sem essas variáveis, o teste PostgreSQL é ignorado e os testes locais continuam disponíveis.

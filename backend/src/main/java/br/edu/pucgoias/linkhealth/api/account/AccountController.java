@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Profile("local")
+@Profile({"local", "postgres"})
 @RequestMapping("/api/v1")
 public class AccountController {
     private final UserAccountService service;
