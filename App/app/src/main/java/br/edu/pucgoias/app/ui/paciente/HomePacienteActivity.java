@@ -9,6 +9,8 @@ import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.model.Paciente;
 import br.edu.pucgoias.app.ui.comum.DashboardCards;
+import br.edu.pucgoias.app.ui.comum.ConfiguracoesActivity;
+import br.edu.pucgoias.app.ui.comum.EvolucaoCorporalActivity;
 
 /** Figma: "Home/Dashboard Paciente". */
 public class HomePacienteActivity extends BaseActivity {
@@ -40,11 +42,11 @@ public class HomePacienteActivity extends BaseActivity {
         configurarMenu(R.id.menuConvites, R.drawable.ic_mail, R.string.menu_convites,
                 R.string.menu_convites_desc, v -> startActivity(new Intent(this, ConvitesActivity.class)));
         configurarMenu(R.id.menuEvolucao, R.drawable.ic_camera, R.string.menu_evolucao,
-                R.string.menu_evolucao_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_evolucao_desc, v -> startActivity(new Intent(this, EvolucaoCorporalActivity.class)));
         configurarMenu(R.id.menuLista, R.drawable.ic_bag, R.string.menu_lista,
                 R.string.menu_lista_desc, v -> startActivity(new Intent(this, ListaComprasActivity.class)));
         configurarMenu(R.id.menuPerfil, R.drawable.ic_person, R.string.menu_perfil,
-                R.string.menu_perfil_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_perfil_desc, v -> startActivity(new Intent(this, ConfiguracoesActivity.class)));
     }
 
     @Override

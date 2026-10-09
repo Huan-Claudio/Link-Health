@@ -64,6 +64,14 @@ public class CadastroActivity extends BaseActivity {
         Sessao.entrar(toggle.getPerfil());
         String nome = ((EditText) findViewById(R.id.etNome)).getText().toString().trim();
         Sessao.setNomeUsuario(nome);
+        if (toggle.getPerfil() == Perfil.PACIENTE) {
+            br.edu.pucgoias.app.model.Paciente paciente =
+                    br.edu.pucgoias.app.data.MockData.getPacienteLogado();
+            paciente.setNome(nome);
+            paciente.setEmail(((EditText) findViewById(R.id.etEmail)).getText().toString().trim());
+            paciente.setTelefone(((EditText) findViewById(R.id.etTelefone)).getText().toString().trim());
+            paciente.setDataNascimento(((EditText) findViewById(R.id.etDataNascimento)).getText().toString().trim());
+        }
         Navegacao.abrirHome(this, toggle.getPerfil());
     }
 }

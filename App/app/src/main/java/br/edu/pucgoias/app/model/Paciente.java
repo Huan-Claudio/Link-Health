@@ -9,6 +9,8 @@ public class Paciente {
     private String objetivo;
     private String cpf;
     private String email;
+    private String telefone = "";
+    private String dataNascimento = "";
 
     private double aguaConsumida;
     private double metaAgua = 5.0;
@@ -59,6 +61,10 @@ public class Paciente {
     public String getObjetivo() { return objetivo; }
     public void setObjetivo(String objetivo) { this.objetivo = objetivo; }
     public String getCpf() { return cpf; }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public String getDataNascimento() { return dataNascimento; }
+    public void setDataNascimento(String data) { this.dataNascimento = data; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public double getAguaConsumida() { return aguaConsumida; }

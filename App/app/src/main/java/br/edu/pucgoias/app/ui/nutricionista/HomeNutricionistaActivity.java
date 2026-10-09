@@ -17,6 +17,7 @@ import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.model.Paciente;
+import br.edu.pucgoias.app.ui.comum.ConfiguracoesActivity;
 import br.edu.pucgoias.app.util.TextoAlterado;
 
 /** Figma: "Home Nutricionista" – lista de pacientes com busca. */
@@ -36,8 +37,8 @@ public class HomeNutricionistaActivity extends BaseActivity {
         etBusca = findViewById(R.id.etBusca);
 
         ((TextView) findViewById(R.id.tvAvatar)).setText("DR.");
-        // TODO: abrir Configurações quando a tela for adicionada.
-        findViewById(R.id.layoutPerfil).setOnClickListener(v -> toast(R.string.tela_em_breve));
+        findViewById(R.id.layoutPerfil).setOnClickListener(v ->
+                startActivity(new Intent(this, ConfiguracoesActivity.class)));
         findViewById(R.id.btnNovoPaciente).setOnClickListener(v ->
                 startActivity(new Intent(this, BuscarPacienteActivity.class)));
 

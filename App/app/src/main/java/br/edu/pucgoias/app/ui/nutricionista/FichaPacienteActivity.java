@@ -10,9 +10,9 @@ import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.model.Paciente;
 import br.edu.pucgoias.app.ui.comum.DashboardCards;
+import br.edu.pucgoias.app.ui.comum.EvolucaoCorporalActivity;
 import br.edu.pucgoias.app.util.Formatador;
 
-/** Figma: "Ficha do Paciente (Tela do nutricionista)". */
 public class FichaPacienteActivity extends BaseActivity {
 
     private int indicePaciente;
@@ -31,8 +31,6 @@ public class FichaPacienteActivity extends BaseActivity {
         cardAgua = findViewById(R.id.cardAgua);
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
-        // TODO: abrir Editar Informações quando a tela for adicionada.
-        findViewById(R.id.btnDadosPaciente).setOnClickListener(v -> toast(R.string.tela_em_breve));
 
         // Nutricionista não registra água: ele só ajusta a meta.
         cardAgua.findViewById(R.id.layoutBotoesAgua).setVisibility(View.GONE);
@@ -40,17 +38,16 @@ public class FichaPacienteActivity extends BaseActivity {
         btnEditarMeta.setVisibility(View.VISIBLE);
         btnEditarMeta.setOnClickListener(v -> editarMeta());
 
-        // TODO: trocar os avisos pelas telas quando forem adicionadas.
         configurarMenu(R.id.menuEditarPlano, R.drawable.ic_restaurant, R.string.menu_editar_plano,
                 R.string.menu_editar_plano_desc, v -> abrir(EditarPlanoActivity.class));
         configurarMenu(R.id.menuEditarProdutos, R.drawable.ic_bag, R.string.menu_editar_produtos,
                 R.string.menu_editar_produtos_desc, v -> abrir(EditarProdutosActivity.class));
         configurarMenu(R.id.menuEvolucao, R.drawable.ic_camera, R.string.menu_evolucao,
-                R.string.menu_evolucao_nutri_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_evolucao_nutri_desc, v -> abrir(EvolucaoCorporalActivity.class));
         configurarMenu(R.id.menuEditarLista, R.drawable.ic_cart, R.string.menu_editar_lista,
-                R.string.menu_editar_lista_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_editar_lista_desc, v -> abrir(EditarListaComprasActivity.class));
         configurarMenu(R.id.menuRegistros, R.drawable.ic_assignment, R.string.menu_registros,
-                R.string.menu_registros_desc, v -> toast(R.string.tela_em_breve));
+                R.string.menu_registros_desc, v -> abrir(RegistroDiarioActivity.class));
     }
 
     @Override
