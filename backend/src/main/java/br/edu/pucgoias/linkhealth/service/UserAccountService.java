@@ -75,7 +75,8 @@ public class UserAccountService {
         }
         String digits = text.replaceAll("\\D", "");
         return repository.findByRole(AccountRole.PACIENTE).stream()
-                .filter(account -> account.email().startsWith(text)
+                .filter(account -> account.fullName().toLowerCase(Locale.ROOT).startsWith(text)
+                        || account.email().startsWith(text)
                         || (!digits.isEmpty() && account.document().replaceAll("\\D", "").startsWith(digits)))
                 .toList();
     }

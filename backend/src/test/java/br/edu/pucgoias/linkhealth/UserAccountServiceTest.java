@@ -42,7 +42,7 @@ class UserAccountServiceTest {
     }
 
     @Test
-    void searchesOnlyPatientsByEmailOrCpf() {
+    void searchesOnlyPatientsByNameEmailOrCpf() {
         service.register("Maria Silva", null, "maria@exemplo.com", null,
                 "123.456.789-00", "senha1234", AccountRole.PACIENTE);
         service.register("Nutricionista Ana", null, "ana@exemplo.com", null,
@@ -50,6 +50,7 @@ class UserAccountServiceTest {
 
         assertEquals(1, service.searchPatients("123456").size());
         assertEquals(1, service.searchPatients("maria@").size());
+        assertEquals(1, service.searchPatients("MARIA").size());
         assertEquals(0, service.searchPatients("ana@").size());
     }
 }
