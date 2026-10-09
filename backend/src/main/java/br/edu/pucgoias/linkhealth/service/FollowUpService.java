@@ -32,7 +32,7 @@ public class FollowUpService {
         }
         boolean existing = repository.findByNutritionistId(nutritionistId).stream()
                 .anyMatch(item -> item.patientId().equals(patientId)
-                        && item.status() != FollowUpStatus.RECUSADO);
+                        && (item.status() == FollowUpStatus.PENDENTE || item.status() == FollowUpStatus.ATIVO));
         if (existing) {
             throw new InvalidRequestException("Já existe um convite ou acompanhamento para este paciente.");
         }
@@ -54,6 +54,33 @@ public class FollowUpService {
         return repository.save(new FollowUp(current.id(), current.nutritionistId(), current.patientId(),
                 accept ? FollowUpStatus.ATIVO : FollowUpStatus.RECUSADO,
                 current.objective(), current.waterGoalMl(), current.invitedAt()));
+    }
+
+    public synchronized FollowUp updateDetails(UUID followUpId, UUID nutritionistId,
+            String objective, Integer waterGoalMl) {
+        FollowUp current = requireActiveNutritionist(followUpId, nutritionistId);
+        if (waterGoalMl != null && waterGoalMl <= 0) {
+            throw new InvalidRequestException("A meta de água deve ser maior que zero.");
+        }
+        return repository.save(new FollowUp(current.id(), current.nutritionistId(), current.patientId(),
+                current.status(), objective == null ? null : objective.trim(), waterGoalMl, current.invitedAt()));
+    }
+
+    public synchronized FollowUp deactivate(UUID followUpId, UUID nutritionistId) {
+        FollowUp current = requireActiveNutritionist(followUpId, nutritionistId);
+        return repository.save(new FollowUp(current.id(), current.nutritionistId(), current.patientId(),
+                FollowUpStatus.INATIVO, current.objective(), current.waterGoalMl(), current.invitedAt()));
+    }
+
+    private FollowUp requireActiveNutritionist(UUID followUpId, UUID nutritionistId) {
+        FollowUp current = find(followUpId);
+        if (!current.nutritionistId().equals(nutritionistId)) {
+            throw new InvalidRequestException("O acompanhamento não pertence a este nutricionista.");
+        }
+        if (current.status() != FollowUpStatus.ATIVO) {
+            throw new InvalidRequestException("É necessário um acompanhamento ativo.");
+        }
+        return current;
     }
 
     public FollowUp find(UUID id) {

@@ -45,4 +45,30 @@ class FollowUpServiceTest {
         assertEquals(FollowUpStatus.PENDENTE,
                 service.invite(nutritionistId, patientId, null, null).status());
     }
+
+    @Test
+    void updatesAndDeactivatesOnlyTheNutritionistsActiveFollowUp() {
+        FollowUp invitation = service.invite(nutritionistId, patientId, null, null);
+        UUID otherNutritionistId = accounts.register("Beatriz", null, "bia@exemplo.com", null,
+                "CRN-456", "senha1234", AccountRole.NUTRICIONISTA).id();
+
+        assertThrows(InvalidRequestException.class,
+                () -> service.updateDetails(invitation.id(), nutritionistId, "Novo objetivo", 1800));
+        service.respond(invitation.id(), patientId, true);
+        assertThrows(InvalidRequestException.class,
+                () -> service.updateDetails(invitation.id(), otherNutritionistId, "Novo objetivo", 1800));
+        assertThrows(InvalidRequestException.class,
+                () -> service.updateDetails(invitation.id(), nutritionistId, "Novo objetivo", -1));
+
+        FollowUp updated = service.updateDetails(invitation.id(), nutritionistId, " Novo objetivo ", 1800);
+        assertEquals("Novo objetivo", updated.objective());
+        assertEquals(1800, updated.waterGoalMl());
+        assertThrows(InvalidRequestException.class,
+                () -> service.deactivate(invitation.id(), otherNutritionistId));
+        assertEquals(FollowUpStatus.INATIVO, service.deactivate(invitation.id(), nutritionistId).status());
+        assertThrows(InvalidRequestException.class,
+                () -> service.updateDetails(invitation.id(), nutritionistId, "Outra meta", 2000));
+        assertEquals(FollowUpStatus.PENDENTE,
+                service.invite(nutritionistId, patientId, null, null).status());
+    }
 }

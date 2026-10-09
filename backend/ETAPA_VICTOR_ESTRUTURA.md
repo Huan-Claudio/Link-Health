@@ -6,7 +6,7 @@ Esta etapa prepara a parte de Victor no mesmo projeto Spring Boot criado por Fel
 
 - `POST /api/v1/auth/register`: cria uma conta de `PACIENTE` ou `NUTRICIONISTA` com nome, e-mail, documento e senha. Data de nascimento e telefone são opcionais nesta estrutura.
 - `POST /api/v1/auth/login`: confere e-mail e senha e devolve os dados básicos da conta.
-- `GET /api/v1/patients/search?query=...`: procura pacientes por início de e-mail ou CPF.
+- `GET /api/v1/patients/search?query=...`: procura pacientes por início de nome, e-mail ou CPF.
 
 O cadastro impede e-mail ou documento duplicado e guarda a senha com bcrypt. A resposta não inclui o hash. O login ainda não gera token ou sessão, e as rotas não têm autorização por usuário. Por isso, esta versão local serve apenas para desenvolvimento com dados de teste.
 
@@ -14,10 +14,12 @@ O cadastro impede e-mail ou documento duplicado e guarda a senha com bcrypt. A r
 
 - `POST /api/v1/follow-ups`: envia convite do nutricionista para o paciente.
 - `POST /api/v1/follow-ups/{id}/response`: paciente aceita ou recusa com `patientId` e `accept`.
+- `PATCH /api/v1/follow-ups/{id}`: nutricionista altera objetivo e meta de água de um acompanhamento ativo.
+- `POST /api/v1/follow-ups/{id}/deactivate`: nutricionista encerra um acompanhamento ativo.
 - `GET /api/v1/nutritionists/{id}/follow-ups`: lista convites e acompanhamentos do nutricionista.
 - `GET /api/v1/patients/{id}/follow-ups`: lista convites e acompanhamentos do paciente.
 
-Um convite começa como `PENDENTE` e muda para `ATIVO` ou `RECUSADO`. Só é possível responder uma vez. Após a recusa, o nutricionista pode enviar um novo convite. A checagem do `patientId` na resposta ainda não substitui autenticação.
+Um convite começa como `PENDENTE` e muda para `ATIVO` ou `RECUSADO`. Só é possível responder uma vez. Um vínculo ativo pode mudar para `INATIVO`. Após recusa ou inativação, o nutricionista pode enviar um novo convite. A checagem dos IDs enviados nas requisições ainda não substitui autenticação individual.
 
 ## Planos alimentares
 
