@@ -11,5 +11,11 @@ public interface MealPlanRepository {
 
     MealPlan save(MealPlan plan);
 
+    default MealPlan activate(MealPlan plan) {
+        findByFollowUpId(plan.followUpId()).stream().filter(MealPlan::active)
+                .forEach(current -> save(new MealPlan(current.id(), current.followUpId(), false, current.meals())));
+        return save(plan);
+    }
+
     void deleteById(UUID id);
 }

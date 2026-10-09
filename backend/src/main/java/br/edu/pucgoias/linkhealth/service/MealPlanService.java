@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("local")
+@Profile({"local", "postgres"})
 public class MealPlanService {
     private final MealPlanRepository repository;
     private final FollowUpService followUps;
@@ -91,11 +91,7 @@ public class MealPlanService {
         if (plan.meals().size() < 3 || plan.meals().stream().anyMatch(meal -> meal.items().isEmpty())) {
             throw new InvalidRequestException("O plano precisa de três refeições, cada uma com pelo menos um item.");
         }
-        repository.findByFollowUpId(plan.followUpId()).stream()
-                .filter(MealPlan::active)
-                .forEach(current -> repository.save(new MealPlan(current.id(), current.followUpId(), false,
-                        current.meals())));
-        return repository.save(new MealPlan(plan.id(), plan.followUpId(), true, plan.meals()));
+        return repository.activate(new MealPlan(plan.id(), plan.followUpId(), true, plan.meals()));
     }
 
     public synchronized void deleteDraft(UUID planId) {
