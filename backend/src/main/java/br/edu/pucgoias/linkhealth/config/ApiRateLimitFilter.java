@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -54,14 +55,14 @@ public class ApiRateLimitFilter extends OncePerRequestFilter {
             counters.entrySet().removeIf(entry -> now - entry.getValue().startedAtMillis() >= WINDOW_MILLIS);
         }
         if (counter.requestCount() > maximumRequests) {
-            response.setStatus(HttpServletResponse.SC_TOO_MANY_REQUESTS);
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
             response.setHeader("Cache-Control", "no-store");
             response.setHeader("Retry-After", "60");
             objectMapper.writeValue(response.getOutputStream(), Map.of(
                     "timestamp", Instant.now().toString(),
-                    "status", HttpServletResponse.SC_TOO_MANY_REQUESTS,
+                    "status", HttpStatus.TOO_MANY_REQUESTS.value(),
                     "code", "RATE_LIMITED",
                     "message", "Muitas requisições. Tente novamente em breve.",
                     "path", request.getRequestURI()));
