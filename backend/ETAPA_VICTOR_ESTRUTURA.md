@@ -1,6 +1,6 @@
 # Backend de contas, acompanhamentos e planos
 
-Esta etapa prepara a parte de Victor no mesmo projeto Spring Boot criado por Felipe. Contas, login e busca estão disponíveis nos perfis `local` e `postgres`. Acompanhamentos e planos ainda ficam somente no perfil `local`, com dados em memória. A conexão com o Android será feita posteriormente.
+Esta etapa prepara a parte de Victor no mesmo projeto Spring Boot criado por Felipe. Contas, login, busca e acompanhamentos estão disponíveis nos perfis `local` e `postgres`. Planos ainda ficam somente no perfil `local`, com dados em memória. A conexão com o Android será feita posteriormente.
 
 ## Contas e perfis
 
@@ -23,6 +23,8 @@ O perfil `postgres` usa as variáveis `LINK_HEALTH_DB_URL`, `LINK_HEALTH_DB_USER
 
 Um convite começa como `PENDENTE` e muda para `ATIVO` ou `RECUSADO`. Só é possível responder uma vez. Um vínculo ativo pode mudar para `INATIVO`. Após recusa ou inativação, o nutricionista pode enviar um novo convite. A checagem dos IDs enviados nas requisições ainda não substitui autenticação individual.
 
+A migração V7 cria `follow_ups` com referências aos perfis de paciente e nutricionista da V6. O banco permite somente um convite pendente ou vínculo ativo para o mesmo par, preservando os anteriores recusados ou inativos. A meta de água deve ser positiva quando informada, e o objetivo aceita até 100 caracteres, conforme o DER. A listagem PostgreSQL segue a ordem de envio dos convites.
+
 ## Planos alimentares
 
 - `POST` e `GET /api/v1/follow-ups/{followUpId}/meal-plans`: cria um rascunho e lista os planos do acompanhamento.
@@ -38,3 +40,5 @@ Os identificadores novos são UUID para seguir as rotas e tabelas que já existe
 ## Verificação da persistência de contas
 
 `PostgresAccountPersistenceTest` só executa quando `LINK_HEALTH_TEST_DB_URL` está definida. Também utiliza `LINK_HEALTH_TEST_DB_USERNAME` e, se necessária, `LINK_HEALTH_TEST_DB_PASSWORD`. Use um banco dedicado a testes: o Spring aplica as migrações Flyway e o teste grava contas fictícias. A verificação cobre os dois perfis, login, busca e rollback quando a gravação do perfil falha. Sem essas variáveis, o teste PostgreSQL é ignorado e os testes locais continuam disponíveis.
+
+`PostgresFollowUpPersistenceTest` usa a mesma configuração de teste e verifica o fluxo de convite, aceite, edição, inativação, recusa e novo convite pelas rotas. Também confere as restrições do banco para perfis incorretos, paciente inexistente, meta inválida e duplicidade de vínculo aberto.

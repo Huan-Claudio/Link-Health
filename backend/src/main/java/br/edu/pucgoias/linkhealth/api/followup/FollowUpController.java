@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Profile("local")
+@Profile({"local", "postgres"})
 @RequestMapping("/api/v1")
 public class FollowUpController {
     private final FollowUpService service;

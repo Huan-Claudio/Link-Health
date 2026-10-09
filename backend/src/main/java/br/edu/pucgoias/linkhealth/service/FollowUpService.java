@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
-@Profile("local")
+@Profile({"local", "postgres"})
 public class FollowUpService {
     private final FollowUpRepository repository;
     private final UserAccountService accounts;
@@ -40,7 +40,7 @@ public class FollowUpService {
             throw new InvalidRequestException("A meta de água deve ser maior que zero.");
         }
         return repository.save(new FollowUp(UUID.randomUUID(), nutritionistId, patientId,
-                FollowUpStatus.PENDENTE, objective == null ? null : objective.trim(), waterGoalMl, Instant.now()));
+                FollowUpStatus.PENDENTE, normalizeObjective(objective), waterGoalMl, Instant.now()));
     }
 
     public synchronized FollowUp respond(UUID followUpId, UUID patientId, boolean accept) {
@@ -63,13 +63,24 @@ public class FollowUpService {
             throw new InvalidRequestException("A meta de água deve ser maior que zero.");
         }
         return repository.save(new FollowUp(current.id(), current.nutritionistId(), current.patientId(),
-                current.status(), objective == null ? null : objective.trim(), waterGoalMl, current.invitedAt()));
+                current.status(), normalizeObjective(objective), waterGoalMl, current.invitedAt()));
     }
 
     public synchronized FollowUp deactivate(UUID followUpId, UUID nutritionistId) {
         FollowUp current = requireActiveNutritionist(followUpId, nutritionistId);
         return repository.save(new FollowUp(current.id(), current.nutritionistId(), current.patientId(),
                 FollowUpStatus.INATIVO, current.objective(), current.waterGoalMl(), current.invitedAt()));
+    }
+
+    private String normalizeObjective(String objective) {
+        if (objective == null) {
+            return null;
+        }
+        String text = objective.trim();
+        if (text.length() > 100) {
+            throw new InvalidRequestException("O objetivo deve ter no máximo 100 caracteres.");
+        }
+        return text;
     }
 
     private FollowUp requireActiveNutritionist(UUID followUpId, UUID nutritionistId) {
