@@ -11,7 +11,9 @@ spring:
   application:
     name: link-health-api
   profiles:
-    default: local
+    # Desenvolvimento local usa o PostgreSQL configurado em backend/.env.
+    # Para executar sem banco, defina SPRING_PROFILES_ACTIVE=local no terminal.
+    default: postgres
   jackson:
     default-property-inclusion: non_null
   servlet:

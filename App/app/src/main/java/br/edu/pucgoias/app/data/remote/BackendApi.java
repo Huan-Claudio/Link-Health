@@ -1,5 +1,7 @@
 package br.edu.pucgoias.app.data.remote;
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import org.json.JSONException;
@@ -20,6 +22,8 @@ import br.edu.pucgoias.app.BuildConfig;
 
 /** Cliente HTTP único da etapa 1. A chave privada do servidor não é enviada nem armazenada no APK. */
 final class BackendApi {
+
+    private static final String LOG_TAG = "LinkHealthApi";
 
     interface Callback {
         void onSuccess(String body);
@@ -76,6 +80,7 @@ final class BackendApi {
                 }
                 callback.onSuccess(response);
             } catch (IOException exception) {
+                Log.e(LOG_TAG, "Falha na chamada " + method + " " + path, exception);
                 callback.onError("Não foi possível conectar ao servidor. Verifique se a API está em execução.");
             } finally {
                 if (connection != null) connection.disconnect();

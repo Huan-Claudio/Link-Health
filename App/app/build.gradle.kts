@@ -2,6 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// Evita que arquivos temporários do Gradle fiquem bloqueados pela sincronização do OneDrive.
+buildDir = File(
+    System.getenv("LOCALAPPDATA") ?: System.getProperty("java.io.tmpdir"),
+    "LinkHealth-Android-Build/${project.name}"
+)
+
 android {
     namespace = "br.edu.pucgoias.app"
     compileSdk {
@@ -20,8 +26,9 @@ android {
 
     buildTypes {
         debug {
-            // Endereço especial do emulador Android para acessar a API executada no computador.
-            buildConfigField("String", "BACKEND_BASE_URL", "\"http://10.0.2.2:8080\"")
+            // IP local deste computador para o emulador durante o desenvolvimento.
+            // A configuração é exclusiva do build debug; a versão publicada usa HTTPS.
+            buildConfigField("String", "BACKEND_BASE_URL", "\"http://192.168.1.95:8080\"")
         }
         release {
             optimization {
