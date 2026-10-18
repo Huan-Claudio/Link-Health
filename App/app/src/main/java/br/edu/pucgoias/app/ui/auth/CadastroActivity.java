@@ -2,14 +2,15 @@ package br.edu.pucgoias.app.ui.auth;
 
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Patterns;
 import android.widget.EditText;
 
 import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
-import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.data.remote.AccountApi;
+import br.edu.pucgoias.app.data.remote.AccountSession;
 import br.edu.pucgoias.app.databinding.ActivityCadastroBinding;
-import br.edu.pucgoias.app.model.Paciente;
 import br.edu.pucgoias.app.model.Perfil;
 import br.edu.pucgoias.app.util.Formatador;
 import br.edu.pucgoias.app.util.Navegacao;
@@ -23,6 +24,7 @@ public class CadastroActivity extends BaseActivity {
 
     private ActivityCadastroBinding binding;
     private PerfilToggle toggle;
+    private final AccountApi accountApi = new AccountApi();
 
     @Override
     protected boolean exigeSessao() {
@@ -74,18 +76,51 @@ public class CadastroActivity extends BaseActivity {
         }
         if (!valido) return;
 
-        // TODO: enviar o cadastro para o back-end.
-        toast(R.string.cadastro_sucesso);
-        Sessao.entrar(toggle.getPerfil());
         String nome = binding.etNome.getText().toString().trim();
-        Sessao.setNomeUsuario(nome);
-        if (toggle.getPerfil() == Perfil.PACIENTE) {
-            Paciente paciente = MockData.getPacienteLogado();
-            paciente.setNome(nome);
-            paciente.setEmail(binding.etEmail.getText().toString().trim());
-            paciente.setTelefone(binding.etTelefone.getText().toString().trim());
-            paciente.setDataNascimento(binding.etDataNascimento.getText().toString().trim());
+        String email = binding.etEmail.getText().toString().trim();
+        String senha = binding.etSenha.getText().toString();
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.etEmail.setError(getString(R.string.email_invalido));
+            return;
         }
-        Navegacao.abrirHome(this, toggle.getPerfil());
+        if (senha.length() < 8) {
+            binding.etSenha.setError(getString(R.string.senha_minima));
+            return;
+        }
+
+        setEnviando(true);
+        accountApi.register(new AccountApi.RegisterData(
+                nome,
+                binding.etDataNascimento.getText().toString().trim(),
+                email,
+                binding.etTelefone.getText().toString().trim(),
+                binding.etDocumento.getText().toString().trim(),
+                senha,
+                toggle.getPerfil()), new AccountApi.Callback() {
+            @Override
+            public void onSuccess(AccountSession session) {
+                runOnUiThread(() -> concluirCadastro(session));
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    setEnviando(false);
+                    toast(message);
+                });
+            }
+        });
+    }
+
+    private void concluirCadastro(AccountSession session) {
+        if (isFinishing() || isDestroyed()) return;
+        Sessao.entrar(session);
+        toast(R.string.cadastro_sucesso);
+        Navegacao.abrirHome(this, session.getPerfil());
+    }
+
+    private void setEnviando(boolean enviando) {
+        binding.btnFinalizar.setEnabled(!enviando);
+        binding.btnFinalizar.setText(enviando ? R.string.aguarde : R.string.finalizar_cadastro);
     }
 }

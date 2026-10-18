@@ -29,10 +29,13 @@ public class SecurityConfig {
             HttpSecurity http,
             LinkHealthSecurityProperties properties,
             ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
+            MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter,
             ApiRateLimitFilter apiRateLimitFilter,
             ApiKeyAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
@@ -59,8 +62,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/mobile-session")
+                        .permitAll()
+                        .requestMatchers("/api/v1/patients/*/shopping-items", "/api/v1/patients/*/shopping-items/**")
+                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
+                        .anyRequest().hasAuthority("ROLE_API_CLIENT"))
                 .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(mobileTokenAuthenticationFilter, ApiKeyAuthenticationFilter.class)
                 .addFilterBefore(apiRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -68,6 +76,11 @@ public class SecurityConfig {
     @Bean
     ApiKeyAuthenticationFilter apiKeyAuthenticationFilter(LinkHealthSecurityProperties properties) {
         return new ApiKeyAuthenticationFilter(properties);
+    }
+
+    @Bean
+    MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter(MobileSessionService sessions) {
+        return new MobileTokenAuthenticationFilter(sessions);
     }
 
     @Bean
@@ -87,7 +100,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(properties.getAllowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
-        configuration.setAllowedHeaders(List.of("Content-Type", "X-API-Key"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "X-API-Key", "Authorization"));
         configuration.setExposedHeaders(List.of("Content-Disposition"));
         configuration.setAllowCredentials(false);
         configuration.setMaxAge(3600L);

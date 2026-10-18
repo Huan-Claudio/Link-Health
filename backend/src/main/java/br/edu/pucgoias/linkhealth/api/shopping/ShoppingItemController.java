@@ -2,6 +2,7 @@ package br.edu.pucgoias.linkhealth.api.shopping;
 
 import br.edu.pucgoias.linkhealth.domain.ShoppingItem;
 import br.edu.pucgoias.linkhealth.service.ShoppingItemService;
+import br.edu.pucgoias.linkhealth.service.PatientAccessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,14 +26,17 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ShoppingItemController {
 
     private final ShoppingItemService service;
+    private final PatientAccessService access;
 
-    public ShoppingItemController(ShoppingItemService service) {
+    public ShoppingItemController(ShoppingItemService service, PatientAccessService access) {
         this.service = service;
+        this.access = access;
     }
 
     @GetMapping
     @Operation(summary = "Lista os itens de compra de um paciente")
     public List<ShoppingItemResponse> list(@PathVariable UUID patientId) {
+        access.ensureCanAccess(patientId);
         return service.list(patientId).stream().map(ShoppingItemResponse::from).toList();
     }
 
@@ -41,6 +45,7 @@ public class ShoppingItemController {
     public ResponseEntity<ShoppingItemResponse> create(
             @PathVariable UUID patientId,
             @Valid @RequestBody CreateShoppingItemRequest request) {
+        access.ensureCanAccess(patientId);
         ShoppingItem item = service.create(patientId, request.name(), request.quantity(), request.unit());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{itemId}")
@@ -55,6 +60,7 @@ public class ShoppingItemController {
             @PathVariable UUID patientId,
             @PathVariable UUID itemId,
             @Valid @RequestBody UpdateShoppingItemRequest request) {
+        access.ensureCanAccess(patientId);
         return ShoppingItemResponse.from(service.update(
                 patientId, itemId, request.name(), request.quantity(), request.unit()));
     }
@@ -65,12 +71,14 @@ public class ShoppingItemController {
             @PathVariable UUID patientId,
             @PathVariable UUID itemId,
             @RequestBody PurchaseStatusRequest request) {
+        access.ensureCanAccess(patientId);
         return ShoppingItemResponse.from(service.updatePurchaseStatus(patientId, itemId, request.purchased()));
     }
 
     @DeleteMapping("/{itemId}")
     @Operation(summary = "Remove um item da lista de compras")
     public ResponseEntity<Void> delete(@PathVariable UUID patientId, @PathVariable UUID itemId) {
+        access.ensureCanAccess(patientId);
         service.delete(patientId, itemId);
         return ResponseEntity.noContent().build();
     }

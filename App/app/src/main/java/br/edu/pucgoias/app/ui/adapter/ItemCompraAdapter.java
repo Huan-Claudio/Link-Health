@@ -15,10 +15,20 @@ import br.edu.pucgoias.app.util.IconeCheck;
 /** Itens da lista de compras do paciente: tocar no item marca/desmarca como comprado. */
 public class ItemCompraAdapter extends RecyclerView.Adapter<ItemCompraAdapter.ViewHolder> {
 
+    public interface OnPurchaseClick {
+        void onPurchaseClick(ItemCompra item, int position);
+    }
+
     private final List<ItemCompra> itens;
+    private final OnPurchaseClick onPurchaseClick;
 
     public ItemCompraAdapter(List<ItemCompra> itens) {
+        this(itens, null);
+    }
+
+    public ItemCompraAdapter(List<ItemCompra> itens, OnPurchaseClick onPurchaseClick) {
         this.itens = itens;
+        this.onPurchaseClick = onPurchaseClick;
     }
 
     @NonNull
@@ -31,8 +41,13 @@ public class ItemCompraAdapter extends RecyclerView.Adapter<ItemCompraAdapter.Vi
             int posicao = holder.getBindingAdapterPosition();
             if (posicao == RecyclerView.NO_POSITION) return;
             ItemCompra item = itens.get(posicao);
-            item.setComprado(!item.isComprado());
-            notifyItemChanged(posicao);
+            if (onPurchaseClick != null) {
+                onPurchaseClick.onPurchaseClick(item, posicao);
+            } else {
+                // Mantém o comportamento local das telas que ainda não fazem parte desta etapa.
+                item.setComprado(!item.isComprado());
+                notifyItemChanged(posicao);
+            }
         });
         return holder;
     }

@@ -1,5 +1,6 @@
 package br.edu.pucgoias.linkhealth.api.account;
 
+import br.edu.pucgoias.linkhealth.config.MobileSessionService;
 import br.edu.pucgoias.linkhealth.domain.UserAccount;
 import br.edu.pucgoias.linkhealth.service.UserAccountService;
 import jakarta.validation.Valid;
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class AccountController {
     private final UserAccountService service;
+    private final MobileSessionService mobileSessions;
 
-    public AccountController(UserAccountService service) {
+    public AccountController(UserAccountService service, MobileSessionService mobileSessions) {
         this.service = service;
+        this.mobileSessions = mobileSessions;
     }
 
     @PostMapping("/auth/register")
@@ -34,6 +37,13 @@ public class AccountController {
     @PostMapping("/auth/login")
     public AccountResponse login(@Valid @RequestBody LoginRequest request) {
         return AccountResponse.from(service.checkCredentials(request.email(), request.password()));
+    }
+
+    @PostMapping("/auth/mobile-session")
+    public MobileSessionResponse mobileSession(@Valid @RequestBody LoginRequest request) {
+        UserAccount account = service.checkCredentials(request.email(), request.password());
+        MobileSessionService.IssuedSession session = mobileSessions.create(account);
+        return MobileSessionResponse.from(account, session.token(), session.expiresAt());
     }
 
     @GetMapping("/patients/search")

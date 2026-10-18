@@ -19,10 +19,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Endereço especial do emulador Android para acessar a API executada no computador.
+            buildConfigField("String", "BACKEND_BASE_URL", "\"http://10.0.2.2:8080\"")
+        }
         release {
             optimization {
                 enable = false
             }
+            // A versão distribuída só deve receber uma URL HTTPS real, definida na implantação.
+            buildConfigField("String", "BACKEND_BASE_URL", "\"\"")
         }
     }
     compileOptions {
@@ -32,6 +38,7 @@ android {
     buildFeatures {
         // Gera uma classe de binding para cada layout (ex.: activity_login.xml -> ActivityLoginBinding)
         viewBinding = true
+        buildConfig = true
     }
 }
 

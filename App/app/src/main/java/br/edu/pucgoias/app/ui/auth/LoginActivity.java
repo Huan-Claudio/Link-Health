@@ -2,10 +2,13 @@ package br.edu.pucgoias.app.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 
 import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.data.remote.AccountApi;
+import br.edu.pucgoias.app.data.remote.AccountSession;
 import br.edu.pucgoias.app.databinding.ActivityLoginBinding;
 import br.edu.pucgoias.app.model.Perfil;
 import br.edu.pucgoias.app.util.Navegacao;
@@ -16,6 +19,7 @@ public class LoginActivity extends BaseActivity {
 
     private ActivityLoginBinding binding;
     private PerfilToggle toggle;
+    private final AccountApi accountApi = new AccountApi();
 
     @Override
     protected boolean exigeSessao() {
@@ -28,10 +32,9 @@ public class LoginActivity extends BaseActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // O rótulo muda conforme o perfil: paciente entra com CPF, nutricionista com CRN.
-        toggle = new PerfilToggle(binding.togglePerfil, Perfil.PACIENTE, perfil ->
-                binding.tvLabelLogin.setText(perfil == Perfil.NUTRICIONISTA
-                        ? R.string.label_email_crn : R.string.label_email_cpf));
+        // A API usa e-mail para os dois perfis; o perfil real é confirmado pela resposta do servidor.
+        toggle = new PerfilToggle(binding.togglePerfil, Perfil.PACIENTE,
+                perfil -> binding.tvLabelLogin.setText(R.string.label_email));
 
         binding.btnEntrar.setOnClickListener(v -> entrar());
         binding.btnCriarConta.setOnClickListener(v -> {
@@ -43,18 +46,44 @@ public class LoginActivity extends BaseActivity {
 
     private void entrar() {
         boolean valido = true;
-        if (binding.etLogin.getText().toString().trim().isEmpty()) {
-            binding.etLogin.setError(getString(R.string.campo_obrigatorio));
+        String email = binding.etLogin.getText().toString().trim();
+        String senha = binding.etSenha.getText().toString();
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.etLogin.setError(getString(R.string.email_invalido));
             valido = false;
         }
-        if (binding.etSenha.getText().toString().isEmpty()) {
+        if (senha.isEmpty()) {
             binding.etSenha.setError(getString(R.string.campo_obrigatorio));
             valido = false;
         }
         if (!valido) return;
 
-        // TODO: validar usuário e senha no back-end.
-        Sessao.entrar(toggle.getPerfil());
-        Navegacao.abrirHome(this, toggle.getPerfil());
+        setEnviando(true);
+        accountApi.login(email, senha, new AccountApi.Callback() {
+            @Override
+            public void onSuccess(AccountSession session) {
+                runOnUiThread(() -> concluirLogin(session));
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    setEnviando(false);
+                    toast(message);
+                });
+            }
+        });
+    }
+
+    private void concluirLogin(AccountSession session) {
+        if (isFinishing() || isDestroyed()) return;
+        Sessao.entrar(session);
+        Navegacao.abrirHome(this, session.getPerfil());
+    }
+
+    private void setEnviando(boolean enviando) {
+        binding.btnEntrar.setEnabled(!enviando);
+        binding.btnCriarConta.setEnabled(!enviando);
+        binding.btnEntrar.setText(enviando ? R.string.aguarde : R.string.entrar_no_app);
     }
 }

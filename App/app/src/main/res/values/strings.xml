@@ -12,6 +12,9 @@
     <string name="cancelar">Cancelar</string>
     <string name="em_breve">Funcionalidade em desenvolvimento</string>
     <string name="campo_obrigatorio">Campo obrigatório</string>
+    <string name="aguarde">Aguarde…</string>
+    <string name="senha_minima">A senha deve ter pelo menos 8 caracteres.</string>
+    <string name="sessao_remota_necessaria">Entre novamente para carregar sua lista de compras.</string>
 
     <!-- Login -->
     <string name="label_email_cpf">E-mail ou CPF</string>
