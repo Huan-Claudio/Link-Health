@@ -1,6 +1,45 @@
+import java.net.Inet4Address
+import java.net.NetworkInterface
+import java.util.Collections
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+/**
+ * Localiza o IPv4 da Wi-Fi/Ethernet ativa para o emulador acessar a API local.
+ * LINK_HEALTH_BACKEND_HOST permite uma substituicao manual somente se necessario.
+ */
+fun detectarHostBackend(): String {
+    val bloqueadas = listOf("virtual", "vmware", "vbox", "hyper-v", "wsl", "docker", "bluetooth")
+    val interfaces = Collections.list(NetworkInterface.getNetworkInterfaces())
+        .filter { networkInterface ->
+            networkInterface.isUp && !networkInterface.isLoopback && !networkInterface.isVirtual &&
+                bloqueadas.none { bloqueada ->
+                    "${networkInterface.name} ${networkInterface.displayName}".lowercase().contains(bloqueada)
+                }
+        }
+        .sortedBy { networkInterface ->
+            val nome = "${networkInterface.name} ${networkInterface.displayName}".lowercase()
+            when {
+                "wi-fi" in nome || "wifi" in nome || "wlan" in nome -> 0
+                "ethernet" in nome || "eth" in nome -> 1
+                else -> 2
+            }
+        }
+
+    return interfaces.asSequence()
+        .flatMap { networkInterface -> Collections.list(networkInterface.inetAddresses).asSequence() }
+        .filterIsInstance<Inet4Address>()
+        .firstOrNull { address -> !address.isLoopbackAddress && !address.isLinkLocalAddress && address.isSiteLocalAddress }
+        ?.hostAddress
+        ?: throw GradleException("Nao foi encontrado um IPv4 local para acessar o backend. Conecte-se a uma rede ou defina LINK_HEALTH_BACKEND_HOST.")
+}
+
+val backendHost = System.getenv("LINK_HEALTH_BACKEND_HOST")
+    ?.trim()
+    ?.takeIf { it.isNotEmpty() }
+    ?: detectarHostBackend()
 
 // Evita que arquivos temporários do Gradle fiquem bloqueados pela sincronização do OneDrive.
 buildDir = File(
@@ -26,9 +65,9 @@ android {
 
     buildTypes {
         debug {
-            // IP local deste computador para o emulador durante o desenvolvimento.
+            // IP identificado automaticamente em cada build de desenvolvimento.
             // A configuração é exclusiva do build debug; a versão publicada usa HTTPS.
-            buildConfigField("String", "BACKEND_BASE_URL", "\"http://192.168.1.95:8080\"")
+            buildConfigField("String", "BACKEND_BASE_URL", "\"http://${backendHost}:8080\"")
         }
         release {
             optimization {
