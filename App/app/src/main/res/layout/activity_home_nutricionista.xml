@@ -84,6 +84,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutPerfil" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnProdutosReais"
+        style="@style/LH.Button.Small"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Produtos recomendados para pacientes vinculados"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnNovoPaciente" />
+
     <EditText
         android:id="@+id/etBusca"
         style="@style/LH.Input"
@@ -96,7 +107,7 @@
         android:imeOptions="actionSearch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnNovoPaciente" />
+        app:layout_constraintTop_toBottomOf="@id/btnProdutosReais" />
 
     <TextView
         android:id="@+id/tvVazio"

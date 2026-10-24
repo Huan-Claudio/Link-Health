@@ -48,6 +48,10 @@ final class BackendApi {
         request("PATCH", path, body, token, callback);
     }
 
+    static void delete(String path, String token, Callback callback) {
+        request("DELETE", path, null, token, callback);
+    }
+
     private static void request(String method, String path, @Nullable JSONObject body, @Nullable String token,
                                 Callback callback) {
         EXECUTOR.execute(() -> {

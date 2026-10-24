@@ -15,12 +15,11 @@ import java.util.Set;
 
 import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
-import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.data.remote.ShoppingApi;
+import br.edu.pucgoias.app.data.remote.RecommendedProductsApi;
 import br.edu.pucgoias.app.databinding.ActivityListaSimplesBinding;
 import br.edu.pucgoias.app.model.ItemCompra;
-import br.edu.pucgoias.app.model.Paciente;
 import br.edu.pucgoias.app.model.Produto;
 import br.edu.pucgoias.app.ui.adapter.ItemCompraAdapter;
 import br.edu.pucgoias.app.ui.adapter.ProdutoRecomendadoAdapter;
@@ -37,6 +36,8 @@ public class ListaComprasActivity extends BaseActivity {
     private final List<ItemCompra> itens = new ArrayList<>();
     private final Set<java.util.UUID> itensEmAtualizacao = new HashSet<>();
     private ItemCompraAdapter itemAdapter;
+    private final List<Produto> produtos = new ArrayList<>();
+    private ProdutoRecomendadoAdapter produtoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,18 +46,31 @@ public class ListaComprasActivity extends BaseActivity {
         ActivityListaSimplesBinding binding = ActivityListaSimplesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Paciente paciente = MockData.getPacienteLogado();
         configurarHeader(binding.header, getString(R.string.lista_compras_de, Sessao.getNomeUsuario()));
 
         itemAdapter = new ItemCompraAdapter(itens, this::alterarStatusCompra);
         ConcatAdapter adapter = new ConcatAdapter(itemAdapter);
-        if (!paciente.getProdutos().isEmpty()) {
-            adapter.addAdapter(new TituloSecaoAdapter(R.string.produtos_recomendados));
-            adapter.addAdapter(new ProdutoRecomendadoAdapter(paciente.getProdutos(), this::abrirLink));
-        }
+        adapter.addAdapter(new TituloSecaoAdapter(R.string.produtos_recomendados));
+        produtoAdapter = new ProdutoRecomendadoAdapter(produtos, this::abrirLink);
+        adapter.addAdapter(produtoAdapter);
         binding.lista.setLayoutManager(new LinearLayoutManager(this));
         binding.lista.setAdapter(adapter);
         carregarItens();
+        carregarProdutos();
+    }
+
+    private void carregarProdutos() {
+        if (!Sessao.temSessaoRemota()) return;
+        new RecommendedProductsApi().list(Sessao.getUsuarioId(), Sessao.getAccessToken(),
+                new RecommendedProductsApi.ListCallback() {
+                    public void onSuccess(List<Produto> resposta) { runOnUiThread(() -> {
+                        if (isFinishing() || isDestroyed()) return;
+                        produtos.clear(); produtos.addAll(resposta); produtoAdapter.notifyDataSetChanged();
+                    }); }
+                    public void onError(String message) { runOnUiThread(() -> {
+                        if (!isFinishing() && !isDestroyed()) toast(message);
+                    }); }
+                });
     }
 
     /** Busca a lista persistida no banco para o paciente da sessão, não a lista de exemplo. */
@@ -138,8 +152,10 @@ public class ListaComprasActivity extends BaseActivity {
             return;
         }
         try {
-            String url = link.startsWith("http") ? link : "https://" + link;
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            Uri uri = Uri.parse(link);
+            if (!("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme()))
+                    || uri.getHost() == null) { toast(R.string.link_invalido); return; }
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
         } catch (ActivityNotFoundException e) {
             toast(R.string.link_invalido);
         }

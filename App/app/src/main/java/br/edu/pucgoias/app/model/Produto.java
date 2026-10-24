@@ -2,6 +2,7 @@ package br.edu.pucgoias.app.model;
 
 /** Produto recomendado pelo nutricionista, com link externo de compra. */
 public class Produto {
+    private java.util.UUID id;
     private String nome;
     private String preco;
     private String link;
@@ -18,4 +19,6 @@ public class Produto {
     public void setPreco(String preco) { this.preco = preco; }
     public String getLink() { return link; }
     public void setLink(String link) { this.link = link; }
+    public java.util.UUID getId() { return id; }
+    public void setId(java.util.UUID id) { this.id = id; }
 }

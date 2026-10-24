@@ -2,6 +2,7 @@ package br.edu.pucgoias.linkhealth.api.product;
 
 import br.edu.pucgoias.linkhealth.domain.RecommendedProduct;
 import br.edu.pucgoias.linkhealth.service.RecommendedProductService;
+import br.edu.pucgoias.linkhealth.service.PatientAccessService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,14 +26,17 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class RecommendedProductController {
 
     private final RecommendedProductService service;
+    private final PatientAccessService access;
 
-    public RecommendedProductController(RecommendedProductService service) {
+    public RecommendedProductController(RecommendedProductService service, PatientAccessService access) {
         this.service = service;
+        this.access = access;
     }
 
     @GetMapping
     @Operation(summary = "Lista os produtos recomendados para um paciente")
     public List<RecommendedProductResponse> list(@PathVariable UUID patientId) {
+        access.ensureCanAccess(patientId);
         return service.list(patientId).stream().map(RecommendedProductResponse::from).toList();
     }
 
@@ -41,6 +45,7 @@ public class RecommendedProductController {
     public ResponseEntity<RecommendedProductResponse> create(
             @PathVariable UUID patientId,
             @Valid @RequestBody CreateRecommendedProductRequest request) {
+        access.ensureCanManageRecommendations(patientId);
         RecommendedProduct product = service.create(
                 patientId,
                 request.name(),
@@ -61,6 +66,7 @@ public class RecommendedProductController {
             @PathVariable UUID patientId,
             @PathVariable UUID productId,
             @Valid @RequestBody UpdateRecommendedProductRequest request) {
+        access.ensureCanManageRecommendations(patientId);
         return RecommendedProductResponse.from(service.update(
                 patientId,
                 productId,
@@ -74,6 +80,7 @@ public class RecommendedProductController {
     @DeleteMapping("/{productId}")
     @Operation(summary = "Remove um produto recomendado")
     public ResponseEntity<Void> delete(@PathVariable UUID patientId, @PathVariable UUID productId) {
+        access.ensureCanManageRecommendations(patientId);
         service.delete(patientId, productId);
         return ResponseEntity.noContent().build();
     }

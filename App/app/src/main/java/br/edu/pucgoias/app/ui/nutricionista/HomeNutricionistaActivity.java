@@ -15,6 +15,8 @@ import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.data.remote.RecommendedProductsApi;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import br.edu.pucgoias.app.databinding.ActivityHomeNutricionistaBinding;
 import br.edu.pucgoias.app.model.Paciente;
 import br.edu.pucgoias.app.ui.adapter.PacienteAdapter;
@@ -40,6 +42,7 @@ public class HomeNutricionistaActivity extends BaseActivity {
                 startActivity(new Intent(this, ConfiguracoesActivity.class)));
         binding.btnNovoPaciente.setOnClickListener(v ->
                 startActivity(new Intent(this, BuscarPacienteActivity.class)));
+        binding.btnProdutosReais.setOnClickListener(v -> escolherPacienteParaProdutos());
 
         adapter = new PacienteAdapter(paciente -> startActivity(
                 Navegacao.comPaciente(this, FichaPacienteActivity.class, paciente)));
@@ -48,6 +51,33 @@ public class HomeNutricionistaActivity extends BaseActivity {
         binding.listaPacientes.setAdapter(adapter);
 
         binding.etBusca.addTextChangedListener(new TextoAlterado(texto -> filtrar()));
+    }
+
+    private void escolherPacienteParaProdutos() {
+        if (!Sessao.temSessaoRemota()) { toast(R.string.sessao_remota_necessaria); return; }
+        binding.btnProdutosReais.setEnabled(false);
+        new RecommendedProductsApi().patients(Sessao.getAccessToken(), new RecommendedProductsApi.PatientCallback() {
+            public void onSuccess(List<RecommendedProductsApi.Patient> pacientes) { runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                binding.btnProdutosReais.setEnabled(true);
+                if (pacientes.isEmpty()) { toast("Nenhum paciente com acompanhamento ativo."); return; }
+                String[] nomes = new String[pacientes.size()];
+                for (int i = 0; i < pacientes.size(); i++) nomes[i] = pacientes.get(i).name;
+                registrarDialog(new MaterialAlertDialogBuilder(HomeNutricionistaActivity.this)
+                        .setTitle("Escolha o paciente vinculado")
+                        .setItems(nomes, (dialog, index) -> {
+                            RecommendedProductsApi.Patient p = pacientes.get(index);
+                            Intent intent = new Intent(HomeNutricionistaActivity.this, EditarProdutosActivity.class);
+                            intent.putExtra(EditarProdutosActivity.EXTRA_PATIENT_ID, p.id.toString());
+                            intent.putExtra(EditarProdutosActivity.EXTRA_PATIENT_NAME, p.name);
+                            startActivity(intent);
+                        }).setNegativeButton(R.string.cancelar, null).show());
+            }); }
+            public void onError(String message) { runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                binding.btnProdutosReais.setEnabled(true); toast(message);
+            }); }
+        });
     }
 
     @Override
