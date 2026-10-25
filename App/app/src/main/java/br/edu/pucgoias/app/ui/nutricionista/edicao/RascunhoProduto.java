@@ -10,6 +10,7 @@ public class RascunhoProduto {
     /** Preço no formato do campo numérico (ponto decimal). */
     public String preco;
     public String link;
+    public boolean pendente;
 
     public RascunhoProduto(Produto original) {
         this.original = original;

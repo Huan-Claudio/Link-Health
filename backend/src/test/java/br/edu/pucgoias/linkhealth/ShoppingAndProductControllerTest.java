@@ -27,11 +27,79 @@ import org.springframework.test.web.servlet.MvcResult;
 class ShoppingAndProductControllerTest {
 
     @Autowired
+    private br.edu.pucgoias.linkhealth.service.UserAccountService accounts;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Test
+    void shouldRequirePurchaseStatusAndPreserveExistingValue() throws Exception {
+        UUID patient = PatientFixtures.create(accounts);
+        String base = "/api/v1/patients/" + patient + "/shopping-items";
+        String created = mockMvc.perform(post(base).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Aveia\",\"quantity\":1,\"unit\":\"UNIT\"}"))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String id = JsonPath.read(created, "$.id");
+        String path = base + "/" + id + "/purchase-status";
+        mockMvc.perform(patch(path).contentType(MediaType.APPLICATION_JSON).content("{\"purchased\":true}"))
+                .andExpect(status().isOk());
+        for (String body : new String[]{"{}", "{\"purchased\":null}"}) {
+            mockMvc.perform(patch(path).contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isBadRequest());
+        }
+        mockMvc.perform(get(base)).andExpect(status().isOk()).andExpect(jsonPath("$[0].purchased", is(true)));
+        mockMvc.perform(patch(path).contentType(MediaType.APPLICATION_JSON).content("{\"purchased\":false}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.purchased", is(false)));
+    }
+
+    @Test
+    void shouldRejectOverflowFractionDigitsAndBlankNames() throws Exception {
+        UUID patient = PatientFixtures.create(accounts);
+        String shopping = "/api/v1/patients/" + patient + "/shopping-items";
+        for (String value : new String[]{"1000000000", "0.0001", "999999999999999"}) {
+            mockMvc.perform(post(shopping).contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"name\":\"Aveia\",\"quantity\":" + value + ",\"unit\":\"UNIT\"}"))
+                    .andExpect(status().isBadRequest());
+        }
+        String products = "/api/v1/patients/" + patient + "/recommended-products";
+        for (String value : new String[]{"10000000000", "1.234", "-1"}) {
+            mockMvc.perform(post(products).contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"name\":\"Iogurte\",\"price\":" + value + "}"))
+                    .andExpect(status().isBadRequest());
+        }
+        String created = mockMvc.perform(post(products).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Iogurte\",\"price\":2,\"currency\":\"USD\"}"))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String id = JsonPath.read(created, "$.id");
+        mockMvc.perform(patch(products + "/" + id).contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"   \"}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(patch(products + "/" + id).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"description\":\"Sem açúcar\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.currency", is("USD")));
+    }
+
+    @Test
+    void shouldRejectUnsupportedLinksAndUnknownPatients() throws Exception {
+        UUID patient = PatientFixtures.create(accounts);
+        String products = "/api/v1/patients/" + patient + "/recommended-products";
+        for (String url : new String[]{"ftp://example.org/item", "https://user:pass@example.org/item"}) {
+            mockMvc.perform(post(products).contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"name\":\"Iogurte\",\"purchaseUrl\":\"" + url + "\"}"))
+                    .andExpect(status().isBadRequest());
+        }
+        mockMvc.perform(get("/api/v1/patients/not-a-uuid/shopping-items"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code", is("INVALID_PARAMETER")));
+        UUID unknown = UUID.randomUUID();
+        mockMvc.perform(post("/api/v1/patients/" + unknown + "/recommended-products")
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Iogurte\"}"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/patients/" + unknown + "/shopping-items"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void shouldManageShoppingItemsForOnePatient() throws Exception {
-        UUID patientId = UUID.randomUUID();
+        UUID patientId = PatientFixtures.create(accounts);
         String basePath = "/api/v1/patients/" + patientId + "/shopping-items";
 
         MvcResult created = mockMvc.perform(post(basePath)
@@ -60,7 +128,7 @@ class ShoppingAndProductControllerTest {
 
     @Test
     void shouldManageRecommendedProductsForOnePatient() throws Exception {
-        UUID patientId = UUID.randomUUID();
+        UUID patientId = PatientFixtures.create(accounts);
         String basePath = "/api/v1/patients/" + patientId + "/recommended-products";
 
         MvcResult created = mockMvc.perform(post(basePath)

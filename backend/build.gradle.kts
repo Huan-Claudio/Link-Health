@@ -41,4 +41,8 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // O arquivo de recursos de teste no OneDrive pode aparecer como "not a regular file".
+    // Sem perfil explícito, testes usam memória; @ActiveProfiles("postgres") continua prioritário.
+    systemProperty("spring.profiles.default", "local")
+    systemProperty("link-health.photos.storage-directory", layout.buildDirectory.dir("test-evolution-photos").get().asFile.absolutePath)
 }

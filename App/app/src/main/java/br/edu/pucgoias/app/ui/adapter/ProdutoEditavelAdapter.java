@@ -69,6 +69,13 @@ public class ProdutoEditavelAdapter extends RecyclerView.Adapter<ProdutoEditavel
         holder.binding.etPrecoProduto.setText(r.preco);
         holder.binding.etLinkProduto.setText(r.link);
         holder.binding.etNomeProduto.setError(null);
+        holder.binding.tvLabelPreco.setText(holder.itemView.getContext().getString(
+                R.string.preco_produto_moeda, r.original.getMoeda()));
+        holder.binding.btnSalvarProduto.setEnabled(!r.pendente);
+        holder.binding.btnRemover.setEnabled(!r.pendente);
+        holder.binding.etNomeProduto.setEnabled(!r.pendente);
+        holder.binding.etPrecoProduto.setEnabled(!r.pendente);
+        holder.binding.etLinkProduto.setEnabled(!r.pendente);
         holder.rascunho = r;
     }
 

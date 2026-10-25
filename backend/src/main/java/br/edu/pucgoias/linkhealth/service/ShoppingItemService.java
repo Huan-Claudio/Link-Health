@@ -15,16 +15,20 @@ import org.springframework.stereotype.Service;
 public class ShoppingItemService {
 
     private final ShoppingItemRepository repository;
+    private final UserAccountService accounts;
 
-    public ShoppingItemService(ShoppingItemRepository repository) {
+    public ShoppingItemService(ShoppingItemRepository repository, UserAccountService accounts) {
         this.repository = repository;
+        this.accounts = accounts;
     }
 
     public List<ShoppingItem> list(UUID patientId) {
+        accounts.requirePatient(patientId);
         return repository.findByPatientId(patientId);
     }
 
     public ShoppingItem create(UUID patientId, String name, BigDecimal quantity, MeasurementUnit unit) {
+        accounts.requirePatient(patientId);
         Instant now = Instant.now();
         ShoppingItem item = new ShoppingItem(
                 UUID.randomUUID(), patientId, name.trim(), quantity, unit, false, now, now);
@@ -73,6 +77,7 @@ public class ShoppingItemService {
     }
 
     private ShoppingItem find(UUID patientId, UUID itemId) {
+        accounts.requirePatient(patientId);
         return repository.findByIdAndPatientId(itemId, patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Item da lista de compras não encontrado."));
     }

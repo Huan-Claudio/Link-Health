@@ -15,7 +15,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.UUID;
+import java.util.zip.CRC32;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +106,36 @@ class EvolutionPhotoRecordControllerTest {
                 .andExpect(jsonPath("$.code", is("INVALID_REQUEST")));
         mockMvc.perform(delete(basePath + "/" + photoId))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldRejectHugeDimensionsBeforeDecodingTheImage() throws Exception {
+        String basePath = "/api/v1/patients/" + UUID.randomUUID() + "/evolution-photos";
+        MvcResult created = mockMvc.perform(post(basePath)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"originalFileName":"grande.png","contentType":"image/png"}
+                                """))
+                .andExpect(status().isCreated()).andReturn();
+        String photoId = JsonPath.read(created.getResponse().getContentAsString(), "$.id");
+        byte[] png;
+        try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            ImageIO.write(new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB), "png", output);
+            png = output.toByteArray();
+        }
+        // Cabeçalho PNG válido com dimensões enormes, sem alocar esse bitmap no teste.
+        ByteBuffer.wrap(png).putInt(16, 100_000).putInt(20, 100_000);
+        CRC32 crc = new CRC32();
+        crc.update(png, 12, 17);
+        ByteBuffer.wrap(png).putInt(29, (int) crc.getValue());
+        try {
+            mockMvc.perform(multipart(basePath + "/" + photoId + "/content")
+                            .file(new MockMultipartFile("file", "grande.png", "image/png", png)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message", is("A imagem tem dimensões muito grandes.")));
+        } finally {
+            mockMvc.perform(delete(basePath + "/" + photoId)).andExpect(status().isNoContent());
+        }
     }
 
     private byte[] validJpeg() throws IOException {

@@ -16,6 +16,18 @@ class UserAccountServiceTest {
     private final UserAccountService service = new UserAccountService(new InMemoryUserAccountRepository());
 
     @Test
+    void handlesTheBcryptByteLimitWithoutTruncatingUnicodePasswords() {
+        String accepted = "é".repeat(36);
+        UserAccount account = service.register("Teste", null, "unicode@example.org", null,
+                "unicode-doc", accepted, AccountRole.PACIENTE);
+        assertEquals(account.id(), service.checkCredentials(account.email(), accepted).id());
+        assertThrows(InvalidRequestException.class, () -> service.register("Teste", null,
+                "too-long@example.org", null, "unicode-long", "é".repeat(37), AccountRole.PACIENTE));
+        assertThrows(InvalidRequestException.class,
+                () -> service.checkCredentials(account.email(), "é".repeat(37)));
+    }
+
+    @Test
     void registersAndChecksCredentialsWithoutReturningPlainPassword() {
         UserAccount patient = service.register("Maria Silva", null, "MARIA@EXEMPLO.COM", null,
                 "123.456.789-00", "senha1234", AccountRole.PACIENTE);

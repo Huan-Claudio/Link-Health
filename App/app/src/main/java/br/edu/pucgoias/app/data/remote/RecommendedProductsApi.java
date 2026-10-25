@@ -59,6 +59,7 @@ public final class RecommendedProductsApi {
             body.put("name", name);
             body.put("price", price);
             body.put("purchaseUrl", link);
+            body.put("currency", product.getMoeda());
             BackendApi.Callback response = new BackendApi.Callback() {
                 public void onSuccess(String result) {
                     try { callback.onSuccess(parse(new JSONObject(result))); }
@@ -82,6 +83,7 @@ public final class RecommendedProductsApi {
         Produto result = new Produto(json.getString("name"), json.isNull("price") ? "" : json.get("price").toString(),
                 json.isNull("purchaseUrl") ? "" : json.getString("purchaseUrl"));
         result.setId(UUID.fromString(json.getString("id")));
+        result.setMoeda(json.optString("currency", "BRL"));
         return result;
     }
     private static String path(UUID id) { return "/api/v1/patients/" + id + "/recommended-products"; }

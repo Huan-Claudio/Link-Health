@@ -2,6 +2,7 @@ package br.edu.pucgoias.linkhealth.api.shopping;
 
 import br.edu.pucgoias.linkhealth.domain.MeasurementUnit;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,6 +14,7 @@ public record CreateShoppingItemRequest(
         String name,
         @NotNull(message = "A quantidade é obrigatória.")
         @DecimalMin(value = "0.001", message = "A quantidade deve ser maior que zero.")
+        @Digits(integer = 9, fraction = 3, message = "A quantidade deve ter até 9 dígitos inteiros e 3 casas decimais.")
         BigDecimal quantity,
         @NotNull(message = "A unidade é obrigatória.")
         MeasurementUnit unit) {

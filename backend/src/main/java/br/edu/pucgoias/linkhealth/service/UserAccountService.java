@@ -7,6 +7,7 @@ import br.edu.pucgoias.linkhealth.domain.UserAccount;
 import br.edu.pucgoias.linkhealth.domain.UserAccountRepository;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -32,6 +33,7 @@ public class UserAccountService {
             String document,
             String password,
             AccountRole role) {
+        validatePassword(password);
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
         String normalizedDocument = document.trim().toUpperCase(Locale.ROOT);
         if (repository.findByEmail(normalizedEmail).isPresent()) {
@@ -54,6 +56,7 @@ public class UserAccountService {
     }
 
     public UserAccount checkCredentials(String email, String password) {
+        validatePassword(password);
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
         UserAccount account = repository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new InvalidRequestException("E-mail ou senha inválidos."));
@@ -66,6 +69,19 @@ public class UserAccountService {
     public UserAccount find(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
+    }
+
+    public void requirePatient(UUID id) {
+        if (find(id).role() != AccountRole.PACIENTE) {
+            throw new InvalidRequestException("A conta informada não é de um paciente.");
+        }
+    }
+
+    private void validatePassword(String password) {
+        if (password == null || password.isEmpty()
+                || password.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new InvalidRequestException("A senha deve ter no máximo 72 bytes em UTF-8; acentos e emojis ocupam mais de um byte.");
+        }
     }
 
     public List<UserAccount> searchPatients(String query) {

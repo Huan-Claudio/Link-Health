@@ -1,4 +1,7 @@
 package br.edu.pucgoias.linkhealth.api.shopping;
 
-public record PurchaseStatusRequest(boolean purchased) {
+import jakarta.validation.constraints.NotNull;
+
+public record PurchaseStatusRequest(
+        @NotNull(message = "Informe se o item foi comprado.") Boolean purchased) {
 }

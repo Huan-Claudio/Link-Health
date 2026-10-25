@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.context.annotation.Profile;
@@ -45,7 +46,7 @@ public class PostgresEvolutionPhotoStorage implements EvolutionPhotoStorage {
                 photoId,
                 encrypted,
                 encryptionService.currentVersion(),
-                Instant.now());
+                Timestamp.from(Instant.now()));
         return photoId.toString();
     }
 

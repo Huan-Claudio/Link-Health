@@ -6,6 +6,7 @@ public class Produto {
     private String nome;
     private String preco;
     private String link;
+    private String moeda = "BRL";
 
     public Produto(String nome, String preco, String link) {
         this.nome = nome;
@@ -21,4 +22,19 @@ public class Produto {
     public void setLink(String link) { this.link = link; }
     public java.util.UUID getId() { return id; }
     public void setId(java.util.UUID id) { this.id = id; }
+    public String getMoeda() { return moeda; }
+    public void setMoeda(String moeda) { this.moeda = moeda == null ? "BRL" : moeda; }
+
+    public String getPrecoFormatado() {
+        if (preco == null || preco.trim().isEmpty()) return "Preço não informado";
+        try {
+            java.math.BigDecimal valor = new java.math.BigDecimal(preco.replace(',', '.'));
+            java.text.NumberFormat formato = java.text.NumberFormat.getCurrencyInstance(
+                    java.util.Locale.forLanguageTag("pt-BR"));
+            formato.setCurrency(java.util.Currency.getInstance(moeda));
+            return formato.format(valor);
+        } catch (IllegalArgumentException exception) {
+            return moeda + " " + preco;
+        }
+    }
 }

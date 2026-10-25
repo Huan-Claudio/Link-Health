@@ -3,6 +3,9 @@ package br.edu.pucgoias.app;
 import org.junit.Before;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.model.Perfil;
+import br.edu.pucgoias.app.data.remote.AccountSession;
+import org.json.JSONObject;
+import static org.hamcrest.Matchers.containsString;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
@@ -36,18 +39,26 @@ public class TelasPacienteTest {
         }
     }
 
-    @Test public void compraContinuaMarcadaAoReabrir() {
-        MockData.getPacienteLogado().getListaCompras().get(0).setComprado(false);
-        String descricao = MockData.getPacienteLogado().getListaCompras().get(0).getDescricao();
+    @Test public void compraContinuaMarcadaAoReabrir() throws Exception {
+        AccountSession account = IntegrationTestSupport.patient();
+        IntegrationTestSupport.enter(account);
+        String path = "/api/v1/patients/" + account.getId() + "/shopping-items";
+        JSONObject body = new JSONObject().put("name", "CompraTesteAndroid").put("quantity", 1).put("unit", "UNIT");
+        String created = IntegrationTestSupport.http("POST", path, body, account);
+        String itemId = new JSONObject(created).getString("id");
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
             onView(withId(R.id.menuLista)).perform(scrollTo(), click());
-            onView(withText(descricao)).perform(click());
-            assertTrue(MockData.getPacienteLogado().getListaCompras().get(0).isComprado());
+            IntegrationTestSupport.awaitText("CompraTesteAndroid");
+            onView(withText(containsString("CompraTesteAndroid"))).perform(click());
+            IntegrationTestSupport.awaitPurchased(path, account, true);
             onView(withId(R.id.btnVoltar)).perform(click());
             onView(withId(R.id.menuLista)).perform(scrollTo(), click());
-            assertTrue(MockData.getPacienteLogado().getListaCompras().get(0).isComprado());
-            onView(withText(descricao)).perform(click());
-            assertFalse(MockData.getPacienteLogado().getListaCompras().get(0).isComprado());
+            IntegrationTestSupport.awaitText("CompraTesteAndroid");
+            IntegrationTestSupport.awaitPurchased(path, account, true);
+            onView(withText(containsString("CompraTesteAndroid"))).perform(click());
+            IntegrationTestSupport.awaitPurchased(path, account, false);
+        } finally {
+            IntegrationTestSupport.http("DELETE", path + "/" + itemId, null, account);
         }
     }
 

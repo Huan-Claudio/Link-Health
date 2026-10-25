@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -175,14 +177,25 @@ public class EvolutionPhotoRecordService {
     }
 
     private void validateReadableImage(MultipartFile file) throws IOException {
-        try (InputStream input = file.getInputStream()) {
-            BufferedImage image = ImageIO.read(input);
-            if (image == null || image.getWidth() <= 0 || image.getHeight() <= 0) {
+        try (InputStream input = file.getInputStream(); ImageInputStream imageInput = ImageIO.createImageInputStream(input)) {
+            if (imageInput == null) {
                 throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
             }
-            long pixels = (long) image.getWidth() * image.getHeight();
-            if (pixels > MAXIMUM_IMAGE_PIXELS) {
-                throw new InvalidRequestException("A imagem tem dimensões muito grandes.");
+            var readers = ImageIO.getImageReaders(imageInput);
+            if (!readers.hasNext()) throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
+            ImageReader reader = readers.next();
+            try {
+                reader.setInput(imageInput, true, true);
+                int width = reader.getWidth(0);
+                int height = reader.getHeight(0);
+                // Verifica o tamanho antes de alocar o bitmap completo na memória.
+                if (width <= 0 || height <= 0 || (long) width * height > MAXIMUM_IMAGE_PIXELS) {
+                    throw new InvalidRequestException("A imagem tem dimensões muito grandes.");
+                }
+                BufferedImage image = reader.read(0);
+                if (image == null) throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
+            } finally {
+                reader.dispose();
             }
         }
     }

@@ -110,6 +110,7 @@
     <string name="adicionar_produto">+ Adicionar Produto</string>
     <string name="comprar_produto">Ver produto na loja</string>
     <string name="produto_salvo">Produto salvo</string>
+    <string name="preco_produto_moeda">Preço do produto (%1$s)</string>
     <string name="link_invalido">Link inválido</string>
 
     <!-- Nutricionista -->

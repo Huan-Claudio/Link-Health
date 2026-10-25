@@ -70,7 +70,7 @@ public class ShoppingItemController {
     public ShoppingItemResponse updatePurchaseStatus(
             @PathVariable UUID patientId,
             @PathVariable UUID itemId,
-            @RequestBody PurchaseStatusRequest request) {
+            @Valid @RequestBody PurchaseStatusRequest request) {
         access.ensureCanAccess(patientId);
         return ShoppingItemResponse.from(service.updatePurchaseStatus(patientId, itemId, request.purchased()));
     }

@@ -43,8 +43,7 @@ public class ProdutoRecomendadoAdapter extends RecyclerView.Adapter<ProdutoRecom
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Produto produto = produtos.get(position);
         holder.binding.tvNomeProduto.setText(produto.getNome());
-        holder.binding.tvPrecoProduto.setText(produto.getPreco().isEmpty() ? "Preço não informado"
-                : "R$ " + produto.getPreco().replace('.', ','));
+        holder.binding.tvPrecoProduto.setText(produto.getPrecoFormatado());
         holder.binding.btnComprar.setEnabled(!produto.getLink().trim().isEmpty());
     }
 
