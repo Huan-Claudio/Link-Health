@@ -34,8 +34,8 @@ public class PerfilPacienteTest {
         }
     }
 
-    @Test public void evolucaoAbreEVoltaParaHome() {
-        Sessao.entrar(Perfil.PACIENTE);
+    @Test public void evolucaoAbreEVoltaParaHome() throws Exception {
+        IntegrationTestSupport.enter(IntegrationTestSupport.patient());
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
             onView(withId(R.id.menuEvolucao)).perform(scrollTo(), click());
             onView(withId(R.id.tvTituloHeader)).check(matches(withText(R.string.evolucao_corporal)));

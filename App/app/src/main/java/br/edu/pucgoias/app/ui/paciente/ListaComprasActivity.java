@@ -4,160 +4,57 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
+import android.view.View;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.Sessao;
-import br.edu.pucgoias.app.data.remote.ShoppingApi;
-import br.edu.pucgoias.app.data.remote.RecommendedProductsApi;
 import br.edu.pucgoias.app.databinding.ActivityListaSimplesBinding;
-import br.edu.pucgoias.app.model.ItemCompra;
 import br.edu.pucgoias.app.model.Produto;
 import br.edu.pucgoias.app.ui.adapter.ItemCompraAdapter;
 import br.edu.pucgoias.app.ui.adapter.ProdutoRecomendadoAdapter;
 import br.edu.pucgoias.app.ui.adapter.TituloSecaoAdapter;
+import br.edu.pucgoias.app.ui.adapter.ShoppingMessageAdapter;
+import br.edu.pucgoias.app.ui.nutricionista.EditarListaComprasActivity;
+import br.edu.pucgoias.app.util.PatientNavigation;
 
-/**
- * Figma: "Editar Lista de Compra" (visão do paciente).
- * O paciente marca os itens comprados e vê os produtos recomendados com link de compra.
- * Itens, título e produtos ficam numa única RecyclerView (ConcatAdapter).
- */
+/** Lista e recomendações reais do paciente autenticado. */
 public class ListaComprasActivity extends BaseActivity {
+    private ShoppingListViewModel model;
 
-    private final ShoppingApi shoppingApi = new ShoppingApi();
-    private final List<ItemCompra> itens = new ArrayList<>();
-    private final Set<java.util.UUID> itensEmAtualizacao = new HashSet<>();
-    private ItemCompraAdapter itemAdapter;
-    private final List<Produto> produtos = new ArrayList<>();
-    private ProdutoRecomendadoAdapter produtoAdapter;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (sessaoExpirada()) return;
-        ActivityListaSimplesBinding binding = ActivityListaSimplesBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        configurarHeader(binding.header, getString(R.string.lista_compras_de, Sessao.getNomeUsuario()));
-
-        itemAdapter = new ItemCompraAdapter(itens, this::alterarStatusCompra);
-        ConcatAdapter adapter = new ConcatAdapter(itemAdapter);
-        adapter.addAdapter(new TituloSecaoAdapter(R.string.produtos_recomendados));
-        produtoAdapter = new ProdutoRecomendadoAdapter(produtos, this::abrirLink);
-        adapter.addAdapter(produtoAdapter);
-        binding.lista.setLayoutManager(new LinearLayoutManager(this));
-        binding.lista.setAdapter(adapter);
-        carregarItens();
-        carregarProdutos();
-    }
-
-    private void carregarProdutos() {
-        if (!Sessao.temSessaoRemota()) return;
-        new RecommendedProductsApi().list(Sessao.getUsuarioId(), Sessao.getAccessToken(),
-                new RecommendedProductsApi.ListCallback() {
-                    public void onSuccess(List<Produto> resposta) { runOnUiThread(() -> {
-                        if (isFinishing() || isDestroyed()) return;
-                        produtos.clear(); produtos.addAll(resposta); produtoAdapter.notifyDataSetChanged();
-                    }); }
-                    public void onError(String message) { runOnUiThread(() -> {
-                        if (!isFinishing() && !isDestroyed()) toast(message);
-                    }); }
-                });
-    }
-
-    /** Busca a lista persistida no banco para o paciente da sessão, não a lista de exemplo. */
-    private void carregarItens() {
-        if (!Sessao.temSessaoRemota()) {
-            toast(R.string.sessao_remota_necessaria);
-            return;
-        }
-        shoppingApi.list(Sessao.getUsuarioId(), Sessao.getAccessToken(), new ShoppingApi.ListCallback() {
-            @Override
-            public void onSuccess(List<ShoppingApi.Item> resposta) {
-                runOnUiThread(() -> {
-                    if (isFinishing() || isDestroyed()) return;
-                    itens.clear();
-                    for (ShoppingApi.Item item : resposta) {
-                        itens.add(new ItemCompra(item.getId(), descricao(item), item.isPurchased()));
-                    }
-                    itemAdapter.notifyDataSetChanged();
-                });
-            }
-
-            @Override
-            public void onError(String message) {
-                runOnUiThread(() -> {
-                    if (!isFinishing() && !isDestroyed()) toast(message);
-                });
-            }
+        if (!Sessao.temSessaoRemota()) { toast(R.string.sessao_remota_necessaria); finish(); return; }
+        ActivityListaSimplesBinding b = ActivityListaSimplesBinding.inflate(getLayoutInflater()); setContentView(b.getRoot());
+        configurarHeader(b.header, getString(R.string.lista_compras_de, Sessao.getNomeUsuario()));
+        model = new ViewModelProvider(this).get(ShoppingListViewModel.class);
+        ItemCompraAdapter items = new ItemCompraAdapter(model.items, (item, position) -> model.toggle(item));
+        ProdutoRecomendadoAdapter products = new ProdutoRecomendadoAdapter(model.products, this::abrirLink);
+        ShoppingMessageAdapter status = new ShoppingMessageAdapter(this::carregar);
+        b.lista.setLayoutManager(new LinearLayoutManager(this));
+        b.lista.setAdapter(new ConcatAdapter(status, items, new TituloSecaoAdapter(R.string.produtos_recomendados), products));
+        b.btnRodape.setText("Editar minha lista"); b.btnRodape.setVisibility(View.VISIBLE);
+        b.btnRodape.setOnClickListener(v -> startActivity(PatientNavigation.intent(
+                this, EditarListaComprasActivity.class, Sessao.getUsuarioId(), Sessao.getNomeUsuario())));
+        model.changes().observe(this, ignored -> {
+            items.notifyDataSetChanged(); products.notifyDataSetChanged(); status.update(model.status);
+            b.btnRodape.setEnabled(!model.pending && !model.loading);
+            String message = model.takeMessage(); if (message != null) toast(message);
         });
     }
 
-    /** Só muda a interface depois que a API confirma a alteração no banco. */
-    private void alterarStatusCompra(ItemCompra item, int position) {
-        if (item.getId() == null || itensEmAtualizacao.contains(item.getId())) return;
-        boolean comprado = !item.isComprado();
-        itensEmAtualizacao.add(item.getId());
-        shoppingApi.updatePurchaseStatus(Sessao.getUsuarioId(), item.getId(), comprado, Sessao.getAccessToken(),
-                new ShoppingApi.ItemCallback() {
-                    @Override
-                    public void onSuccess(ShoppingApi.Item resposta) {
-                        runOnUiThread(() -> {
-                            itensEmAtualizacao.remove(item.getId());
-                            if (isFinishing() || isDestroyed()) return;
-                            item.setComprado(resposta.isPurchased());
-                            itemAdapter.notifyItemChanged(position);
-                        });
-                    }
+    @Override protected void onResume() { super.onResume(); if (model != null) carregar(); }
+    private void carregar() { model.load(Sessao.getUsuarioId(), Sessao.getAccessToken()); }
 
-                    @Override
-                    public void onError(String message) {
-                        runOnUiThread(() -> {
-                            itensEmAtualizacao.remove(item.getId());
-                            if (!isFinishing() && !isDestroyed()) toast(message);
-                        });
-                    }
-                });
-    }
-
-    private String descricao(ShoppingApi.Item item) {
-        return item.getQuantity() + " " + unidade(item.getUnit()) + " de " + item.getName();
-    }
-
-    private String unidade(String unit) {
-        switch (unit) {
-            case "GRAM": return "g";
-            case "KILOGRAM": return "kg";
-            case "MILLILITER": return "ml";
-            case "LITER": return "L";
-            case "PACKAGE": return "pacote(s)";
-            case "BOX": return "caixa(s)";
-            default: return "unidade(s)";
-        }
-    }
-
-    /** Abre o link do produto no navegador com uma Intent implícita (ACTION_VIEW). */
-    private void abrirLink(Produto produto) {
-        String link = produto.getLink().trim();
-        if (link.isEmpty()) {
-            toast(R.string.link_invalido);
-            return;
-        }
+    private void abrirLink(Produto product) {
         try {
-            Uri uri = Uri.parse(link);
+            Uri uri = Uri.parse(product.getLink().trim());
             if (!("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme()))
-                    || uri.getHost() == null) { toast(R.string.link_invalido); return; }
+                    || uri.getHost() == null || uri.getUserInfo() != null) { toast(R.string.link_invalido); return; }
             startActivity(new Intent(Intent.ACTION_VIEW, uri));
-        } catch (ActivityNotFoundException e) {
-            toast(R.string.link_invalido);
-        }
+        } catch (ActivityNotFoundException | IllegalArgumentException e) { toast(R.string.link_invalido); }
     }
 }

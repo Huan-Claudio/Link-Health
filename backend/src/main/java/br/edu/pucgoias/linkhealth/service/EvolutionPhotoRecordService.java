@@ -7,6 +7,7 @@ import br.edu.pucgoias.linkhealth.domain.EvolutionPhotoRecord;
 import br.edu.pucgoias.linkhealth.domain.EvolutionPhotoRecordRepository;
 import br.edu.pucgoias.linkhealth.domain.EvolutionPhotoStorage;
 import br.edu.pucgoias.linkhealth.domain.PhotoUploadStatus;
+import br.edu.pucgoias.linkhealth.domain.PatientRecordLock;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,22 +32,35 @@ public class EvolutionPhotoRecordService {
     private final EvolutionPhotoRecordRepository repository;
     private final EvolutionPhotoStorage storage;
     private final long maximumFileSize;
+    private final UserAccountService accounts;
+    private final PatientAccessService access;
+    private final PatientRecordLock lock;
 
     public EvolutionPhotoRecordService(
             EvolutionPhotoRecordRepository repository,
             EvolutionPhotoStorage storage,
+            UserAccountService accounts,
+            PatientAccessService access,
+            PatientRecordLock lock,
             @Value("${link-health.photos.max-size-bytes}") long maximumFileSize) {
         this.repository = repository;
         this.storage = storage;
         this.maximumFileSize = maximumFileSize;
+        this.accounts = accounts;
+        this.access = access;
+        this.lock = lock;
     }
 
     public List<EvolutionPhotoRecord> list(UUID patientId) {
+        access.ensureCanAccess(patientId);
+        accounts.requirePatient(patientId);
         return repository.findByPatientId(patientId);
     }
 
     public EvolutionPhotoRecord create(
             UUID patientId, String originalFileName, String contentType, Instant capturedAt, String notes) {
+        access.ensureCanWriteRecords(patientId);
+        accounts.requirePatient(patientId);
         Instant now = Instant.now();
         EvolutionPhotoRecord record = new EvolutionPhotoRecord(
                 UUID.randomUUID(),
@@ -63,7 +77,10 @@ public class EvolutionPhotoRecordService {
     }
 
     @Transactional
-    public EvolutionPhotoRecord upload(UUID patientId, UUID photoId, MultipartFile file) {
+    public synchronized EvolutionPhotoRecord upload(UUID patientId, UUID photoId, MultipartFile file) {
+        access.ensureCanWriteRecords(patientId);
+        accounts.requirePatient(patientId);
+        lock.lock(patientId);
         EvolutionPhotoRecord current = find(patientId, photoId);
         if (current.uploadStatus() == PhotoUploadStatus.STORED) {
             throw new InvalidRequestException("A foto deste registro já foi enviada.");
@@ -97,6 +114,8 @@ public class EvolutionPhotoRecordService {
     }
 
     public EvolutionPhotoContent openContent(UUID patientId, UUID photoId) {
+        access.ensureCanAccess(patientId);
+        accounts.requirePatient(patientId);
         EvolutionPhotoRecord record = find(patientId, photoId);
         if (record.uploadStatus() != PhotoUploadStatus.STORED || record.storageKey() == null) {
             throw new ResourceNotFoundException("A imagem desta foto de evolução ainda não foi enviada.");
@@ -115,7 +134,10 @@ public class EvolutionPhotoRecordService {
     }
 
     @Transactional
-    public void delete(UUID patientId, UUID photoId) {
+    public synchronized void delete(UUID patientId, UUID photoId) {
+        access.ensureCanWriteRecords(patientId);
+        accounts.requirePatient(patientId);
+        lock.lock(patientId);
         EvolutionPhotoRecord record = find(patientId, photoId);
         if (record.storageKey() != null) {
             try {

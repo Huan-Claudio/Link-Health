@@ -64,4 +64,17 @@ public class PatientAccessService {
         }
         throw new ForbiddenOperationException("Somente o nutricionista vinculado pode alterar as recomendações.");
     }
+
+    /** Registros de consumo e imagens são preenchidos pelo próprio paciente. */
+    public void ensureCanWriteRecords(UUID patientId) {
+        if (!security.isEnabled()) return;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            if ("link-health-client".equals(authentication.getPrincipal())) return;
+            if (authentication.getPrincipal() instanceof MobilePrincipal principal
+                    && principal.role() == AccountRole.PACIENTE
+                    && principal.accountId().equals(patientId)) return;
+        }
+        throw new ForbiddenOperationException("Somente o próprio paciente pode alterar seus registros.");
+    }
 }

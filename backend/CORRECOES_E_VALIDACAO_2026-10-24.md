@@ -1,5 +1,7 @@
 # Correções e validação — 24/10/2026
 
+> Relatório histórico anterior à autorização da Etapa 3. A entrega posterior e os testes atuais estão em [integração do escopo completo](../INTEGRACAO_ETAPA_3_ESCOPO_COMPLETO.md).
+
 ## Limite da autorização
 
 Este trabalho corrige defeitos das integrações já existentes de lista de compras (Etapa 1)

@@ -29,7 +29,6 @@
             android:layout_height="40dp"
             android:layout_marginTop="8dp"
             android:contentDescription="@string/voltar"
-            android:translationX="-8dp"
             app:icon="@drawable/ic_arrow_back"
             app:iconSize="24dp"
             app:iconTint="@color/lh_primary_light"

@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,10 +18,11 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.UUID;
 
 import br.edu.pucgoias.app.BuildConfig;
 
-/** Cliente HTTP único da etapa 1. A chave privada do servidor não é enviada nem armazenada no APK. */
+/** Transporte autenticado. A chave administrativa nunca é enviada nem armazenada no APK. */
 final class BackendApi {
 
     private static final String LOG_TAG = "LinkHealthApi";
@@ -30,8 +32,15 @@ final class BackendApi {
         void onError(String message);
     }
 
+    interface BinaryCallback {
+        void onSuccess(byte[] bytes);
+        void onError(String message);
+    }
+
     private static final int TIMEOUT_MILLIS = 15_000;
     private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(2);
+    private static final ExecutorService FILE_EXECUTOR = Executors.newFixedThreadPool(2);
+    private static final int MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
     private BackendApi() {
     }
@@ -52,6 +61,97 @@ final class BackendApi {
         request("DELETE", path, null, token, callback);
     }
 
+    static void download(String path, String token, BinaryCallback callback) {
+        FILE_EXECUTOR.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                connection = open("GET", path, token);
+                connection.setRequestProperty("Accept", "image/jpeg, image/png");
+                int status = connection.getResponseCode();
+                if (status < 200 || status >= 300) {
+                    callback.onError(errorMessage(read(connection.getErrorStream()), status));
+                    return;
+                }
+                if (connection.getContentLengthLong() > MAX_PHOTO_BYTES) {
+                    callback.onError("A foto ultrapassa o limite de 5 MB.");
+                    return;
+                }
+                String type = connection.getContentType();
+                if (type == null || !(type.startsWith("image/jpeg") || type.startsWith("image/png"))) {
+                    callback.onError("O servidor não retornou uma foto JPEG ou PNG.");
+                    return;
+                }
+                try (InputStream input = connection.getInputStream();
+                     ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+                    byte[] buffer = new byte[8192];
+                    int count;
+                    while ((count = input.read(buffer)) != -1) {
+                        if (output.size() + count > MAX_PHOTO_BYTES) throw new IOException("Photo too large");
+                        output.write(buffer, 0, count);
+                    }
+                    callback.onSuccess(output.toByteArray());
+                }
+            } catch (IOException exception) {
+                callback.onError("Não foi possível carregar a foto. Confira a conexão e tente novamente.");
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        });
+    }
+
+    static void uploadMultipart(String path, String token, byte[] bytes, String filename,
+                                String mime, Callback callback) {
+        if (bytes == null || bytes.length == 0 || bytes.length > MAX_PHOTO_BYTES
+                || !("image/jpeg".equals(mime) || "image/png".equals(mime))) {
+            callback.onError("Selecione uma foto JPEG ou PNG de até 5 MB.");
+            return;
+        }
+        FILE_EXECUTOR.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                connection = open("POST", path, token);
+                String boundary = "LinkHealth" + UUID.randomUUID().toString().replace("-", "");
+                // Nome fixo impede injeção de cabeçalhos e evita enviar caminhos pessoais.
+                String safeName = "image/png".equals(mime) ? "evolucao.png" : "evolucao.jpg";
+                byte[] prefix = ("--" + boundary + "\r\nContent-Disposition: form-data; name=\"file\"; filename=\""
+                        + safeName + "\"\r\nContent-Type: " + mime + "\r\n\r\n").getBytes(StandardCharsets.UTF_8);
+                byte[] suffix = ("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8);
+                connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+                connection.setFixedLengthStreamingMode(prefix.length + bytes.length + suffix.length);
+                connection.setDoOutput(true);
+                try (OutputStream output = connection.getOutputStream()) {
+                    output.write(prefix);
+                    output.write(bytes);
+                    output.write(suffix);
+                }
+                int status = connection.getResponseCode();
+                String response = read(status >= 200 && status < 300
+                        ? connection.getInputStream() : connection.getErrorStream());
+                if (status >= 200 && status < 300) callback.onSuccess(response);
+                else callback.onError(errorMessage(response, status));
+            } catch (IOException exception) {
+                callback.onError("Não foi possível confirmar o envio da foto. Atualize a tela antes de tentar novamente.");
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        });
+    }
+
+    private static HttpURLConnection open(String method, String path, @Nullable String token) throws IOException {
+        String baseUrl = BuildConfig.BACKEND_BASE_URL;
+        if (blank(baseUrl)) throw new IOException("Backend not configured");
+        HttpURLConnection connection = (HttpURLConnection) new URL(removeFinalSlash(baseUrl) + path).openConnection();
+        // Não encaminha tokens para outro servidor em redirecionamentos.
+        connection.setInstanceFollowRedirects(false);
+        connection.setUseCaches(false);
+        connection.setRequestMethod(method);
+        connection.setConnectTimeout(TIMEOUT_MILLIS);
+        connection.setReadTimeout(TIMEOUT_MILLIS);
+        connection.setRequestProperty("Accept", "application/json");
+        if (!blank(token)) connection.setRequestProperty("Authorization", "Bearer " + token);
+        return connection;
+    }
+
     private static void request(String method, String path, @Nullable JSONObject body, @Nullable String token,
                                 Callback callback) {
         EXECUTOR.execute(() -> {
@@ -62,12 +162,7 @@ final class BackendApi {
                     callback.onError("A conexão com o servidor ainda não está configurada.");
                     return;
                 }
-                connection = (HttpURLConnection) new URL(removeFinalSlash(baseUrl) + path).openConnection();
-                connection.setRequestMethod(method);
-                connection.setConnectTimeout(TIMEOUT_MILLIS);
-                connection.setReadTimeout(TIMEOUT_MILLIS);
-                connection.setRequestProperty("Accept", "application/json");
-                if (!blank(token)) connection.setRequestProperty("Authorization", "Bearer " + token);
+                connection = open(method, path, token);
                 if (body != null) {
                     connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
                     connection.setDoOutput(true);

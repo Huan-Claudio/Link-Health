@@ -69,6 +69,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/patients/*/recommended-products", "/api/v1/patients/*/recommended-products/**",
                                 "/api/v1/nutritionists/me/recommended-product-patients")
                         .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
+                        .requestMatchers("/api/v1/patients/*/water-intakes", "/api/v1/patients/*/water-intakes/**",
+                                "/api/v1/patients/*/meal-records", "/api/v1/patients/*/meal-records/**",
+                                "/api/v1/patients/*/weight-records", "/api/v1/patients/*/weight-records/**",
+                                "/api/v1/patients/*/evolution-photos", "/api/v1/patients/*/evolution-photos/**",
+                                "/api/v1/patients/*/records-summary", "/api/v1/patients/*/records-history",
+                                "/api/v1/patients/*/planned-meals")
+                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
                         .anyRequest().hasAuthority("ROLE_API_CLIENT"))
                 .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(mobileTokenAuthenticationFilter, ApiKeyAuthenticationFilter.class)

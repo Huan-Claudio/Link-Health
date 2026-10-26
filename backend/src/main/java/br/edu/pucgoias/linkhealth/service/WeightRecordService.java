@@ -14,16 +14,24 @@ import org.springframework.stereotype.Service;
 public class WeightRecordService {
 
     private final WeightRecordRepository repository;
+    private final UserAccountService accounts;
+    private final PatientAccessService access;
 
-    public WeightRecordService(WeightRecordRepository repository) {
+    public WeightRecordService(WeightRecordRepository repository, UserAccountService accounts, PatientAccessService access) {
         this.repository = repository;
+        this.accounts = accounts;
+        this.access = access;
     }
 
     public List<WeightRecord> list(UUID patientId) {
+        access.ensureCanAccess(patientId);
+        accounts.requirePatient(patientId);
         return repository.findByPatientId(patientId);
     }
 
     public WeightRecord create(UUID patientId, BigDecimal weightKg, Instant measuredAt, String notes) {
+        access.ensureCanWriteRecords(patientId);
+        accounts.requirePatient(patientId);
         Instant now = Instant.now();
         WeightRecord record = new WeightRecord(
                 UUID.randomUUID(), patientId, weightKg, defaultToNow(measuredAt), trimToNull(notes), now, now);
@@ -36,6 +44,8 @@ public class WeightRecordService {
             BigDecimal weightKg,
             Instant measuredAt,
             String notes) {
+        access.ensureCanWriteRecords(patientId);
+        accounts.requirePatient(patientId);
         if (weightKg == null && measuredAt == null && notes == null) {
             throw new InvalidRequestException("Informe ao menos um campo para atualizar o peso.");
         }
@@ -51,6 +61,8 @@ public class WeightRecordService {
     }
 
     public void delete(UUID patientId, UUID recordId) {
+        access.ensureCanWriteRecords(patientId);
+        accounts.requirePatient(patientId);
         repository.delete(find(patientId, recordId));
     }
 

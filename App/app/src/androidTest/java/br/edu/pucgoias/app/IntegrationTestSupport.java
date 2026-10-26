@@ -63,6 +63,15 @@ final class IntegrationTestSupport {
             return false;
         });
     }
+    static void awaitEnabled(int id) {
+        await(() -> {
+            for (Activity activity : ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED)) {
+                View view = activity.findViewById(id);
+                if (view != null && view.isShown() && view.isEnabled()) return true;
+            }
+            return false;
+        });
+    }
 
     static void awaitText(String text) {
         await(() -> {
@@ -71,6 +80,18 @@ final class IntegrationTestSupport {
             }
             return false;
         });
+    }
+
+    /** Diálogos possuem outra janela, fora do decorView da Activity. */
+    static void awaitDialogText(String text) {
+        long end = SystemClock.uptimeMillis() + 20_000;
+        while (SystemClock.uptimeMillis() < end) {
+            android.view.accessibility.AccessibilityNodeInfo root = InstrumentationRegistry.getInstrumentation()
+                    .getUiAutomation().getRootInActiveWindow();
+            if (root != null && !root.findAccessibilityNodeInfosByText(text).isEmpty()) return;
+            SystemClock.sleep(100);
+        }
+        fail("O diálogo não exibiu o conteúdo esperado: " + text);
     }
 
     private interface Condition { boolean ready(); }

@@ -1,0 +1,126 @@
+TESTES DA PARTE DO FELIPE — COMPRAS, PRODUTOS E REGISTROS
+
+1. INICIAR A API
+
+No PowerShell:
+cd "C:\Users\felip\OneDrive\Documents\api\Link-Health\backend"
+..\App\gradlew.bat bootRun
+
+O PostgreSQL deve estar em execução. A conexão é lida do backend/.env local,
+que não deve ser enviado ao GitHub. Aguarde Started LinkHealthApiApplication
+e confira o perfil postgres. Deixe o terminal aberto. O bootRun continuar em
+EXECUTING é normal: a API fica aguardando requisições. As migrações são aplicadas
+ao iniciar; não apague tabelas ou arquivos fonte para resolver um erro.
+
+2. ABRIR O APP
+
+No Android Studio, abra:
+C:\Users\felip\OneDrive\Documents\api\Link-Health\App
+
+Selecione o emulador e pressione Run. Compile novamente se mudou de rede: o
+build debug detecta o endereço na compilação. A API precisa estar acessível
+pelo dispositivo; essa configuração não publica o servidor na internet.
+
+Cadastre uma conta PACIENTE no app ou entre com uma já existente nesse banco.
+Não precisa recriar a conta a cada reinício. Se a API reiniciou, entre novamente
+para obter uma sessão válida. Não coloque a chave administrativa no aplicativo.
+
+3. CONFERIR COMO PACIENTE
+
+COMPRAS: Lista de compras > Editar minha lista > Adicionar item. Informe nome,
+quantidade e unidade. Salve e volte: o item deve aparecer. Marque comprado,
+reabra e confirme. Desmarque. No editor, altere a quantidade e depois remova.
+
+ÁGUA: adicione 500 ml na home. Reabra/entre novamente e confira a persistência.
+Remova 500 ml. Remover mais que o total deve mostrar erro sem consumo negativo.
+No Histórico, registre uma quantidade, edite quantidade/data e remova o registro.
+
+REFEIÇÕES: em Meu plano alimentar, marque uma refeição de plano publicado,
+reabra e desmarque. Sem plano, a tela informa a ausência e permite Registrar
+outra refeição. Cadastre, edite e remova uma refeição. A home deve refletir
+as refeições realmente registradas hoje.
+
+PESO: Evolução corporal > Registrar peso. Salve, reabra, edite e remova uma
+pesagem. Confira também no Histórico. Peso pode ser salvo sem enviar uma foto.
+
+FOTOS: Evolução corporal > Escolher foto da galeria ou Tirar foto. Aguarde,
+reabra e toque Ver foto. Confira a imagem e remova. Cancelar a seleção não cria
+registro. Se ficar pendente, envie novamente para esse registro ou remova-o.
+O app prepara a imagem e o servidor valida JPEG/PNG de até 5 MB.
+
+HISTÓRICO: os totais devem corresponder aos registros salvos em cada dia.
+Datas e separação dos dias no app seguem o horário de Brasília.
+
+ISOLAMENTO: saia e entre com outro paciente. Os registros do primeiro não devem
+aparecer. Girar durante um salvamento não deve repetir a operação.
+
+4. CONFERIR COMO NUTRICIONISTA
+
+Use uma conta NUTRICIONISTA com acompanhamento ATIVO com o paciente. Abra a
+ficha real na home. Crie/edite/remova compras e produtos recomendados. Entre
+como paciente e confira os mesmos dados. O nutricionista consulta água,
+refeições, peso, fotos e histórico; a alteração desses registros é do paciente.
+Comprar abre o link do produto; o aplicativo não realiza pagamentos.
+
+Convites/aceitação e autoria de planos são da outra parte da equipe. Sem vínculo
+ativo, o paciente não aparece na lista do nutricionista. Esta entrega utiliza
+vínculos existentes e não insere vínculos fictícios para liberar acesso.
+
+5. TESTES AUTOMÁTICOS DO BACKEND
+
+cd "C:\Users\felip\OneDrive\Documents\api\Link-Health\backend"
+..\App\gradlew.bat test --no-daemon
+
+Confirme BUILD SUCCESSFUL. Sem configurar banco exclusivo de testes, 20 casos
+PostgreSQL são ignorados; os demais usam memória. Para executar também esses
+casos, configure no ambiente LINK_HEALTH_TEST_DB_URL,
+LINK_HEALTH_TEST_DB_USERNAME e LINK_HEALTH_TEST_DB_PASSWORD, apontando para
+um banco SOMENTE de testes. Não use o banco da apresentação para dados sintéticos.
+
+6. TESTES AUTOMÁTICOS DO ANDROID
+
+cd "C:\Users\felip\OneDrive\Documents\api\Link-Health\App"
+.\gradlew.bat testDebugUnitTest lintDebug assembleDebug
+
+Confirme BUILD SUCCESSFUL. Para testar a interface, mantenha a API conectada
+a banco exclusivo de testes, abra o emulador e execute:
+
+.\gradlew.bat connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=br.edu.pucgoias.app.EscopoPacienteIntegrationTest,br.edu.pucgoias.app.FluxoPacienteTest"
+
+Esses testes usam contas inéditas, cadastro real e tokens próprios; não levam
+chave administrativa no APK. Cobrem compras, registros, foto, login e cadastro.
+O teste de foto cobre transporte e visualização; confira também a aquisição
+pela câmera e galeria manualmente, conforme o roteiro acima.
+
+EscopoVinculadoIntegrationTest acrescenta nutricionista e plano. Exige duas
+contas sintéticas vinculadas, senha de testes AuditOnly123, plano publicado e
+argumentos scopePatientEmail e scopeNutritionistEmail. Não use contas reais.
+
+7. RESULTADOS
+
+Backend: 54 aprovados, 0 falhas, 0 ignorados, incluindo 20 PostgreSQL reais.
+HTTP: 147 verificações aprovadas.
+Concorrência de água: 60 solicitações, com totais e rejeições corretos.
+Android: compilação e testes JVM concluídos; Lint sem erros.
+Android no emulador: 13 testes dedicados aprovados, 0 falhas e 0 ignorados,
+incluindo paciente, nutricionista, plano e retomada de foto PNG pendente.
+Suíte geral anterior ao caso PNG adicional: 17 de 18 aprovados; única falha
+em aceitar convite/voltar, no cabeçalho da tela de convites (fora do escopo).
+O teste não foi removido nem considerado aprovado.
+Câmera e galeria: envio, persistência, visualização e limpeza do cache confirmados.
+Nutricionista vinculado: visualização da imagem confirmada, sem controles de escrita.
+Banco de desenvolvimento: inicialização e migração V11 confirmadas, sem cadastros
+sintéticos de teste. O .env não foi alterado nem incluído nos arquivos versionados.
+
+Sem variáveis de banco exclusivo, o comando comum do backend também foi repetido:
+34 aprovados e 20 PostgreSQL ignorados, com BUILD SUCCESSFUL.
+Não foram testados aparelho físico, todos os fabricantes, servidor público HTTPS,
+carga de produção ou invasão externa.
+
+Os servidores temporários foram encerrados, o banco descartável foi removido
+e as configurações temporárias do emulador foram restauradas. O APK foi recompilado
+com a configuração normal de desenvolvimento. Para testar seus cadastros, inicie a API
+e execute novamente o app conforme os passos 1 e 2.
+
+Convites, perfil, endereço, avatar, notificações e autoria clínica de planos
+continuam com seus respectivos responsáveis e não fazem parte deste escopo.

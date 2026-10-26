@@ -1,5 +1,7 @@
 # Etapa 2 — produtos recomendados
 
+> Registro da entrega inicial de produtos. A ficha e a lista de pacientes reais foram conectadas posteriormente: veja [Integração do escopo completo](INTEGRACAO_ETAPA_3_ESCOPO_COMPLETO.md).
+
 ## O que foi conectado
 
 - A tabela `recommended_products` existente continua armazenando os produtos. A migração V10 liga cada produto a um paciente em `patients`; não cria outra tabela de pacientes.

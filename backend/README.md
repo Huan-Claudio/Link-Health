@@ -2,6 +2,8 @@
 
 Backend REST do Link Health, separado do aplicativo Android em `App/`.
 
+Entrega atual da parte do Felipe: [integração completa](../INTEGRACAO_ETAPA_3_ESCOPO_COMPLETO.md). Roteiro de testes e resultados: [TESTES_ESCOPO_FELIPE.txt](TESTES_ESCOPO_FELIPE.txt).
+
 ## Recursos implementados
 
 - API HTTP com Spring Boot;

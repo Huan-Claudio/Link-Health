@@ -1,5 +1,7 @@
 # Integração — Etapa 1: lista de compras
 
+> Registro da entrega inicial. A conexão ampliada, incluindo edição da lista e registros do paciente, está em [Integração do escopo completo](INTEGRACAO_ETAPA_3_ESCOPO_COMPLETO.md).
+
 Esta é a primeira etapa de conexão da parte de lista de compras. Ela foi concluída de ponta a ponta: banco PostgreSQL, API Java e tela Android do paciente.
 
 ## Entrega desta etapa

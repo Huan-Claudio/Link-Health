@@ -26,12 +26,14 @@ import org.springframework.test.web.servlet.MvcResult;
 @AutoConfigureMockMvc
 class PatientRecordsControllerTest {
 
+    @Autowired private br.edu.pucgoias.linkhealth.service.UserAccountService accounts;
+
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     void shouldManageWaterIntakes() throws Exception {
-        UUID patientId = UUID.randomUUID();
+        UUID patientId = PatientFixtures.create(accounts);
         String basePath = "/api/v1/patients/" + patientId + "/water-intakes";
         MvcResult created = mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +53,7 @@ class PatientRecordsControllerTest {
 
     @Test
     void shouldManageMealRecords() throws Exception {
-        UUID patientId = UUID.randomUUID();
+        UUID patientId = PatientFixtures.create(accounts);
         String basePath = "/api/v1/patients/" + patientId + "/meal-records";
         MvcResult created = mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -67,7 +69,7 @@ class PatientRecordsControllerTest {
 
     @Test
     void shouldManageWeightRecords() throws Exception {
-        UUID patientId = UUID.randomUUID();
+        UUID patientId = PatientFixtures.create(accounts);
         String basePath = "/api/v1/patients/" + patientId + "/weight-records";
         MvcResult created = mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -7,8 +7,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.math.BigDecimal;
 
-/** Chamadas da etapa 1: carregar a lista de compras e alterar somente o estado de compra. */
+/** Lista de compras persistida, acessada com a sessão do usuário. */
 public final class ShoppingApi {
 
     public interface ListCallback {
@@ -20,6 +21,8 @@ public final class ShoppingApi {
         void onSuccess(Item item);
         void onError(String message);
     }
+
+    public interface DeleteCallback { void onSuccess(); void onError(String message); }
 
     public static final class Item {
         private final UUID id;
@@ -90,6 +93,32 @@ public final class ShoppingApi {
         } catch (JSONException exception) {
             callback.onError("Não foi possível preparar a atualização do item.");
         }
+    }
+
+    public void save(UUID patientId, UUID itemId, String name, BigDecimal quantity, String unit,
+                     String token, ItemCallback callback) {
+        try {
+            JSONObject body = new JSONObject();
+            body.put("name", name);
+            body.put("quantity", quantity);
+            body.put("unit", unit);
+            BackendApi.Callback result = new BackendApi.Callback() {
+                public void onSuccess(String response) {
+                    try { callback.onSuccess(parse(new JSONObject(response))); }
+                    catch (JSONException | IllegalArgumentException e) { callback.onError("Resposta inválida ao salvar o item."); }
+                }
+                public void onError(String message) { callback.onError(message); }
+            };
+            if (itemId == null) BackendApi.post(path(patientId), body, token, result);
+            else BackendApi.patch(path(patientId) + "/" + itemId, body, token, result);
+        } catch (JSONException exception) { callback.onError("Não foi possível preparar o item."); }
+    }
+
+    public void delete(UUID patientId, UUID itemId, String token, DeleteCallback callback) {
+        BackendApi.delete(path(patientId) + "/" + itemId, token, new BackendApi.Callback() {
+            public void onSuccess(String response) { callback.onSuccess(); }
+            public void onError(String message) { callback.onError(message); }
+        });
     }
 
     private static Item parse(JSONObject json) throws JSONException {

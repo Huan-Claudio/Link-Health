@@ -26,16 +26,18 @@ public class TelasPacienteTest {
         Sessao.entrar(Perfil.PACIENTE);
     }
 
-    @Test public void planoAtualizaResumoAoVoltar() {
-        MockData.getPacienteLogado().getPlano().forEach(r -> r.setConcluida(false));
+    @Test public void planoAtualizaResumoAoVoltar() throws Exception {
+        AccountSession account = IntegrationTestSupport.patient();
+        IntegrationTestSupport.enter(account);
+        IntegrationTestSupport.http("POST", "/api/v1/patients/" + account.getId() + "/meal-records",
+                new JSONObject().put("mealName", "Refeição real do teste"), account);
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
+            IntegrationTestSupport.awaitText("1 refeições registradas hoje");
             onView(withId(R.id.menuPlano)).perform(scrollTo(), click());
-            onView(withText(MockData.getPacienteLogado().getPlano().get(0).getTitulo()))
-                    .perform(click());
+            IntegrationTestSupport.awaitText("Refeição real do teste");
             onView(withId(R.id.btnVoltar)).perform(click());
-            onView(withId(R.id.tvRefeicoesConcluidas)).check(matches(withText(
-                    androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
-                            .getTargetContext().getString(R.string.refeicoes_concluidas, 1, 4))));
+            IntegrationTestSupport.awaitText("1 refeições registradas hoje");
+            onView(withId(R.id.tvRefeicoesConcluidas)).check(matches(withSubstring("1 refeições registradas hoje")));
         }
     }
 

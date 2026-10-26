@@ -37,8 +37,17 @@ public class WaterIntakeController {
     @Operation(summary = "Lista os registros de água de um paciente")
     public List<WaterIntakeResponse> list(
             @PathVariable UUID patientId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return service.list(patientId, date).stream().map(WaterIntakeResponse::from).toList();
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(defaultValue = "America/Sao_Paulo") String zoneId) {
+        return service.list(patientId, date, zoneId).stream().map(WaterIntakeResponse::from).toList();
+    }
+
+    @PostMapping("/adjustment")
+    @Operation(summary = "Adiciona ou desconta água de um dia, sem permitir saldo negativo")
+    public List<WaterIntakeResponse> adjust(@PathVariable UUID patientId,
+            @Valid @RequestBody AdjustWaterIntakeRequest request) {
+        return service.adjust(patientId, request.amountMilliliters(), request.date(), request.zoneId())
+                .stream().map(WaterIntakeResponse::from).toList();
     }
 
     @PostMapping

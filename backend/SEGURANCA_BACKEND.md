@@ -2,7 +2,9 @@
 
 ## O que foi implementado
 
-- autenticação obrigatória por chave de API no cabeçalho X-API-Key;
+- autenticação administrativa por chave de API no cabeçalho X-API-Key;
+- autenticação do aplicativo por token da conta, sem chave administrativa no APK: compras, produtos e registros autorizados por paciente, perfil e vínculo ativo;
+- registros de água, refeições, peso e fotos alteráveis somente pelo próprio paciente; nutricionista vinculado possui consulta; detalhes e testes em [integração completa](../INTEGRACAO_ETAPA_3_ESCOPO_COMPLETO.md);
 - chaves mantidas fora do código, no arquivo .env ignorado pelo Git ou em
   variáveis de ambiente;
 - sessões desativadas: cada requisição precisa se autenticar;

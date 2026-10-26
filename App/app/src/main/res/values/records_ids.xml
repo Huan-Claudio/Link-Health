@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="recordsStatus" />
+    <item type="id" name="recordsRefresh" />
+    <item type="id" name="recordAddMeal" />
+    <item type="id" name="recordAddWater" />
+    <item type="id" name="recordAddWeight" />
+    <item type="id" name="recordAddPhoto" />
+    <item type="id" name="recordInputValue" />
+    <item type="id" name="recordInputDate" />
+    <item type="id" name="recordInputNotes" />
+    <item type="id" name="recordHistory" />
+</resources>

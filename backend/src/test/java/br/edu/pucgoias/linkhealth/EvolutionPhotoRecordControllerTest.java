@@ -36,12 +36,14 @@ import org.springframework.mock.web.MockMultipartFile;
 @AutoConfigureMockMvc
 class EvolutionPhotoRecordControllerTest {
 
+    @Autowired private br.edu.pucgoias.linkhealth.service.UserAccountService accounts;
+
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     void shouldCreateUploadReadAndDeleteEvolutionPhoto() throws Exception {
-        UUID patientId = UUID.randomUUID();
+        UUID patientId = PatientFixtures.create(accounts);
         String basePath = "/api/v1/patients/" + patientId + "/evolution-photos";
 
         MvcResult created = mockMvc.perform(post(basePath)
@@ -81,7 +83,7 @@ class EvolutionPhotoRecordControllerTest {
 
     @Test
     void shouldRejectAFileThatIsNotARealImage() throws Exception {
-        UUID patientId = UUID.randomUUID();
+        UUID patientId = PatientFixtures.create(accounts);
         String basePath = "/api/v1/patients/" + patientId + "/evolution-photos";
 
         MvcResult created = mockMvc.perform(post(basePath)
@@ -110,7 +112,7 @@ class EvolutionPhotoRecordControllerTest {
 
     @Test
     void shouldRejectHugeDimensionsBeforeDecodingTheImage() throws Exception {
-        String basePath = "/api/v1/patients/" + UUID.randomUUID() + "/evolution-photos";
+        String basePath = "/api/v1/patients/" + PatientFixtures.create(accounts) + "/evolution-photos";
         MvcResult created = mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
