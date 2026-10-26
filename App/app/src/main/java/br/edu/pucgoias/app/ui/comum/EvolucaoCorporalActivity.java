@@ -1,142 +1,220 @@
 package br.edu.pucgoias.app.ui.comum;
 
-import android.content.ActivityNotFoundException;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.content.FileProvider;
+import android.widget.*;
+
 import androidx.lifecycle.ViewModelProvider;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-import br.edu.pucgoias.app.BaseActivity;
-import br.edu.pucgoias.app.R;
+
+import br.edu.pucgoias.app.*;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.data.remote.RecordsApi;
 import br.edu.pucgoias.app.model.Perfil;
 import br.edu.pucgoias.app.util.PatientNavigation;
 
-/** Fotos autenticadas no banco e histórico de peso; o nutricionista vinculado apenas consulta. */
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import org.json.*;
+
+import java.util.*;
+
+/** Uma avaliação é um card com três fotos, peso e data. */
 public class EvolucaoCorporalActivity extends BaseActivity {
     private RecordsScreen screen;
     private RecordsViewModel vm;
     private UUID patient;
-    private boolean own;
-    private String cameraName, retryId;
-    private boolean previewLoading;
-    private final ActivityResultLauncher<String> gallery = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-        if (uri != null && vm != null) vm.preparePhoto(getApplicationContext().getContentResolver(), uri, retryId, null);
-        retryId = null;
-    });
-    private final ActivityResultLauncher<Uri> camera = registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
-        File file = cameraFile();
-        if (success && file != null && vm != null) vm.preparePhoto(getApplicationContext().getContentResolver(), Uri.fromFile(file), retryId, file);
-        else if (file != null) file.delete();
-        cameraName = null; retryId = null;
-    });
-    @Override protected void onCreate(Bundle state) {
-        super.onCreate(state); if (sessaoExpirada()) return;
+    private boolean own, oldVisible;
+
+    @Override
+    protected void onCreate(Bundle state) {
+        super.onCreate(state);
+        if (sessaoExpirada()) return;
         patient = PatientNavigation.patientId(getIntent());
-        if (patient == null) { fecharPacienteNaoEncontrado(); return; }
+        if (patient == null) {
+            fecharPacienteNaoEncontrado();
+            return;
+        }
         own = Sessao.getPerfil() == Perfil.PACIENTE;
-        if (state != null) { cameraName = state.getString("cameraName"); retryId = state.getString("retryId"); }
-        screen = new RecordsScreen(this, getString(R.string.evolucao_corporal)); setContentView(screen.root);
+        oldVisible = state != null && state.getBoolean("oldVisible");
+        screen = new RecordsScreen(this, getString(R.string.evolucao_corporal));
+        setContentView(screen.root);
         vm = new ViewModelProvider(this).get(RecordsViewModel.class);
         if (own) {
-            MaterialButton weight = screen.button("Registrar peso", v -> registrarDialog(RecordDialogs.edit(this, vm, RecordsApi.WEIGHT, null)));
-            weight.setId(R.id.recordAddWeight); screen.actions.addView(weight);
-            MaterialButton photo = screen.button("Escolher foto da galeria", v -> choosePhoto(null));
-            photo.setId(R.id.recordAddPhoto); screen.actions.addView(photo);
-            MaterialButton take = screen.button("Tirar foto", v -> takePhoto());
-            take.setId(R.id.btnTirarFoto); screen.actions.addView(take);
+            MaterialButton add =
+                    screen.button(
+                            "Nova avaliação · fotos e peso",
+                            v -> startActivity(new Intent(this, NovaEvolucaoActivity.class)));
+            add.setId(R.id.assessmentNew);
+            screen.actions.addView(add);
         }
         screen.refresh.setOnClickListener(v -> vm.reload());
-        vm.changes.observe(this, ignored -> render());
-        vm.configure(patient, Sessao.getAccessToken(), false, RecordsApi.PHOTOS, RecordsApi.WEIGHT);
+        vm.changes.observe(this, x -> render());
+        vm.configure(
+                patient,
+                Sessao.getAccessToken(),
+                false,
+                RecordsApi.ASSESSMENTS,
+                RecordsApi.PHOTOS,
+                RecordsApi.WEIGHT);
     }
-    @Override protected void onResume() { super.onResume(); if (vm != null) vm.reload(); }
-    @Override protected void onSaveInstanceState(Bundle out) {
-        out.putString("cameraName", cameraName); out.putString("retryId", retryId); super.onSaveInstanceState(out);
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (vm != null) vm.reload();
     }
-    private File cameraFile() {
-        if (cameraName == null || !cameraName.matches("capture-[a-f0-9-]+\\.jpg")) return null;
-        return new File(new File(getCacheDir(), "evolution-camera"), cameraName);
+
+    @Override
+    protected void onSaveInstanceState(Bundle out) {
+        out.putBoolean("oldVisible", oldVisible);
+        super.onSaveInstanceState(out);
     }
-    private void takePhoto() {
-        try {
-            File directory = new File(getCacheDir(), "evolution-camera");
-            if (!directory.exists() && !directory.mkdirs()) throw new IOException();
-            cameraName = "capture-" + UUID.randomUUID() + ".jpg"; retryId = null;
-            camera.launch(FileProvider.getUriForFile(this, getPackageName() + ".evolution-files", cameraFile()));
-        } catch (IOException | ActivityNotFoundException e) { vm.report("Não foi possível abrir a câmera. Você pode escolher uma foto da galeria."); }
-    }
-    private void choosePhoto(String pendingId) {
-        retryId = pendingId;
-        try { gallery.launch("image/*"); }
-        catch (ActivityNotFoundException e) { vm.report("Nenhum aplicativo disponível para selecionar a imagem."); }
-    }
+
     private void render() {
-        screen.state(vm); screen.rows.removeAllViews();
-        screen.rows.addView(screen.text("Fotos de evolução", 20));
-        JSONArray photos = vm.items(RecordsApi.PHOTOS);
-        if (photos.length() == 0 && vm.loading == 0) screen.rows.addView(screen.text("Nenhuma foto enviada.", 15));
-        for (int i = 0; i < photos.length(); i++) {
-            JSONObject photo = photos.optJSONObject(i); if (photo == null) continue;
-            String id = photo.optString("id"); boolean stored = "STORED".equals(photo.optString("uploadStatus"));
-            LinearLayout card = screen.card(RecordFormatting.time(photo.optString("capturedAt")), stored ? "Foto armazenada" : "Envio pendente");
-            if (stored) {
-                MaterialButton open = screen.button("Ver foto", v -> preview(id)); open.setEnabled(vm.ready()); card.addView(open);
-            } else if (own) {
-                MaterialButton retry = screen.button("Enviar foto pendente", v -> choosePhoto(id)); retry.setEnabled(vm.ready()); card.addView(retry);
+        screen.state(vm);
+        if (vm.loading > 0) return;
+        screen.rows.removeAllViews();
+        JSONArray records = vm.items(RecordsApi.ASSESSMENTS);
+        Set<String> photoIds = new HashSet<>(), weightIds = new HashSet<>();
+        if (records.length() == 0)
+            screen.card(
+                    "Sua evolução ao longo do tempo",
+                    "Cada avaliação reúne frente, lado, costas e peso. Registre uma nova avaliação"
+                        + " para começar.");
+        for (int i = 0; i < records.length(); i++) {
+            JSONObject record = records.optJSONObject(i);
+            if (record == null) continue;
+            weightIds.add(record.optString("weightRecordId"));
+            LinearLayout card =
+                    screen.card(
+                            record.optString("weightKg") + " kg",
+                            RecordFormatting.time(record.optString("recordedAt")));
+            LinearLayout strip = screen.column();
+            strip.setOrientation(LinearLayout.HORIZONTAL);
+            card.addView(strip);
+            JSONArray photos = record.optJSONArray("photos");
+            String[] positions = {"Frente", "Lado", "Costas"};
+            for (int j = 0; photos != null && j < photos.length(); j++) {
+                JSONObject photo = photos.optJSONObject(j);
+                if (photo == null) continue;
+                String id = photo.optString("photoId");
+                photoIds.add(id);
+                final int index = j;
+                LinearLayout cell = screen.column();
+                LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1);
+                p.setMargins(screen.dp(3), screen.dp(8), screen.dp(3), screen.dp(8));
+                strip.addView(cell, p);
+                ImageView image = new ImageView(this);
+                image.setImageResource(R.drawable.ic_image);
+                image.setBackgroundResource(R.drawable.bg_image_placeholder);
+                image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                image.setContentDescription("Foto de " + positions[j]);
+                cell.addView(image, new LinearLayout.LayoutParams(-1, screen.dp(112)));
+                TextView text = screen.text(positions[j], 12);
+                text.setGravity(17);
+                cell.addView(text);
+                cell.setOnClickListener(
+                        v ->
+                                registrarDialog(
+                                        EvolutionBook.show(
+                                                this,
+                                                patient,
+                                                Sessao.getAccessToken(),
+                                                record,
+                                                index)));
+                EvolutionBook.thumbnail(this, patient, Sessao.getAccessToken(), id, image, 360);
             }
+            MaterialButton book =
+                    screen.button(
+                            "Ver 3 fotos",
+                            v ->
+                                    registrarDialog(
+                                            EvolutionBook.show(
+                                                    this,
+                                                    patient,
+                                                    Sessao.getAccessToken(),
+                                                    record,
+                                                    0)));
+            card.addView(book);
             if (own) {
-                MaterialButton remove = screen.button("Remover foto", v -> registrarDialog(RecordDialogs.remove(this, vm, RecordsApi.PHOTOS, id)));
-                remove.setEnabled(vm.ready()); card.addView(remove);
+                MaterialButton remove =
+                        screen.button(
+                                "Remover avaliação",
+                                v ->
+                                        registrarDialog(
+                                                new MaterialAlertDialogBuilder(this)
+                                                        .setTitle("Remover avaliação?")
+                                                        .setMessage(
+                                                                "As três fotos e o peso deste"
+                                                                    + " registro serão removidos"
+                                                                    + " juntos.")
+                                                        .setNegativeButton("Cancelar", null)
+                                                        .setPositiveButton(
+                                                                "Remover",
+                                                                (d, n) ->
+                                                                        vm.delete(
+                                                                                RecordsApi
+                                                                                        .ASSESSMENTS,
+                                                                                record.optString(
+                                                                                        "id")))
+                                                        .show()));
+                remove.setEnabled(vm.ready());
+                card.addView(remove);
             }
         }
-        screen.rows.addView(screen.text("Histórico de peso", 20));
-        JSONArray weights = vm.items(RecordsApi.WEIGHT);
-        if (weights.length() == 0 && vm.loading == 0) screen.rows.addView(screen.text("Nenhum peso registrado.", 15));
-        for (int i = 0; i < weights.length(); i++) {
-            JSONObject record = weights.optJSONObject(i); if (record == null) continue;
-            LinearLayout card = screen.card(RecordFormatting.value(record, "weightKg") + " kg", RecordFormatting.time(record.optString("measuredAt")) + "\n" + RecordFormatting.value(record, "notes"));
-            if (own) {
-                MaterialButton edit = screen.button("Editar peso", v -> registrarDialog(RecordDialogs.edit(this, vm, RecordsApi.WEIGHT, record)));
-                MaterialButton remove = screen.button("Remover peso", v -> registrarDialog(RecordDialogs.remove(this, vm, RecordsApi.WEIGHT, record.optString("id"))));
-                edit.setEnabled(vm.ready()); remove.setEnabled(vm.ready()); card.addView(edit); card.addView(remove);
+        JSONArray photos = vm.items(RecordsApi.PHOTOS), weights = vm.items(RecordsApi.WEIGHT);
+        boolean legacy = false;
+        for (int i = 0; i < photos.length(); i++)
+            if (!photoIds.contains(photos.optJSONObject(i).optString("id"))) legacy = true;
+        for (int i = 0; i < weights.length(); i++)
+            if (!weightIds.contains(weights.optJSONObject(i).optString("id"))) legacy = true;
+        if (legacy) {
+            MaterialButton old =
+                    screen.button(
+                            oldVisible
+                                    ? "Ocultar registros anteriores"
+                                    : "Ver registros anteriores",
+                            v -> {
+                                oldVisible = !oldVisible;
+                                render();
+                            });
+            screen.rows.addView(old);
+            if (oldVisible) {
+                screen.rows.addView(screen.text("Registros anteriores sem avaliação conjunta", 18));
+                screen.rows.addView(
+                        screen.text(
+                                "Esses dados foram salvos antes do novo formato. Não associamos"
+                                    + " fotos e pesos por suposição.",
+                                13));
+                for (int i = 0; i < weights.length(); i++) {
+                    JSONObject w = weights.optJSONObject(i);
+                    if (!weightIds.contains(w.optString("id")))
+                        screen.card(
+                                w.optString("weightKg") + " kg",
+                                RecordFormatting.time(w.optString("measuredAt")));
+                }
+                for (int i = 0; i < photos.length(); i++) {
+                    JSONObject photo = photos.optJSONObject(i);
+                    if (photoIds.contains(photo.optString("id"))) continue;
+                    LinearLayout c =
+                            screen.card(
+                                    "Foto anterior",
+                                    RecordFormatting.time(photo.optString("capturedAt")));
+                    if ("STORED".equals(photo.optString("uploadStatus"))) {
+                        ImageView image = new ImageView(this);
+                        image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        c.addView(image, new LinearLayout.LayoutParams(-1, screen.dp(240)));
+                        EvolutionBook.thumbnail(
+                                this,
+                                patient,
+                                Sessao.getAccessToken(),
+                                photo.optString("id"),
+                                image,
+                                1200);
+                    } else c.addView(screen.text("Envio anterior pendente", 14));
+                }
             }
         }
-    }
-    private void preview(String id) {
-        if (previewLoading) return;
-        previewLoading = true; screen.status.setText("Carregando foto…");
-        new RecordsApi().download(patient, Sessao.getAccessToken(), id, new RecordsApi.Callback<byte[]>() {
-            public void onSuccess(byte[] bytes) {
-                BitmapFactory.Options bounds = new BitmapFactory.Options(); bounds.inJustDecodeBounds = true;
-                BitmapFactory.decodeByteArray(bytes, 0, bytes.length, bounds);
-                BitmapFactory.Options options = new BitmapFactory.Options(); options.inSampleSize = 1;
-                while (Math.max(bounds.outWidth, bounds.outHeight) / options.inSampleSize > 1600) options.inSampleSize *= 2;
-                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                runOnUiThread(() -> {
-                    previewLoading = false;
-                    if (isFinishing() || isDestroyed()) { if (bitmap != null) bitmap.recycle(); return; }
-                    screen.state(vm);
-                    if (bitmap == null) { vm.report("Não foi possível visualizar a imagem."); return; }
-                    ImageView image = new ImageView(EvolucaoCorporalActivity.this); image.setImageBitmap(bitmap);
-                    image.setAdjustViewBounds(true); image.setContentDescription("Foto de evolução"); image.setMaxHeight(screen.dp(480));
-                    registrarDialog(new MaterialAlertDialogBuilder(EvolucaoCorporalActivity.this).setTitle("Foto de evolução").setView(image).setPositiveButton("Fechar", null).show());
-                });
-            }
-            public void onError(String value) { runOnUiThread(() -> { previewLoading = false; if (!isDestroyed()) vm.report(value); }); }
-        });
     }
 }

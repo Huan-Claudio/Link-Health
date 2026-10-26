@@ -48,6 +48,7 @@
         <activity android:name=".ui.comum.ConfiguracoesActivity" android:exported="false" />
         <activity android:name=".ui.comum.EditarInformacoesActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.comum.EvolucaoCorporalActivity" android:exported="false" />
+        <activity android:name=".ui.comum.NovaEvolucaoActivity" android:exported="false" />
     </application>
 
 </manifest>

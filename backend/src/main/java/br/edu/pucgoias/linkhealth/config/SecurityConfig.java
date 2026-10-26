@@ -1,7 +1,7 @@
 package br.edu.pucgoias.linkhealth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +19,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableConfigurationProperties(LinkHealthSecurityProperties.class)
@@ -31,23 +33,36 @@ public class SecurityConfig {
             ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
             MobileTokenAuthenticationFilter mobileTokenAuthenticationFilter,
             ApiRateLimitFilter apiRateLimitFilter,
-            ApiKeyAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+            ApiKeyAuthenticationEntryPoint authenticationEntryPoint)
+            throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .requestCache(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers
-                        .contentSecurityPolicy(policy -> policy.policyDirectives(
-                                "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; "
-                                        + "form-action 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; "
-                                        + "script-src 'self' 'unsafe-inline'; connect-src 'self'"))
-                        .frameOptions(frameOptions -> frameOptions.deny())
-                        .referrerPolicy(policy -> policy.policy(ReferrerPolicy.NO_REFERRER))
-                        .addHeaderWriter(new StaticHeadersWriter(
-                                "Permissions-Policy",
-                                "camera=(), microphone=(), geolocation=()")));
+                .headers(
+                        headers ->
+                                headers.contentSecurityPolicy(
+                                                policy ->
+                                                        policy.policyDirectives(
+                                                                "default-src 'self'; base-uri"
+                                                                    + " 'self'; frame-ancestors"
+                                                                    + " 'none'; form-action 'self';"
+                                                                    + " img-src 'self' data:;"
+                                                                    + " style-src 'self'"
+                                                                    + " 'unsafe-inline'; script-src"
+                                                                    + " 'self' 'unsafe-inline';"
+                                                                    + " connect-src 'self'"))
+                                        .frameOptions(frameOptions -> frameOptions.deny())
+                                        .referrerPolicy(
+                                                policy -> policy.policy(ReferrerPolicy.NO_REFERRER))
+                                        .addHeaderWriter(
+                                                new StaticHeadersWriter(
+                                                        "Permissions-Policy",
+                                                        "camera=(), microphone=(),"
+                                                            + " geolocation=()")));
 
         if (!properties.isEnabled()) {
             http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
@@ -58,26 +73,52 @@ public class SecurityConfig {
         if (properties.isRequireHttps()) {
             http.requiresChannel(channel -> channel.anyRequest().requiresSecure());
         }
-        http.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/register", "/api/v1/auth/mobile-session")
-                        .permitAll()
-                        .requestMatchers("/api/v1/patients/*/shopping-items", "/api/v1/patients/*/shopping-items/**")
-                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
-                        .requestMatchers("/api/v1/patients/*/recommended-products", "/api/v1/patients/*/recommended-products/**",
-                                "/api/v1/nutritionists/me/recommended-product-patients")
-                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
-                        .requestMatchers("/api/v1/patients/*/water-intakes", "/api/v1/patients/*/water-intakes/**",
-                                "/api/v1/patients/*/meal-records", "/api/v1/patients/*/meal-records/**",
-                                "/api/v1/patients/*/weight-records", "/api/v1/patients/*/weight-records/**",
-                                "/api/v1/patients/*/evolution-photos", "/api/v1/patients/*/evolution-photos/**",
-                                "/api/v1/patients/*/records-summary", "/api/v1/patients/*/records-history",
-                                "/api/v1/patients/*/planned-meals")
-                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
-                        .anyRequest().hasAuthority("ROLE_API_CLIENT"))
-                .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        http.exceptionHandling(
+                        exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
+                .authorizeHttpRequests(
+                        authorize ->
+                                authorize
+                                        .requestMatchers(
+                                                "/swagger-ui.html",
+                                                "/swagger-ui/**",
+                                                "/api-docs/**")
+                                        .permitAll()
+                                        .requestMatchers(HttpMethod.OPTIONS, "/**")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                HttpMethod.POST,
+                                                "/api/v1/auth/register",
+                                                "/api/v1/auth/mobile-session")
+                                        .permitAll()
+                                        .requestMatchers(
+                                                "/api/v1/patients/*/shopping-items",
+                                                "/api/v1/patients/*/shopping-items/**")
+                                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
+                                        .requestMatchers(
+                                                "/api/v1/patients/*/recommended-products",
+                                                "/api/v1/patients/*/recommended-products/**",
+                                                "/api/v1/nutritionists/me/recommended-product-patients")
+                                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
+                                        .requestMatchers(
+                                                "/api/v1/patients/*/water-intakes",
+                                                "/api/v1/patients/*/water-intakes/**",
+                                                "/api/v1/patients/*/meal-records",
+                                                "/api/v1/patients/*/meal-records/**",
+                                                "/api/v1/patients/*/weight-records",
+                                                "/api/v1/patients/*/weight-records/**",
+                                                "/api/v1/patients/*/evolution-photos",
+                                                "/api/v1/patients/*/evolution-photos/**",
+                                                "/api/v1/patients/*/records-summary",
+                                                "/api/v1/patients/*/records-history",
+                                                "/api/v1/patients/*/planned-meals",
+                                                "/api/v1/patients/*/care-settings",
+                                                "/api/v1/patients/*/evolution-assessments",
+                                                "/api/v1/patients/*/evolution-assessments/**")
+                                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
+                                        .anyRequest()
+                                        .hasAuthority("ROLE_API_CLIENT"))
+                .addFilterBefore(
+                        apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(mobileTokenAuthenticationFilter, ApiKeyAuthenticationFilter.class)
                 .addFilterBefore(apiRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -100,8 +141,7 @@ public class SecurityConfig {
 
     @Bean
     ApiRateLimitFilter apiRateLimitFilter(
-            LinkHealthSecurityProperties properties,
-            ObjectMapper objectMapper) {
+            LinkHealthSecurityProperties properties, ObjectMapper objectMapper) {
         return new ApiRateLimitFilter(properties.getRateLimitPerMinute(), objectMapper);
     }
 

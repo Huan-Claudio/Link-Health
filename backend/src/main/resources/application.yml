@@ -20,7 +20,7 @@ spring:
     multipart:
       max-file-size: 5MB
       # Reserva espaço para os cabeçalhos multipart sem reduzir o limite de 5 MB da foto.
-      max-request-size: 6MB
+      max-request-size: 16MB
 
 link-health:
   security:

@@ -1,5 +1,7 @@
 # Link Health API
 
+Revisão atual de uso: [água, objetivo e avaliação com três fotos e peso](../MELHORIAS_AGUA_E_EVOLUCAO.md).
+
 Backend REST do Link Health, separado do aplicativo Android em `App/`.
 
 Entrega atual da parte do Felipe: [integração completa](../INTEGRACAO_ETAPA_3_ESCOPO_COMPLETO.md). Roteiro de testes e resultados: [TESTES_ESCOPO_FELIPE.txt](TESTES_ESCOPO_FELIPE.txt).

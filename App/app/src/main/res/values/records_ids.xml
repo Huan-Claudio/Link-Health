@@ -10,4 +10,13 @@
     <item type="id" name="recordInputDate" />
     <item type="id" name="recordInputNotes" />
     <item type="id" name="recordHistory" />
+    <item type="id" name="waterCustomAmount" />
+    <item type="id" name="assessmentWeight" />
+    <item type="id" name="assessmentSave" />
+    <item type="id" name="assessmentNew" />
+    <item type="id" name="assessmentFront" />
+    <item type="id" name="assessmentSide" />
+    <item type="id" name="assessmentBack" />
+    <item type="id" name="careObjectiveInput" />
+    <item type="id" name="careGoalInput" />
 </resources>

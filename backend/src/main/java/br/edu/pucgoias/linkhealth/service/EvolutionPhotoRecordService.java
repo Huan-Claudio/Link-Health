@@ -6,8 +6,14 @@ import br.edu.pucgoias.linkhealth.domain.EvolutionPhotoContent;
 import br.edu.pucgoias.linkhealth.domain.EvolutionPhotoRecord;
 import br.edu.pucgoias.linkhealth.domain.EvolutionPhotoRecordRepository;
 import br.edu.pucgoias.linkhealth.domain.EvolutionPhotoStorage;
-import br.edu.pucgoias.linkhealth.domain.PhotoUploadStatus;
 import br.edu.pucgoias.linkhealth.domain.PatientRecordLock;
+import br.edu.pucgoias.linkhealth.domain.PhotoUploadStatus;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,18 +22,24 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class EvolutionPhotoRecordService {
 
     private static final long MAXIMUM_IMAGE_PIXELS = 36_000_000;
+
+    public void validateUpload(MultipartFile file) {
+        validateSize(file);
+        detectImage(file);
+    }
+
+    public String imageContentType(MultipartFile file) {
+        return detectImage(file).contentType();
+    }
 
     private final EvolutionPhotoRecordRepository repository;
     private final EvolutionPhotoStorage storage;
@@ -35,6 +47,7 @@ public class EvolutionPhotoRecordService {
     private final UserAccountService accounts;
     private final PatientAccessService access;
     private final PatientRecordLock lock;
+    private final br.edu.pucgoias.linkhealth.domain.EvolutionAssessmentRepository assessments;
 
     public EvolutionPhotoRecordService(
             EvolutionPhotoRecordRepository repository,
@@ -42,6 +55,7 @@ public class EvolutionPhotoRecordService {
             UserAccountService accounts,
             PatientAccessService access,
             PatientRecordLock lock,
+            br.edu.pucgoias.linkhealth.domain.EvolutionAssessmentRepository assessments,
             @Value("${link-health.photos.max-size-bytes}") long maximumFileSize) {
         this.repository = repository;
         this.storage = storage;
@@ -49,6 +63,7 @@ public class EvolutionPhotoRecordService {
         this.accounts = accounts;
         this.access = access;
         this.lock = lock;
+        this.assessments = assessments;
     }
 
     public List<EvolutionPhotoRecord> list(UUID patientId) {
@@ -58,26 +73,32 @@ public class EvolutionPhotoRecordService {
     }
 
     public EvolutionPhotoRecord create(
-            UUID patientId, String originalFileName, String contentType, Instant capturedAt, String notes) {
+            UUID patientId,
+            String originalFileName,
+            String contentType,
+            Instant capturedAt,
+            String notes) {
         access.ensureCanWriteRecords(patientId);
         accounts.requirePatient(patientId);
         Instant now = Instant.now();
-        EvolutionPhotoRecord record = new EvolutionPhotoRecord(
-                UUID.randomUUID(),
-                patientId,
-                originalFileName.trim(),
-                contentType.toLowerCase(Locale.ROOT),
-                capturedAt == null ? now : capturedAt,
-                trimToNull(notes),
-                PhotoUploadStatus.PENDING_UPLOAD,
-                null,
-                now,
-                now);
+        EvolutionPhotoRecord record =
+                new EvolutionPhotoRecord(
+                        UUID.randomUUID(),
+                        patientId,
+                        originalFileName.trim(),
+                        contentType.toLowerCase(Locale.ROOT),
+                        capturedAt == null ? now : capturedAt,
+                        trimToNull(notes),
+                        PhotoUploadStatus.PENDING_UPLOAD,
+                        null,
+                        now,
+                        now);
         return repository.save(record);
     }
 
     @Transactional
-    public synchronized EvolutionPhotoRecord upload(UUID patientId, UUID photoId, MultipartFile file) {
+    public synchronized EvolutionPhotoRecord upload(
+            UUID patientId, UUID photoId, MultipartFile file) {
         access.ensureCanWriteRecords(patientId);
         accounts.requirePatient(patientId);
         lock.lock(patientId);
@@ -94,17 +115,18 @@ public class EvolutionPhotoRecordService {
         }
 
         String storageKey = storeFile(current, file, detectedImage.extension());
-        EvolutionPhotoRecord stored = new EvolutionPhotoRecord(
-                current.id(),
-                current.patientId(),
-                current.originalFileName(),
-                current.contentType(),
-                current.capturedAt(),
-                current.notes(),
-                PhotoUploadStatus.STORED,
-                storageKey,
-                current.createdAt(),
-                Instant.now());
+        EvolutionPhotoRecord stored =
+                new EvolutionPhotoRecord(
+                        current.id(),
+                        current.patientId(),
+                        current.originalFileName(),
+                        current.contentType(),
+                        current.capturedAt(),
+                        current.notes(),
+                        PhotoUploadStatus.STORED,
+                        storageKey,
+                        current.createdAt(),
+                        Instant.now());
         try {
             return repository.save(stored);
         } catch (RuntimeException exception) {
@@ -118,7 +140,8 @@ public class EvolutionPhotoRecordService {
         accounts.requirePatient(patientId);
         EvolutionPhotoRecord record = find(patientId, photoId);
         if (record.uploadStatus() != PhotoUploadStatus.STORED || record.storageKey() == null) {
-            throw new ResourceNotFoundException("A imagem desta foto de evolução ainda não foi enviada.");
+            throw new ResourceNotFoundException(
+                    "A imagem desta foto de evolução ainda não foi enviada.");
         }
 
         try {
@@ -127,9 +150,11 @@ public class EvolutionPhotoRecordService {
                     record.contentType(),
                     record.originalFileName());
         } catch (NoSuchFileException exception) {
-            throw new ResourceNotFoundException("O arquivo desta foto de evolução não foi encontrado.");
+            throw new ResourceNotFoundException(
+                    "O arquivo desta foto de evolução não foi encontrado.");
         } catch (IOException exception) {
-            throw new IllegalStateException("Não foi possível abrir a foto de evolução.", exception);
+            throw new IllegalStateException(
+                    "Não foi possível abrir a foto de evolução.", exception);
         }
     }
 
@@ -138,20 +163,29 @@ public class EvolutionPhotoRecordService {
         access.ensureCanWriteRecords(patientId);
         accounts.requirePatient(patientId);
         lock.lock(patientId);
+        if (assessments.referencesPhoto(photoId))
+            throw new InvalidRequestException(
+                    "Esta foto pertence a uma avaliação. Remova o registro completo na evolução"
+                        + " corporal.");
         EvolutionPhotoRecord record = find(patientId, photoId);
         if (record.storageKey() != null) {
             try {
                 storage.delete(record.storageKey());
             } catch (IOException exception) {
-                throw new IllegalStateException("Não foi possível remover o arquivo da foto de evolução.", exception);
+                throw new IllegalStateException(
+                        "Não foi possível remover o arquivo da foto de evolução.", exception);
             }
         }
         repository.delete(record);
     }
 
     private EvolutionPhotoRecord find(UUID patientId, UUID photoId) {
-        return repository.findByIdAndPatientId(photoId, patientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Registro de foto de evolução não encontrado."));
+        return repository
+                .findByIdAndPatientId(photoId, patientId)
+                .orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        "Registro de foto de evolução não encontrado."));
     }
 
     private void validateSize(MultipartFile file) {
@@ -178,33 +212,37 @@ public class EvolutionPhotoRecordService {
     }
 
     private DetectedImage detectBySignature(byte[] header) {
-        boolean jpeg = header.length >= 3
-                && (header[0] & 0xFF) == 0xFF
-                && (header[1] & 0xFF) == 0xD8
-                && (header[2] & 0xFF) == 0xFF;
+        boolean jpeg =
+                header.length >= 3
+                        && (header[0] & 0xFF) == 0xFF
+                        && (header[1] & 0xFF) == 0xD8
+                        && (header[2] & 0xFF) == 0xFF;
         if (jpeg) {
             return new DetectedImage("image/jpeg", "jpg");
         }
 
-        boolean png = header.length >= 8
-                && (header[0] & 0xFF) == 0x89
-                && header[1] == 0x50
-                && header[2] == 0x4E
-                && header[3] == 0x47
-                && header[4] == 0x0D
-                && header[5] == 0x0A
-                && header[6] == 0x1A
-                && header[7] == 0x0A;
+        boolean png =
+                header.length >= 8
+                        && (header[0] & 0xFF) == 0x89
+                        && header[1] == 0x50
+                        && header[2] == 0x4E
+                        && header[3] == 0x47
+                        && header[4] == 0x0D
+                        && header[5] == 0x0A
+                        && header[6] == 0x1A
+                        && header[7] == 0x0A;
         return png ? new DetectedImage("image/png", "png") : null;
     }
 
     private void validateReadableImage(MultipartFile file) throws IOException {
-        try (InputStream input = file.getInputStream(); ImageInputStream imageInput = ImageIO.createImageInputStream(input)) {
+        try (InputStream input = file.getInputStream();
+                ImageInputStream imageInput = ImageIO.createImageInputStream(input)) {
             if (imageInput == null) {
                 throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
             }
             var readers = ImageIO.getImageReaders(imageInput);
-            if (!readers.hasNext()) throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
+            if (!readers.hasNext())
+                throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
             ImageReader reader = readers.next();
             try {
                 reader.setInput(imageInput, true, true);
@@ -215,7 +253,8 @@ public class EvolutionPhotoRecordService {
                     throw new InvalidRequestException("A imagem tem dimensões muito grandes.");
                 }
                 BufferedImage image = reader.read(0);
-                if (image == null) throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
+                if (image == null)
+                    throw new InvalidRequestException("Envie uma imagem JPEG ou PNG válida.");
             } finally {
                 reader.dispose();
             }
@@ -226,7 +265,8 @@ public class EvolutionPhotoRecordService {
         try (InputStream input = file.getInputStream()) {
             return storage.store(record.patientId(), record.id(), extension, input);
         } catch (IOException exception) {
-            throw new IllegalStateException("Não foi possível armazenar a foto de evolução.", exception);
+            throw new IllegalStateException(
+                    "Não foi possível armazenar a foto de evolução.", exception);
         }
     }
 
@@ -242,6 +282,5 @@ public class EvolutionPhotoRecordService {
         return value == null || value.isBlank() ? null : value.trim();
     }
 
-    private record DetectedImage(String contentType, String extension) {
-    }
+    private record DetectedImage(String contentType, String extension) {}
 }

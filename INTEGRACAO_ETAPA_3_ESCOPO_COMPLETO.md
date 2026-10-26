@@ -1,5 +1,7 @@
 # Integração do escopo do Felipe — Etapa 3
 
+> A apresentação de água e evolução foi revisada posteriormente: [Melhorias de água e evolução](MELHORIAS_AGUA_E_EVOLUCAO.md). Os novos registros reúnem três fotos e peso na mesma avaliação; objetivo/meta agora podem ser definidos pela ficha do nutricionista.
+
 Esta entrega completa as conexões de compras, produtos e registros do paciente. Complementa as Etapas 1 e 2; os documentos antigos descrevem o estado de cada entrega anterior.
 
 ## Funções pelo aplicativo

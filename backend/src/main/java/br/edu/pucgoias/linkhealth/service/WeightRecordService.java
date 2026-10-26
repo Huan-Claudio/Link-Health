@@ -4,11 +4,13 @@ import br.edu.pucgoias.linkhealth.api.error.InvalidRequestException;
 import br.edu.pucgoias.linkhealth.api.error.ResourceNotFoundException;
 import br.edu.pucgoias.linkhealth.domain.WeightRecord;
 import br.edu.pucgoias.linkhealth.domain.WeightRecordRepository;
+
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
 
 @Service
 public class WeightRecordService {
@@ -16,11 +18,17 @@ public class WeightRecordService {
     private final WeightRecordRepository repository;
     private final UserAccountService accounts;
     private final PatientAccessService access;
+    private final br.edu.pucgoias.linkhealth.domain.EvolutionAssessmentRepository assessments;
 
-    public WeightRecordService(WeightRecordRepository repository, UserAccountService accounts, PatientAccessService access) {
+    public WeightRecordService(
+            WeightRecordRepository repository,
+            UserAccountService accounts,
+            PatientAccessService access,
+            br.edu.pucgoias.linkhealth.domain.EvolutionAssessmentRepository assessments) {
         this.repository = repository;
         this.accounts = accounts;
         this.access = access;
+        this.assessments = assessments;
     }
 
     public List<WeightRecord> list(UUID patientId) {
@@ -29,21 +37,25 @@ public class WeightRecordService {
         return repository.findByPatientId(patientId);
     }
 
-    public WeightRecord create(UUID patientId, BigDecimal weightKg, Instant measuredAt, String notes) {
+    public WeightRecord create(
+            UUID patientId, BigDecimal weightKg, Instant measuredAt, String notes) {
         access.ensureCanWriteRecords(patientId);
         accounts.requirePatient(patientId);
         Instant now = Instant.now();
-        WeightRecord record = new WeightRecord(
-                UUID.randomUUID(), patientId, weightKg, defaultToNow(measuredAt), trimToNull(notes), now, now);
+        WeightRecord record =
+                new WeightRecord(
+                        UUID.randomUUID(),
+                        patientId,
+                        weightKg,
+                        defaultToNow(measuredAt),
+                        trimToNull(notes),
+                        now,
+                        now);
         return repository.save(record);
     }
 
     public WeightRecord update(
-            UUID patientId,
-            UUID recordId,
-            BigDecimal weightKg,
-            Instant measuredAt,
-            String notes) {
+            UUID patientId, UUID recordId, BigDecimal weightKg, Instant measuredAt, String notes) {
         access.ensureCanWriteRecords(patientId);
         accounts.requirePatient(patientId);
         if (weightKg == null && measuredAt == null && notes == null) {
@@ -51,24 +63,38 @@ public class WeightRecordService {
         }
 
         WeightRecord current = find(patientId, recordId);
-        WeightRecord updated = new WeightRecord(
-                current.id(), current.patientId(),
-                weightKg == null ? current.weightKg() : weightKg,
-                measuredAt == null ? current.measuredAt() : measuredAt,
-                notes == null ? current.notes() : trimToNull(notes),
-                current.createdAt(), Instant.now());
+        requireStandalone(recordId);
+        WeightRecord updated =
+                new WeightRecord(
+                        current.id(),
+                        current.patientId(),
+                        weightKg == null ? current.weightKg() : weightKg,
+                        measuredAt == null ? current.measuredAt() : measuredAt,
+                        notes == null ? current.notes() : trimToNull(notes),
+                        current.createdAt(),
+                        Instant.now());
         return repository.save(updated);
     }
 
     public void delete(UUID patientId, UUID recordId) {
         access.ensureCanWriteRecords(patientId);
         accounts.requirePatient(patientId);
+        requireStandalone(recordId);
         repository.delete(find(patientId, recordId));
     }
 
+    private void requireStandalone(UUID id) {
+        if (assessments.referencesWeight(id))
+            throw new InvalidRequestException(
+                    "Este peso pertence a uma avaliação com três fotos. Remova o registro completo"
+                        + " na evolução corporal.");
+    }
+
     private WeightRecord find(UUID patientId, UUID recordId) {
-        return repository.findByIdAndPatientId(recordId, patientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Registro de peso não encontrado."));
+        return repository
+                .findByIdAndPatientId(recordId, patientId)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Registro de peso não encontrado."));
     }
 
     private Instant defaultToNow(Instant value) {

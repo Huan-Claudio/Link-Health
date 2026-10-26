@@ -31,22 +31,25 @@ COMPRAS: Lista de compras > Editar minha lista > Adicionar item. Informe nome,
 quantidade e unidade. Salve e volte: o item deve aparecer. Marque comprado,
 reabra e confirme. Desmarque. No editor, altere a quantidade e depois remova.
 
-ÁGUA: adicione 500 ml na home. Reabra/entre novamente e confira a persistência.
-Remova 500 ml. Remover mais que o total deve mostrar erro sem consumo negativo.
-No Histórico, registre uma quantidade, edite quantidade/data e remova o registro.
+ÁGUA: no nutricionista vinculado, abra a ficha > Editar meta e informe 3 litros.
+Como paciente, registre 500 ml: a barra verde deve chegar a 17%; com 3000 ml,
+fica completa. Reabra e confira a persistência. Personalizado oferece Adicionar
+quantidade personalizada e Corrigir total de hoje. Corrigir para 1000 ml deve
+deixar exatamente 1000 ml, sem somar esse valor ao total anterior.
 
 REFEIÇÕES: em Meu plano alimentar, marque uma refeição de plano publicado,
 reabra e desmarque. Sem plano, a tela informa a ausência e permite Registrar
 outra refeição. Cadastre, edite e remova uma refeição. A home deve refletir
 as refeições realmente registradas hoje.
 
-PESO: Evolução corporal > Registrar peso. Salve, reabra, edite e remova uma
-pesagem. Confira também no Histórico. Peso pode ser salvo sem enviar uma foto.
-
-FOTOS: Evolução corporal > Escolher foto da galeria ou Tirar foto. Aguarde,
-reabra e toque Ver foto. Confira a imagem e remova. Cancelar a seleção não cria
-registro. Se ficar pendente, envie novamente para esse registro ou remova-o.
-O app prepara a imagem e o servidor valida JPEG/PNG de até 5 MB.
+EVOLUÇÃO: Evolução corporal > Nova avaliação · fotos e peso. Adicione Frente,
+Lado e Costas pela câmera/galeria. Só então aparece o campo de peso. Informe o
+peso e salve. As três fotos e a pesagem precisam aparecer no mesmo card, com
+uma data/hora. Ver 3 fotos abre um álbum: deslize ou use as setas, conferindo as
+posições e as informações. Feche/reabra e confirme a persistência. Remover
+avaliação deve apagar as três imagens e o peso juntos. Cancelar antes de salvar
+não cria fotos ou peso parciais. Registros antigos continuam acessíveis pelo
+botão Ver registros anteriores, sem associação automática entre fotos e pesos.
 
 HISTÓRICO: os totais devem corresponder aos registros salvos em cada dia.
 Datas e separação dos dias no app seguem o horário de Brasília.
@@ -57,7 +60,9 @@ aparecer. Girar durante um salvamento não deve repetir a operação.
 4. CONFERIR COMO NUTRICIONISTA
 
 Use uma conta NUTRICIONISTA com acompanhamento ATIVO com o paciente. Abra a
-ficha real na home. Crie/edite/remova compras e produtos recomendados. Entre
+ficha real na home. Toque no card do objetivo ou em Editar meta para definir o
+objetivo e a meta diária de água em litros. Crie/edite/remova compras e produtos
+em Editar Produtos Recomendados, informando nome, preço e link. Entre
 como paciente e confira os mesmos dados. O nutricionista consulta água,
 refeições, peso, fotos e histórico; a alteração desses registros é do paciente.
 Comprar abre o link do produto; o aplicativo não realiza pagamentos.
@@ -71,7 +76,7 @@ vínculos existentes e não insere vínculos fictícios para liberar acesso.
 cd "C:\Users\felip\OneDrive\Documents\api\Link-Health\backend"
 ..\App\gradlew.bat test --no-daemon
 
-Confirme BUILD SUCCESSFUL. Sem configurar banco exclusivo de testes, 20 casos
+Confirme BUILD SUCCESSFUL. Sem configurar banco exclusivo de testes, 24 casos
 PostgreSQL são ignorados; os demais usam memória. Para executar também esses
 casos, configure no ambiente LINK_HEALTH_TEST_DB_URL,
 LINK_HEALTH_TEST_DB_USERNAME e LINK_HEALTH_TEST_DB_PASSWORD, apontando para
@@ -98,22 +103,23 @@ argumentos scopePatientEmail e scopeNutritionistEmail. Não use contas reais.
 
 7. RESULTADOS
 
-Backend: 54 aprovados, 0 falhas, 0 ignorados, incluindo 20 PostgreSQL reais.
+Backend após a revisão de água/evolução: 62 aprovados, 0 falhas, 0 ignorados,
+incluindo 24 PostgreSQL reais.
 HTTP: 147 verificações aprovadas.
 Concorrência de água: 60 solicitações, com totais e rejeições corretos.
 Android: compilação e testes JVM concluídos; Lint sem erros.
-Android no emulador: 13 testes dedicados aprovados, 0 falhas e 0 ignorados,
-incluindo paciente, nutricionista, plano e retomada de foto PNG pendente.
-Suíte geral anterior ao caso PNG adicional: 17 de 18 aprovados; única falha
+Android no emulador: 15 testes dedicados aprovados, 0 falhas e 0 ignorados,
+incluindo registro conjunto, álbum de três páginas, correção, meta, barra e produtos.
+Suíte geral atual: 20 de 21 aprovados; única falha
 em aceitar convite/voltar, no cabeçalho da tela de convites (fora do escopo).
 O teste não foi removido nem considerado aprovado.
 Câmera e galeria: envio, persistência, visualização e limpeza do cache confirmados.
 Nutricionista vinculado: visualização da imagem confirmada, sem controles de escrita.
-Banco de desenvolvimento: inicialização e migração V11 confirmadas, sem cadastros
+Banco de desenvolvimento: inicialização e migração V12 confirmadas, sem cadastros
 sintéticos de teste. O .env não foi alterado nem incluído nos arquivos versionados.
 
 Sem variáveis de banco exclusivo, o comando comum do backend também foi repetido:
-34 aprovados e 20 PostgreSQL ignorados, com BUILD SUCCESSFUL.
+38 aprovados e 24 PostgreSQL ignorados, com BUILD SUCCESSFUL.
 Não foram testados aparelho físico, todos os fabricantes, servidor público HTTPS,
 carga de produção ou invasão externa.
 
