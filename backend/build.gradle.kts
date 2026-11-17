@@ -6,7 +6,10 @@ plugins {
 
 // O OneDrive pode bloquear arquivos compilados dentro de build/. Quando o clone
 // estiver nessa pasta, os arquivos temporários do Gradle ficam fora da nuvem.
-if (project.projectDir.absolutePath.contains("\\OneDrive\\", ignoreCase = true)) {
+val testBuildDirectory = providers.gradleProperty("linkHealthBuildDir").orNull
+if (!testBuildDirectory.isNullOrBlank()) {
+    layout.buildDirectory.set(file(testBuildDirectory))
+} else if (project.projectDir.absolutePath.contains("\\OneDrive\\", ignoreCase = true)) {
     layout.buildDirectory.set(file(System.getProperty("java.io.tmpdir") + "link-health-backend-build"))
 }
 

@@ -1,0 +1,466 @@
+LINK HEALTH — PASSO A PASSO PARA TESTAR EM OUTRO COMPUTADOR
+ATALHO NOVO: veja TESTAR_EM_2_COMANDOS.md na raiz do clone.
+Com as ferramentas instaladas, execute .\testar.cmd api e .\testar.cmd app.
+O roteiro abaixo permanece como alternativa de configuracao manual.
+
+Conferido no código em 16/11/2026. Roteiro para Windows e Android Studio.
+Escopo: compras, produtos recomendados, água, refeições, evolução e histórico.
+
+Cada colega roda o aplicativo, a API e o PostgreSQL no PRÓPRIO computador.
+Os cadastros e as fotos do computador do Felipe NÃO são baixados pelo GitHub.
+O Git compartilha o código; cada instalação local tem seu próprio banco.
+Use contas e imagens de teste. Anote os resultados do final deste arquivo.
+
+==========================================================================
+1. BAIXAR OU ATUALIZAR O PROJETO
+==========================================================================
+
+No GitHub Desktop, selecione Huan-Claudio/Link-Health e a branch combinada
+com a equipe (main, se as melhorias já estiverem nela).
+
+- Se já clonou: clique em Fetch origin e depois em Pull origin, se aparecer.
+- Se ainda não clonou: File > Clone repository > URL e informe:
+  https://github.com/Huan-Claudio/Link-Health
+- Escolha uma pasta fora do OneDrive, por exemplo C:\Projetos\Link-Health.
+- Preserve alterações locais antes de trocar de branch ou atualizar.
+
+Os caminhos abaixo usam C:\Projetos\Link-Health como EXEMPLO. Substitua pelo
+caminho real do seu clone. Na raiz devem existir as pastas App e backend.
+Abra App no Android Studio. Não abra uma cópia antiga Link-Health-main.
+
+As melhorias precisam ter sido enviadas ao GitHub para os colegas recebê-las.
+Na revisão consultada, o commit é 4fc3e48 (Melhoria nas ferramentas visuais).
+Confirme que ele está no histórico da branch, ou que a branch contém essas
+mudanças. Este roteiro não executa commit nem push automaticamente.
+
+==========================================================================
+2. PREPARAR AS FERRAMENTAS — SOMENTE NA PRIMEIRA VEZ
+==========================================================================
+
+Instale Android Studio com Android SDK, Platform-Tools e Android Emulator,
+além de PostgreSQL com pgAdmin. Não é necessário instalar Gradle separado:
+o projeto já tem gradlew.bat.
+
+No Android Studio:
+1) File > Open > C:\Projetos\Link-Health\App.
+2) Espere o Gradle Sync e aceite a instalação dos componentes do SDK exigidos
+   pelo projeto. O código atual compila com SDK 37, usa Gradle 9.5.0, AGP 9.3.3
+   e solicita JDK 25 para o daemon Android. Não atualize essas versões ao acaso.
+3) Em SDK Manager, instale a plataforma 37 e os componentes solicitados.
+4) Em Device Manager, crie/inicie um emulador. O app exige Android 8/API 26
+   ou superior. O SDK de compilação não precisa ser igual à API do emulador.
+5) Se aparecer um caminho de SDK de outro computador, selecione seu SDK local.
+   App/local.properties é uma configuração de cada máquina, ignorada pelo Git.
+
+Para os comandos PowerShell, use o Java que acompanha o Android Studio:
+
+    $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+    $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+    java -version
+
+Se instalou o Android Studio em outro lugar, ajuste JAVA_HOME. Execute essas
+linhas novamente em cada novo terminal que precisar do Java.
+Na primeira execução, o Gradle baixa dependências; é necessário ter internet.
+
+==========================================================================
+3. CRIAR UM BANCO LOCAL PARA TESTES MANUAIS
+==========================================================================
+
+1) Inicie o serviço do PostgreSQL no Windows.
+2) Abra o pgAdmin e conecte ao servidor local, normalmente localhost:5432,
+   usuário postgres, usando a SENHA DEFINIDA NA SUA INSTALAÇÃO.
+3) Clique com o botão direito em Databases > Create > Database.
+4) Crie um banco novo chamado link_health_app_testes, com owner postgres.
+
+Não precisa criar tabelas nem importar SQL manualmente em um banco vazio.
+Ao iniciar a API com o perfil postgres, o Flyway executa as migrações.
+Se o grupo já tiver um banco compartilhado com dados, não o substitua.
+Para este roteiro, prefira um banco local novo e exclusivo de testes.
+
+==========================================================================
+4. CONFIGURAR backend/.env — SOMENTE NA PRIMEIRA VEZ
+==========================================================================
+
+No PowerShell:
+
+    cd "C:\Projetos\Link-Health\backend"
+    if (-not (Test-Path -LiteralPath '.env')) { Copy-Item -LiteralPath '.env.example' -Destination '.env' }
+    notepad .env
+
+O .env.example vem com perfil local e campos vazios. Para testar persistência
+real, preencha o .env assim, substituindo todos os valores entre < >:
+
+    SPRING_PROFILES_ACTIVE=postgres
+    LINK_HEALTH_DB_URL=jdbc:postgresql://localhost:5432/link_health_app_testes
+    LINK_HEALTH_DB_USERNAME=postgres
+    LINK_HEALTH_DB_PASSWORD=<SENHA_DO_SEU_POSTGRESQL>
+    LINK_HEALTH_API_KEY=<CHAVE_ALEATORIA_GERADA_ABAIXO>
+    LINK_HEALTH_PHOTOS_ENCRYPTION_KEY=<CHAVE_BASE64_GERADA_ABAIXO>
+    LINK_HEALTH_ALLOWED_ORIGINS=
+    LINK_HEALTH_REQUIRE_HTTPS=false
+
+Para gerar as duas chaves locais, execute no PowerShell:
+
+    $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    $apiBytes = New-Object byte[] 32
+    $photoBytes = New-Object byte[] 32
+    $rng.GetBytes($apiBytes)
+    $rng.GetBytes($photoBytes)
+    "LINK_HEALTH_API_KEY=" + [BitConverter]::ToString($apiBytes).Replace('-', '').ToLowerInvariant()
+    "LINK_HEALTH_PHOTOS_ENCRYPTION_KEY=" + [Convert]::ToBase64String($photoBytes)
+    $rng.Dispose()
+
+Copie os valores gerados para as linhas correspondentes do .env, salve e feche
+o Bloco de Notas. Não deixe os marcadores < >. Não são URLs nem senhas do app.
+A chave da API precisa ter pelo menos 32 caracteres; a chave das fotos contém
+exatamente 32 bytes em Base64. O comando acima atende aos dois formatos.
+
+Gere as chaves uma vez para este ambiente. Preserve a chave das fotos:
+trocar essa chave impede a leitura das fotos já criptografadas com ela.
+Não envie .env ao GitHub ou ao grupo. Não coloque a chave da API no Android.
+O backend/.gitignore já ignora .env; confira a lista de arquivos do commit.
+
+==========================================================================
+5. INICIAR A API
+==========================================================================
+
+No PowerShell com JAVA_HOME configurado conforme o passo 2:
+
+    cd "C:\Projetos\Link-Health\backend"
+    ..\App\gradlew.bat bootRun
+
+Aguarde:
+- indicação de que o perfil ativo é postgres;
+- conclusão das migrações do Flyway, sem erros;
+- Tomcat iniciado na porta 8080;
+- Started LinkHealthApiApplication.
+
+Deixe o terminal aberto. 80% EXECUTING / :bootRun é normal: o servidor continua
+em execução esperando o aplicativo. Ctrl+C encerra a API.
+
+No navegador do computador, abra http://localhost:8080/swagger-ui.html.
+A página abrir confirma que a API responde; o teste completo é feito no app.
+Se aparecer perfil local, os dados ficam em memória e somem ao reiniciar.
+
+==========================================================================
+6. CONECTAR O APP E EXECUTAR NO ANDROID STUDIO
+==========================================================================
+
+Caminho normal:
+1) Mantenha a API do passo 5 aberta.
+2) No Android Studio, abra C:\Projetos\Link-Health\App.
+3) Selecione o módulo app, a variante debug e o emulador.
+4) Clique no triângulo verde Run e espere a instalação terminar.
+
+O build debug identifica o IP do computador na compilação. Se mudar de rede,
+compile e instale novamente. Um APK antigo pode continuar usando o IP anterior.
+Isso é desenvolvimento local: a API não fica publicada na internet.
+
+ALTERNATIVA PARA NÃO DEPENDER DO IP: EMULADOR OU CELULAR CONECTADO POR USB
+
+Use esta opção se a rede da faculdade bloquear o acesso ou o IP variar.
+Ela encaminha a porta 8080 do Android para a API deste computador via ADB.
+
+1) Feche as janelas do Android Studio antes de executar as próximas linhas,
+   para ele receber a variável. A API pode continuar aberta em outro terminal.
+2) No PowerShell, execute (ajuste o caminho do Studio/clone se necessário):
+
+    $env:LINK_HEALTH_BACKEND_HOST = "127.0.0.1"
+    & "C:\Program Files\Android\Android Studio\bin\studio64.exe" "C:\Projetos\Link-Health\App"
+
+3) Inicie o emulador pelo Device Manager. Para um celular, conecte por USB,
+   habilite Depuração USB e aceite a autorização no telefone.
+4) No mesmo PowerShell, localize o ADB (caminho padrão):
+
+    $adbPath = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
+    & $adbPath devices
+
+5) Com exatamente um dispositivo listado no estado device, execute:
+
+    & $adbPath reverse tcp:8080 tcp:8080
+    & $adbPath reverse --list
+
+6) No Android Studio aberto pelo comando acima, faça Gradle Sync e clique Run
+   para compilar e instalar com 127.0.0.1. Fechar/abrir o app antigo não recompila.
+
+Se houver mais de um dispositivo, escolha o serial mostrado em devices:
+
+    & $adbPath -s <SERIAL_DO_DISPOSITIVO> reverse tcp:8080 tcp:8080
+
+Substitua <SERIAL_DO_DISPOSITIVO> pelo valor real, sem os sinais < >.
+Repita o reverse depois de reiniciar/reconectar o dispositivo. Em outro dia,
+abra o Studio novamente com a variável se quiser manter esta alternativa.
+O host deve conter apenas 127.0.0.1; não coloque http:// ou :8080 na variável.
+O encaminhamento por USB está previsto no roteiro; a validação anterior do
+projeto foi em emulador, sem comprovação em aparelho físico.
+
+==========================================================================
+7. CRIAR AS CONTAS NO APLICATIVO
+==========================================================================
+
+Paciente:
+1) Selecione Paciente na tela de login e toque em Criar Nova Conta.
+2) Preencha os campos obrigatórios com dados de teste, e-mail exclusivo e uma
+   senha de pelo menos 8 caracteres. Anote e-mail e senha para repetir o teste.
+3) Finalize. A conta deve ser salva e a home do paciente deve abrir.
+4) Saia e entre novamente com o mesmo perfil, e-mail e senha.
+
+Depois cadastre uma conta Nutricionista pelo mesmo caminho, trocando o perfil
+e usando outro documento/CRN e e-mail. Volte a entrar como paciente para os
+testes iniciais. Não é necessário recriar contas ao reiniciar a API PostgreSQL.
+Se a API reiniciar, faça login novamente: os tokens de sessão são temporários.
+
+==========================================================================
+8. TESTAR A PARTE DO PACIENTE DENTRO DO APP
+==========================================================================
+
+A) LISTA DE COMPRAS
+- Abra Lista de compras > Editar minha lista > Adicionar item.
+- Cadastre Aveia, quantidade 1, unidade UNIT. Salve e volte.
+- Marque como comprado, saia da tela e reabra: deve continuar marcado.
+- Desmarque e confirme. Edite a quantidade para 2 e confira na lista.
+- Remova o item e confirme que não reaparece ao reabrir.
+
+B) ÁGUA
+- Toque em +500 ml: o total de hoje deve aumentar em 500 ml.
+- Toque em +1 L: deve somar mais 1000 ml.
+- Personalizado > Adicionar quantidade personalizada: adicione 250 ml.
+- Personalizado > Corrigir total de hoje: informe 1000 ml.
+  O resultado deve ser exatamente 1000 ml, e não o total anterior + 1000.
+- Reabra a tela e confira o valor salvo.
+- A barra depende de uma meta definida pelo nutricionista: veja os passos 9/10.
+  Com meta de 3 L e total corrigido para 500 ml, deve aparecer verde em 17%.
+  Com total de 3000 ml, a barra deve ficar completa.
+- "Meta não definida" significa ausência da meta no acompanhamento ativo.
+  Sem meta, não há porcentagem para calcular; a barra fica vazia/cinza.
+- A versão nova tem +500 ml, +1 L e Personalizado. Se aparecem botões de
+  menos 500 ml/menos 1 L, confirme branch/commit e reinstale pelo Run.
+
+C) REFEIÇÕES
+- Abra Meu plano alimentar > Registrar outra refeição.
+- Cadastre Jantar de teste, salve e confira na lista.
+- Edite o nome/observação e confirme a atualização. Depois remova.
+- Sem plano publicado, a ausência de refeições planejadas é um estado vazio
+  esperado; o cadastro de refeição avulsa continua disponível.
+- Se já houver plano publicado para o vínculo ativo: marque uma refeição como
+  realizada, reabra e confira; desmarque e confira novamente.
+
+D) EVOLUÇÃO CORPORAL — TRÊS FOTOS + PESO NO MESMO REGISTRO
+- Abra Evolução corporal > Nova avaliação · fotos e peso.
+- Escolha uma imagem para Frente, outra para Lado e outra para Costas.
+  Use câmera e galeria; confirme a seleção no seletor do Android quando pedido.
+- O campo de peso só deve aparecer depois das três imagens.
+- Informe, por exemplo, 72,5 kg e salve.
+- Deve aparecer UM card com as três fotos, o peso e a data/hora.
+- Toque em Ver 3 fotos e deslize/use as setas: Frente, Lado, Costas.
+  Peso e data devem continuar correspondendo à mesma avaliação.
+- Feche/reabra o app, entre novamente e confira a avaliação.
+- Inicie outra avaliação, selecione só duas fotos e cancele. Isso não deve
+  criar peso nem fotos parciais no servidor.
+- Remover avaliação deve remover o grupo inteiro: três imagens e pesagem.
+- Registros anteriores à mudança continuam em Ver registros anteriores.
+
+E) HISTÓRICO, PERSISTÊNCIA E SEPARAÇÃO ENTRE CONTAS
+- Abra o histórico/registro diário disponível na navegação e confira os totais.
+- Saia e entre com outro paciente de teste: os dados do primeiro não aparecem.
+- Volte para o primeiro: os dados salvos continuam lá.
+- Reinicie a API, entre novamente e confira os dados. Com PostgreSQL, eles
+  devem permanecer. Para fotos, mantenha a mesma chave de criptografia.
+
+==========================================================================
+9. PREPARAR O VÍNCULO PARA OS TESTES DO NUTRICIONISTA
+==========================================================================
+
+Ponto confirmado no código desta revisão:
+BuscarPacienteActivity e ConvitesActivity ainda usam MockData e TODOs para
+busca/envio/aceite. Tocar em "aceitar" nessa tela NÃO cria um vínculo no banco.
+São partes dos responsáveis por convites e não validam a integração real.
+
+Para testar nossa parte em um banco novo, prepare um vínculo real entre as
+DUAS CONTAS DE TESTE. Se já existe acompanhamento ATIVO, pule para o passo 10.
+Esta preparação administrativa é pelo Swagger; os testes seguintes são no app.
+
+1) Abra http://localhost:8080/swagger-ui.html.
+2) Clique em Authorize e cole somente o VALOR de LINK_HEALTH_API_KEY do SEU
+   backend/.env. Não cole o link da API nem a senha do PostgreSQL.
+3) Abra POST /api/v1/auth/login > Try it out. No Request body, use o e-mail e a
+   senha da conta paciente criada no app. Exemplo com marcadores para substituir:
+
+    {"email":"<EMAIL_DO_PACIENTE>","password":"<SENHA_DO_PACIENTE>"}
+
+4) Clique Execute. Copie o id do Response body real (não do Example Value).
+5) Repita o login com a conta nutricionista e copie o id dela.
+6) Abra POST /api/v1/follow-ups > Try it out. Substitua os dois IDs:
+
+    {
+      "nutritionistId": "<ID_DO_NUTRICIONISTA>",
+      "patientId": "<ID_DO_PACIENTE>",
+      "objective": "Acompanhamento de teste",
+      "waterGoalMl": 3000
+    }
+
+7) Execute. A resposta deve ser 201 com status PENDENTE. Copie o id retornado:
+   esse é o ID DO ACOMPANHAMENTO, diferente dos IDs das contas.
+8) Abra POST /api/v1/follow-ups/{id}/response > Try it out.
+   No campo id, coloque o id do acompanhamento; no Request body:
+
+    {"patientId":"<ID_DO_PACIENTE>","accept":true}
+
+9) Execute. Confirme status ATIVO na resposta.
+
+Esta operação usa privilégio administrativo apenas para preparar o ambiente
+local de testes. Não representa um aceite feito pelo paciente no aplicativo.
+Não use contas de pessoas reais para simular aceites.
+Se já existe convite pendente, consulte GET /api/v1/patients/{id}/follow-ups
+com o id do paciente para encontrar o acompanhamento; não crie duplicatas.
+
+==========================================================================
+10. TESTAR A PARTE VINCULADA DENTRO DO APP
+==========================================================================
+
+Entre como Nutricionista no mesmo banco do paciente e do vínculo preparado.
+
+A) FICHA, OBJETIVO E META
+- O paciente deve aparecer na home do nutricionista. Abra a ficha dele.
+- Toque no card do objetivo ou em Editar meta.
+- Defina um objetivo e meta diária de 3 litros. Salve.
+- Entre como paciente: confira o objetivo na home.
+- Em Personalizado > Corrigir total de hoje, defina 500 ml.
+- A barra deve mostrar 17% da meta de 3 litros. Defina 3000 ml: 100%.
+
+B) PRODUTOS RECOMENDADOS
+- Como nutricionista, abra a ficha > Editar Produtos Recomendados.
+- Cadastre um produto com nome, preço e link HTTPS válido de um site conhecido.
+- Entre como paciente e abra Lista de compras: a recomendação deve aparecer.
+- Toque no link/botão de compra: deve abrir o endereço informado. Não há
+  pagamento dentro deste app; não finalize uma compra real durante o teste.
+- Edite o produto como nutricionista e confira a alteração como paciente.
+- Remova como nutricionista e confirme que saiu da lista do paciente.
+
+C) CONSULTA DOS REGISTROS
+- Registre água, refeição e uma avaliação como paciente.
+- Como nutricionista vinculado, consulte os dados pela ficha/histórico/evolução.
+- O nutricionista consulta esses registros, mas não deve ter os controles para
+  registrar água, refeição avulsa ou avaliação corporal no lugar do paciente.
+- Outra conta nutricionista, sem vínculo, não deve ganhar acesso ao paciente.
+
+Sem acompanhamento ATIVO, estes testes ficam bloqueados por pré-requisito.
+A autoria/publicação de planos pertence a outra parte do grupo. O teste de
+marcar refeições planejadas exige um plano real publicado para esse vínculo;
+não confunda a tela de edição de exemplo com um plano salvo no PostgreSQL.
+
+==========================================================================
+11. TESTES AUTOMÁTICOS — OPCIONAIS PARA COMPLEMENTAR O ROTEIRO MANUAL
+==========================================================================
+
+Backend, no PowerShell com Java configurado:
+
+    cd "C:\Projetos\Link-Health\backend"
+    ..\App\gradlew.bat test --no-daemon
+
+Esperado: BUILD SUCCESSFUL. Sem variáveis de banco de testes, os casos
+condicionados a PostgreSQL ficam SKIPPED/ignorados. Isso não comprova esses
+casos no banco; os demais testes executam em memória.
+
+Para incluir PostgreSQL, crie OUTRO banco vazio no pgAdmin, chamado
+link_health_automacao. Não aponte a suíte para dados reais ou de apresentação.
+No mesmo PowerShell, informe a senha sem gravá-la no histórico de comandos:
+
+    $env:LINK_HEALTH_TEST_DB_URL = "jdbc:postgresql://localhost:5432/link_health_automacao"
+    $env:LINK_HEALTH_TEST_DB_USERNAME = "postgres"
+    $dbCredential = Get-Credential -UserName postgres -Message "Senha do PostgreSQL local para testes"
+    $env:LINK_HEALTH_TEST_DB_PASSWORD = $dbCredential.GetNetworkCredential().Password
+    ..\App\gradlew.bat test --no-daemon --rerun-tasks
+    Remove-Item Env:\LINK_HEALTH_TEST_DB_PASSWORD -ErrorAction SilentlyContinue
+    Remove-Variable dbCredential -ErrorAction SilentlyContinue
+
+Use a senha do PostgreSQL no diálogo. --rerun-tasks evita reutilizar o resultado
+anterior que ignorou os casos de banco. A suíte aplica migrações e pode deixar
+dados sintéticos no banco exclusivo. Não compartilhe esse banco com a API
+durante a execução desses testes.
+
+Android — testes JVM, análise e compilação (API/emulador não são necessários):
+
+    cd "C:\Projetos\Link-Health\App"
+    .\gradlew.bat testDebugUnitTest lintDebug assembleDebug
+
+Android — testes de interface reais com API, banco local de testes e emulador
+abertos, e a conexão do passo 6 funcionando:
+
+    cd "C:\Projetos\Link-Health\App"
+    .\gradlew.bat connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=br.edu.pucgoias.app.EscopoPacienteIntegrationTest,br.edu.pucgoias.app.FluxoPacienteTest"
+
+Se usar o encaminhamento ADB, defina LINK_HEALTH_BACKEND_HOST=127.0.0.1 também
+neste terminal antes do comando. Mantenha o reverse ativo e use um dispositivo.
+Esses testes criam contas inéditas. O backend/.env deve apontar para o banco
+local exclusivo de testes manuais, nunca para um banco com dados reais.
+
+A seleção acima cobre o paciente e a autenticação de apoio. Não inclui os
+testes EscopoVinculadoIntegrationTest: eles precisam de contas/planos preparados
+e argumentos próprios. Faça os testes vinculados manuais dos passos 9/10.
+
+O histórico da revisão anterior contém 62 testes backend aprovados, incluindo
+24 PostgreSQL, e 15 testes Android dedicados aprovados no emulador. São resultados
+daquela execução, não uma garantia de resultado em cada computador novo.
+A suíte Android geral tinha uma falha conhecida no teste de voltar da tela
+de convites (cabeçalho parcialmente fora da área clicável), fora deste escopo.
+Não trate uma falha ou um caso ignorado como aprovado.
+
+==========================================================================
+12. SE DER ERRO
+==========================================================================
+
+"Não foi possível conectar ao servidor": confira se a API terminou de iniciar,
+se está na porta 8080 e se o app usa o endereço certo. Confira o passo 6; se
+usar reverse, repita devices/reverse --list e reinstale após mudar o host.
+No Logcat, filtre por LinkHealthApi e guarde a mensagem técnica do erro.
+
+"Chave da API ausente ou inválida" no Swagger: Authorize recebe o valor de
+LINK_HEALTH_API_KEY. O app usa token do login e não recebe essa chave.
+
+"Password authentication failed": confira usuário e senha LOCAIS no .env.
+"Connection refused" na porta 5432: confira serviço/porta do PostgreSQL.
+"Database does not exist": crie o banco do passo 3 e confira o nome na URL.
+Erro do Flyway: guarde a mensagem completa. Não apague migrações nem tabelas
+de um banco com dados para forçar a inicialização.
+
+"Unable to delete directory" / "not a regular file": confira sincronização
+OneDrive e processos usando arquivos. Prefira o clone fora do OneDrive.
+Não apague src, classes Java, migrations ou .env. Os builds Android já são
+direcionados para fora do clone, e o backend faz isso em caminhos OneDrive.
+
+Botões antigos de água ou fotos/peso separados para novos registros:
+confira se baixou as melhorias e se abriu o clone correto. Clique Run para
+instalar a compilação nova. Para definir a porcentagem, prepare também a meta.
+
+Paciente não aparece para o nutricionista: confirme o mesmo banco para as
+duas contas e acompanhamento ATIVO no passo 9. Convite visual de exemplo
+não cria vínculo real nesta revisão.
+
+Foto não abre após reiniciar: confira se preservou a chave de criptografia
+original desse banco. Reinicie a API depois de editar .env e entre novamente.
+
+==========================================================================
+REGISTRAR E ENVIAR O RESULTADO AO GRUPO
+==========================================================================
+
+Nome do colega:
+Commit/branch testados:
+Data:
+Emulador ou modelo/API do celular:
+Modo de conexão: IP automático / ADB reverse:
+API iniciou com postgres e sem erro de migração? SIM / NÃO:
+Cadastro e login: PASSOU / FALHOU:
+Compras (criar/editar/marcar/desmarcar/remover): PASSOU / FALHOU:
+Água (somar/personalizado/corrigir/persistir): PASSOU / FALHOU:
+Meta 3 L + 500 ml = barra verde 17%: PASSOU / FALHOU / SEM VÍNCULO:
+Refeição avulsa (criar/editar/remover): PASSOU / FALHOU:
+Refeição planejada (marcar/desmarcar): PASSOU / FALHOU / SEM PLANO:
+Evolução (3 fotos + peso, álbum e exclusão conjunta): PASSOU / FALHOU:
+Histórico e persistência após reiniciar API: PASSOU / FALHOU:
+Isolamento entre pacientes: PASSOU / FALHOU:
+Objetivo/meta/produtos pelo nutricionista: PASSOU / FALHOU / SEM VÍNCULO:
+Testes automáticos executados e quantos passaram/falharam/foram ignorados:
+Erro: tela, ação exata, resultado esperado, mensagem e print/Logcat sem segredos:
+
+Não envie .env, senhas, tokens ou fotos de pessoas reais com os resultados.

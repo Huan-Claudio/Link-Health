@@ -42,9 +42,13 @@ val backendHost = System.getenv("LINK_HEALTH_BACKEND_HOST")
     ?: detectarHostBackend()
 
 // Evita que arquivos temporários do Gradle fiquem bloqueados pela sincronização do OneDrive.
-buildDir = File(
-    System.getenv("LOCALAPPDATA") ?: System.getProperty("java.io.tmpdir"),
-    "LinkHealth-Android-Build/${project.name}"
+val testBuildDirectory = providers.gradleProperty("linkHealthBuildDir").orNull
+layout.buildDirectory.set(
+    if (!testBuildDirectory.isNullOrBlank()) file(testBuildDirectory)
+    else File(
+        System.getenv("LOCALAPPDATA") ?: System.getProperty("java.io.tmpdir"),
+        "LinkHealth-Android-Build/${project.name}"
+    )
 )
 
 android {
