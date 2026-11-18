@@ -70,6 +70,17 @@ public class UserAccountEntity {
         return entity;
     }
 
+    void updateFrom(UserAccount account) {
+        if (!id.equals(account.id()) || role != account.role()) {
+            throw new IllegalArgumentException("A identidade e o papel da conta não podem ser alterados.");
+        }
+        fullName = account.fullName();
+        birthDate = account.birthDate();
+        email = account.email();
+        phone = account.phone();
+        passwordHash = account.passwordHash();
+    }
+
     UserAccount toDomain() {
         String document = role == AccountRole.PACIENTE ? patientProfile.cpf() : nutritionistProfile.registration();
         return new UserAccount(id, fullName, birthDate, email, phone, document, passwordHash, role, createdAt);

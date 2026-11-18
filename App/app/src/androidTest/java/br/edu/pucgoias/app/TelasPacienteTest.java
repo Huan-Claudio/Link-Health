@@ -4,13 +4,13 @@ import org.junit.Before;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.model.Perfil;
 import br.edu.pucgoias.app.data.remote.AccountSession;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import static org.hamcrest.Matchers.containsString;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.ui.paciente.HomePacienteActivity;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.*;
@@ -64,17 +64,22 @@ public class TelasPacienteTest {
         }
     }
 
-    @Test public void aceitarUltimoConviteMostraEstadoVazio() {
-        MockData.getConvites().clear();
-        MockData.getConvites().add("Nutricionista Teste");
+    @Test public void aceitarConviteRealMostraAcompanhamentoAtivo() throws Exception {
+        AccountSession patient = IntegrationTestSupport.patient();
+        AccountSession nutritionist = IntegrationTestSupport.nutritionist();
+        IntegrationTestSupport.http("POST", "/api/v1/follow-ups",
+                new JSONObject().put("nutritionistId", nutritionist.getId()).put("patientId", patient.getId()),
+                nutritionist);
+        IntegrationTestSupport.enter(patient);
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
             onView(withId(R.id.menuConvites)).perform(scrollTo(), click());
+            IntegrationTestSupport.awaitText("Nutricionista de Teste");
             onView(withId(R.id.btnAdicionar)).perform(click());
-            onView(withId(R.id.tvVazio)).check(matches(isDisplayed()));
-            assertTrue(MockData.getConvites().isEmpty());
-            onView(withId(R.id.btnVoltar)).perform(click());
-            onView(withId(R.id.menuConvites)).perform(scrollTo(), click());
-            onView(withId(R.id.tvVazio)).check(matches(isDisplayed()));
+            IntegrationTestSupport.awaitDialogText("Aceitar");
+            onView(withText("Aceitar")).perform(click());
+            IntegrationTestSupport.awaitText("ATIVO");
+            JSONArray links = new JSONArray(IntegrationTestSupport.http("GET", "/api/v1/me/follow-ups", null, patient));
+            assertEquals("ATIVO", links.getJSONObject(0).getString("status"));
         }
     }
 }

@@ -100,8 +100,8 @@ public class MealPlanService {
 
     private MealPlan requireDraft(UUID planId) {
         MealPlan plan = find(planId);
-        if (plan.active()) {
-            throw new InvalidRequestException("Um plano ativo não pode ser editado ou excluído.");
+        if (plan.published()) {
+            throw new InvalidRequestException("Este plano faz parte do histórico. Copie como rascunho para alterar.");
         }
         requireActiveFollowUp(plan.followUpId());
         return plan;
@@ -111,6 +111,15 @@ public class MealPlanService {
         if (followUps.find(followUpId).status() != FollowUpStatus.ATIVO) {
             throw new InvalidRequestException("É necessário um acompanhamento ativo.");
         }
+    }
+
+    public MealPlan copyDraft(UUID planId) {
+        MealPlan source = find(planId);
+        requireActiveFollowUp(source.followUpId());
+        List<PlannedMeal> copied = source.meals().stream()
+                .map(m -> new PlannedMeal(UUID.randomUUID(), m.name(), m.time(), m.items().stream()
+                        .map(i -> new MealItem(UUID.randomUUID(), i.description())).toList())).toList();
+        return repository.save(new MealPlan(UUID.randomUUID(), source.followUpId(), false, copied));
     }
 
     private PlannedMeal findMeal(MealPlan plan, UUID mealId) {

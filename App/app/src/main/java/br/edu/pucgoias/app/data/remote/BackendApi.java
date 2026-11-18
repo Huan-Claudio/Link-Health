@@ -54,6 +54,10 @@ final class BackendApi {
         request("POST", path, body, token, callback);
     }
 
+    static void put(String path, JSONObject body, String token, Callback callback) {
+        request("PUT", path, body, token, callback);
+    }
+
     static void patch(String path, JSONObject body, String token, Callback callback) {
         request("PATCH", path, body, token, callback);
     }

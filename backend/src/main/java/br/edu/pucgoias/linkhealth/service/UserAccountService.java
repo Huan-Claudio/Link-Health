@@ -71,6 +71,29 @@ public class UserAccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
     }
 
+    public synchronized UserAccount update(UUID id, String name, LocalDate birthDate, String email,
+            String phone, String currentPassword, String newPassword) {
+        UserAccount current = find(id);
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        if (!current.email().equals(normalizedEmail) || newPassword != null) {
+            validatePassword(currentPassword);
+            if (!passwordEncoder.matches(currentPassword, current.passwordHash())) {
+                throw new InvalidRequestException("Confirme sua senha atual para alterar o e-mail ou a senha.");
+            }
+        }
+        if (repository.findByEmail(normalizedEmail).filter(a -> !a.id().equals(id)).isPresent()) {
+            throw new InvalidRequestException("Este e-mail já está cadastrado.");
+        }
+        String hash = current.passwordHash();
+        if (newPassword != null) {
+            validatePassword(newPassword);
+            if (newPassword.length() < 8) throw new InvalidRequestException("A nova senha deve ter pelo menos 8 caracteres.");
+            hash = passwordEncoder.encode(newPassword);
+        }
+        return repository.save(new UserAccount(current.id(), name.trim(), birthDate, normalizedEmail,
+                phone == null ? null : phone.trim(), current.document(), hash, current.role(), current.createdAt()));
+    }
+
     public void requirePatient(UUID id) {
         if (find(id).role() != AccountRole.PACIENTE) {
             throw new InvalidRequestException("A conta informada não é de um paciente.");

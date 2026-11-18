@@ -46,10 +46,14 @@ public class FichaPacienteActivity extends BaseActivity {
                 R.drawable.ic_restaurant,
                 R.string.menu_editar_plano,
                 R.string.menu_editar_plano_desc,
-                v -> abrir(PlanoAlimentarActivity.class));
-        binding.menuEditarPlano.tvTitulo.setText("Refeições realizadas");
+                v -> abrir(EditarPlanoActivity.class));
+        binding.menuEditarPlano.tvTitulo.setText("Planos alimentares");
         binding.menuEditarPlano.tvDescricao.setText(
-                "Consultar as refeições e os registros do paciente");
+                "Criar, editar e publicar planos alimentares");
+        configurarMenu(binding.menuRefeicoesRealizadas, R.drawable.ic_restaurant, R.string.menu_editar_plano,
+                R.string.menu_editar_plano_desc, v -> abrir(PlanoAlimentarActivity.class));
+        binding.menuRefeicoesRealizadas.tvTitulo.setText("Refeições realizadas");
+        binding.menuRefeicoesRealizadas.tvDescricao.setText("Consultar as refeições e os registros do paciente");
         configurarMenu(
                 binding.menuEditarProdutos,
                 R.drawable.ic_bag,

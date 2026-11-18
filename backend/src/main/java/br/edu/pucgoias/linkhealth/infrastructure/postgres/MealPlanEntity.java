@@ -24,6 +24,9 @@ public class MealPlanEntity {
     @Column(nullable = false)
     private boolean active;
 
+    @Column(nullable = false)
+    private boolean published;
+
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC")
     private List<PlannedMealEntity> meals = new ArrayList<>();
@@ -36,6 +39,7 @@ public class MealPlanEntity {
         entity.id = plan.id();
         entity.followUpId = plan.followUpId();
         entity.active = plan.active();
+        entity.published = plan.published();
         for (int index = 0; index < plan.meals().size(); index++) {
             entity.meals.add(PlannedMealEntity.from(plan.meals().get(index), entity, index));
         }
@@ -47,6 +51,6 @@ public class MealPlanEntity {
     }
 
     MealPlan toDomain() {
-        return new MealPlan(id, followUpId, active, meals.stream().map(PlannedMealEntity::toDomain).toList());
+        return new MealPlan(id, followUpId, active, published, meals.stream().map(PlannedMealEntity::toDomain).toList());
     }
 }

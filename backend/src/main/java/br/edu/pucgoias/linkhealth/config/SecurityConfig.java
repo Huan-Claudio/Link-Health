@@ -115,6 +115,11 @@ public class SecurityConfig {
                                                 "/api/v1/patients/*/evolution-assessments",
                                                 "/api/v1/patients/*/evolution-assessments/**")
                                         .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
+                                        .requestMatchers("/api/v1/patients/search", "/api/v1/me/follow-ups", "/api/v1/me", "/api/v1/auth/logout",
+                                                "/api/v1/follow-ups", "/api/v1/follow-ups/**",
+                                                "/api/v1/nutritionists/*/follow-ups", "/api/v1/patients/*/follow-ups",
+                                                "/api/v1/meal-plans/**")
+                                        .hasAnyAuthority("ROLE_API_CLIENT", "ROLE_MOBILE")
                                         .anyRequest()
                                         .hasAuthority("ROLE_API_CLIENT"))
                 .addFilterBefore(

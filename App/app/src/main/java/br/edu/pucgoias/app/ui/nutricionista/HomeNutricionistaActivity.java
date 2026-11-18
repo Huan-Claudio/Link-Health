@@ -33,6 +33,7 @@ public class HomeNutricionistaActivity extends BaseActivity {
         setContentView(binding.getRoot());
         binding.tvAvatar.setText("DR.");
         binding.layoutPerfil.setOnClickListener(v -> startActivity(new Intent(this, ConfiguracoesActivity.class)));
+        binding.btnAcompanhamentos.setOnClickListener(v -> startActivity(new Intent(this, br.edu.pucgoias.app.ui.paciente.ConvitesActivity.class)));
         binding.btnNovoPaciente.setOnClickListener(v -> startActivity(new Intent(this, BuscarPacienteActivity.class)));
         binding.btnProdutosReais.setOnClickListener(v -> escolherPacienteParaProdutos());
         adapter = new LinkedPatientAdapter(p -> startActivity(PatientNavigation.intent(

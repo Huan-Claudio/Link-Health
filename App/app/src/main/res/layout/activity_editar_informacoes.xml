@@ -138,6 +138,36 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvLabelTelefone" />
 
+            <EditText
+                android:id="@+id/etSenhaAtual"
+                style="@style/LH.Input"
+                android:layout_width="0dp"
+                android:layout_marginTop="16dp"
+                android:inputType="textPassword"
+                android:saveEnabled="false"
+                android:hint="Senha atual (para trocar e-mail ou senha)"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etTelefone" />
+            <EditText
+                android:id="@+id/etNovaSenha"
+                style="@style/LH.Input"
+                android:layout_width="0dp"
+                android:layout_marginTop="8dp"
+                android:inputType="textPassword"
+                android:saveEnabled="false"
+                android:hint="Nova senha (opcional, mínimo 8 caracteres)"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etSenhaAtual" />
+            <TextView
+                android:id="@+id/tvPerfilStatus"
+                style="@style/LH.Text.Caption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etNovaSenha" />
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSalvar"
                 style="@style/LH.Button"
@@ -146,7 +176,7 @@
                 android:text="@string/salvar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/etTelefone" />
+                app:layout_constraintTop_toBottomOf="@id/tvPerfilStatus" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>

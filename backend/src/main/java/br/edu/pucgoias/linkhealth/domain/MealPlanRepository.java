@@ -13,7 +13,7 @@ public interface MealPlanRepository {
 
     default MealPlan activate(MealPlan plan) {
         findByFollowUpId(plan.followUpId()).stream().filter(MealPlan::active)
-                .forEach(current -> save(new MealPlan(current.id(), current.followUpId(), false, current.meals())));
+                .forEach(current -> save(new MealPlan(current.id(), current.followUpId(), false, true, current.meals())));
         return save(plan);
     }
 

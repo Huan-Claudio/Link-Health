@@ -60,6 +60,12 @@ public class MobileSessionService {
         }
     }
 
+    public void revokeAccount(java.util.UUID id) {
+        sessions.entrySet().removeIf(e -> e.getValue().principal().accountId().equals(id));
+    }
+
+    public void revoke(String token) { sessions.remove(hash(token)); }
+
     public record IssuedSession(String token, Instant expiresAt) {
     }
 

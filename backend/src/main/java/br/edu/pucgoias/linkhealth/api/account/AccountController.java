@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class AccountController {
     private final UserAccountService service;
+    private final br.edu.pucgoias.linkhealth.service.ClinicalAccessService access;
     private final MobileSessionService mobileSessions;
 
-    public AccountController(UserAccountService service, MobileSessionService mobileSessions) {
+    public AccountController(UserAccountService service, MobileSessionService mobileSessions, br.edu.pucgoias.linkhealth.service.ClinicalAccessService access) {
+        this.access = access;
         this.service = service;
         this.mobileSessions = mobileSessions;
     }
@@ -48,6 +50,7 @@ public class AccountController {
 
     @GetMapping("/patients/search")
     public List<AccountResponse> searchPatients(@RequestParam String query) {
+        access.nutritionist();
         return service.searchPatients(query).stream().map(AccountResponse::from).toList();
     }
 }

@@ -95,6 +95,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnNovoPaciente" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAcompanhamentos"
+        style="@style/LH.Button.Small"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Acompanhamentos e convites"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnProdutosReais" />
+
     <EditText
         android:id="@+id/etBusca"
         style="@style/LH.Input"
@@ -107,7 +117,7 @@
         android:imeOptions="actionSearch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnProdutosReais" />
+        app:layout_constraintTop_toBottomOf="@id/btnAcompanhamentos" />
 
     <TextView
         android:id="@+id/tvVazio"

@@ -10,8 +10,8 @@ import androidx.annotation.StringRes;
 
 import br.edu.pucgoias.app.BaseActivity;
 import br.edu.pucgoias.app.R;
-import br.edu.pucgoias.app.data.MockData;
 import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.data.remote.ClinicalApi;
 import br.edu.pucgoias.app.databinding.ActivityConfiguracoesBinding;
 import br.edu.pucgoias.app.databinding.ItemConfigOpcaoBinding;
 import br.edu.pucgoias.app.model.Paciente;
@@ -34,7 +34,8 @@ public class ConfiguracoesActivity extends BaseActivity {
         boolean nutri = Sessao.getPerfil() == Perfil.NUTRICIONISTA;
         if (nutri) {
             binding.tvPacientesAtivos.setVisibility(View.VISIBLE);
-            binding.tvPacientesAtivos.setText(getString(R.string.pacientes_ativos, MockData.getPacientes().size()));
+            binding.tvPacientesAtivos.setText(getString(R.string.pacientes_ativos, 0));
+            carregarPacientesAtivos();
         }
 
         configurarOpcao(binding.opcaoDados, R.drawable.ic_phone,
@@ -54,6 +55,7 @@ public class ConfiguracoesActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (binding == null) return;
         // Atualiza nome/iniciais caso tenham sido alterados em "Editar Informações".
         String nome = Sessao.getNomeUsuario();
         boolean nutri = Sessao.getPerfil() == Perfil.NUTRICIONISTA;
@@ -69,10 +71,34 @@ public class ConfiguracoesActivity extends BaseActivity {
     }
 
     private void sair() {
+        if (Sessao.temSessaoRemota()) {
+            // O token é capturado antes de limpar a sessão local. Falhas de rede não prendem o usuário no app.
+            new ClinicalApi().request("POST", "/api/v1/auth/logout", null, new ClinicalApi.Callback() {
+                @Override public void success(String body) { }
+                @Override public void error(String message) { }
+            });
+        }
         Sessao.sair();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void carregarPacientesAtivos() {
+        if (!Sessao.temSessaoRemota()) return;
+        new ClinicalApi().request("GET", "/api/v1/me/follow-ups", null, new ClinicalApi.Callback() {
+            @Override public void success(String body) {
+                try {
+                    org.json.JSONArray links = new org.json.JSONArray(body);
+                    int ativos = 0;
+                    for (int i = 0; i < links.length(); i++)
+                        if ("ATIVO".equals(links.getJSONObject(i).optString("status"))) ativos++;
+                    int total = ativos;
+                    runOnUiThread(() -> binding.tvPacientesAtivos.setText(getString(R.string.pacientes_ativos, total)));
+                } catch (org.json.JSONException ignored) { }
+            }
+            @Override public void error(String message) { }
+        });
     }
 }

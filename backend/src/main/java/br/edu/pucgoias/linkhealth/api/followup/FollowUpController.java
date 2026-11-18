@@ -21,13 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class FollowUpController {
     private final FollowUpService service;
+    private final br.edu.pucgoias.linkhealth.service.ClinicalAccessService access;
 
-    public FollowUpController(FollowUpService service) {
+    public FollowUpController(FollowUpService service, br.edu.pucgoias.linkhealth.service.ClinicalAccessService access) {
+        this.access = access;
         this.service = service;
     }
 
     @PostMapping("/follow-ups")
     public ResponseEntity<FollowUp> invite(@Valid @RequestBody InviteRequest request) {
+        access.owner(request.nutritionistId(), br.edu.pucgoias.linkhealth.domain.AccountRole.NUTRICIONISTA);
         FollowUp followUp = service.invite(request.nutritionistId(), request.patientId(),
                 request.objective(), request.waterGoalMl());
         return ResponseEntity.status(HttpStatus.CREATED).body(followUp);
@@ -35,26 +38,31 @@ public class FollowUpController {
 
     @PostMapping("/follow-ups/{id}/response")
     public FollowUp respond(@PathVariable UUID id, @Valid @RequestBody RespondRequest request) {
+        access.owner(request.patientId(), br.edu.pucgoias.linkhealth.domain.AccountRole.PACIENTE);
         return service.respond(id, request.patientId(), request.accept());
     }
 
     @PatchMapping("/follow-ups/{id}")
     public FollowUp updateDetails(@PathVariable UUID id, @Valid @RequestBody UpdateFollowUpRequest request) {
+        access.owner(request.nutritionistId(), br.edu.pucgoias.linkhealth.domain.AccountRole.NUTRICIONISTA);
         return service.updateDetails(id, request.nutritionistId(), request.objective(), request.waterGoalMl());
     }
 
     @PostMapping("/follow-ups/{id}/deactivate")
     public FollowUp deactivate(@PathVariable UUID id, @Valid @RequestBody DeactivateFollowUpRequest request) {
+        access.owner(request.nutritionistId(), br.edu.pucgoias.linkhealth.domain.AccountRole.NUTRICIONISTA);
         return service.deactivate(id, request.nutritionistId());
     }
 
     @GetMapping("/nutritionists/{id}/follow-ups")
     public List<FollowUp> byNutritionist(@PathVariable UUID id) {
+        access.owner(id, br.edu.pucgoias.linkhealth.domain.AccountRole.NUTRICIONISTA);
         return service.byNutritionist(id);
     }
 
     @GetMapping("/patients/{id}/follow-ups")
     public List<FollowUp> byPatient(@PathVariable UUID id) {
+        access.owner(id, br.edu.pucgoias.linkhealth.domain.AccountRole.PACIENTE);
         return service.byPatient(id);
     }
 }

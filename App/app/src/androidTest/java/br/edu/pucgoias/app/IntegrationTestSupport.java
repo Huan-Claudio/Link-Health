@@ -36,11 +36,19 @@ final class IntegrationTestSupport {
     }
 
     static AccountSession patient() throws Exception {
+        return account("Paciente de Teste", Perfil.PACIENTE);
+    }
+
+    static AccountSession nutritionist() throws Exception {
+        return account("Nutricionista de Teste", Perfil.NUTRICIONISTA);
+    }
+
+    private static AccountSession account(String name, Perfil profile) throws Exception {
         CountDownLatch done = new CountDownLatch(1);
         AtomicReference<AccountSession> session = new AtomicReference<>();
         AtomicReference<String> error = new AtomicReference<>();
-        new AccountApi().register(new AccountApi.RegisterData("Paciente de Teste", "", email(), "",
-                document(), PASSWORD, Perfil.PACIENTE), new AccountApi.Callback() {
+        new AccountApi().register(new AccountApi.RegisterData(name, "", email(), "",
+                document(), PASSWORD, profile), new AccountApi.Callback() {
             public void onSuccess(AccountSession value) { session.set(value); done.countDown(); }
             public void onError(String message) { error.set(message); done.countDown(); }
         });

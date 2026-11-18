@@ -46,7 +46,13 @@ public class PostgresUserAccountRepository implements UserAccountRepository {
     @Transactional
     public UserAccount save(UserAccount account) {
         try {
-            return repository.saveAndFlush(UserAccountEntity.from(account)).toDomain();
+            UserAccountEntity entity = repository.findById(account.id()).orElse(null);
+            if (entity == null) {
+                entity = UserAccountEntity.from(account);
+            } else {
+                entity.updateFrom(account);
+            }
+            return repository.saveAndFlush(entity).toDomain();
         } catch (DataIntegrityViolationException exception) {
             throw new InvalidRequestException("Não foi possível salvar a conta. Verifique o e-mail e o documento.");
         }
