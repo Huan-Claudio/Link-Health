@@ -41,8 +41,6 @@ public class ConfiguracoesActivity extends BaseActivity {
         configurarOpcao(binding.opcaoDados, R.drawable.ic_phone,
                 nutri ? R.string.alterar_dados_pessoais : R.string.dados_contato,
                 v -> startActivity(new Intent(this, EditarInformacoesActivity.class)));
-        configurarOpcao(binding.opcaoEndereco, R.drawable.ic_location, R.string.endereco,
-                v -> toast(R.string.em_breve));
         configurarOpcao(binding.opcaoNotificacoes, R.drawable.ic_notifications, R.string.notificacoes,
                 v -> binding.opcaoNotificacoes.switchOpcao.toggle());
         binding.opcaoNotificacoes.switchOpcao.setVisibility(View.VISIBLE);
