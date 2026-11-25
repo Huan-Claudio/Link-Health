@@ -156,12 +156,25 @@
     <string name="paciente_nao_encontrado">Paciente não encontrado.</string>
     <string name="sessao_expirada">Sua sessão expirou. Entre novamente.</string>
     <string name="editar_foto">Editar foto</string>
+    <!-- Editar Plano Alimentar -->
+    <string name="salvando">Salvando…</string>
+    <string name="salvo">Salvo</string>
+    <string name="plano_carregando">Carregando plano…</string>
+    <string name="plano_status_erro">Não foi possível concluir</string>
+    <string name="toque_tentar_novamente">Toque aqui para tentar novamente.</string>
+    <string name="remover_refeicao_titulo">Remover refeição?</string>
+    <string name="remover_refeicao_msg">A refeição e os alimentos dela serão removidos do plano.</string>
+    <string name="sair_sem_salvar_titulo">Sair sem salvar?</string>
+    <string name="sair_sem_salvar_msg">Há refeições com alterações que ainda não foram salvas.</string>
+    <string name="sair_sem_salvar">Sair sem salvar</string>
+    <string name="continuar_editando">Continuar editando</string>
     <string-array name="tipos_refeicao">
         <item>Café da manhã</item>
-        <item>Colação</item>
+        <item>Lanche da manhã</item>
         <item>Almoço</item>
-        <item>Lanche</item>
+        <item>Lanche da tarde</item>
         <item>Jantar</item>
         <item>Ceia</item>
+        <item>Refeição livre</item>
     </string-array>
 </resources>
