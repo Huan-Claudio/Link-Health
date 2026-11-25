@@ -124,6 +124,7 @@
     <string name="buscar_paciente_instrucao">Digite o CPF ou o e-mail do paciente.</string>
     <string name="paciente_ja_vinculado">%1$s (já é seu paciente)</string>
     <string name="edite_meta">Edite a meta</string>
+    <string name="editar_meta">Editar meta</string>
     <string name="nova_meta_agua">Nova meta de água (litros)</string>
     <string name="menu_editar_plano">Editar Plano Alimentar</string>
     <string name="menu_editar_plano_desc">Edite a rotina alimentar do paciente</string>

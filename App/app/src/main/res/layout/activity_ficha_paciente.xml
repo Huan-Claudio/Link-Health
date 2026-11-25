@@ -76,16 +76,6 @@
             app:layout_constraintTop_toBottomOf="@id/cardAgua" />
 
         <include
-            android:id="@+id/menuRefeicoesRealizadas"
-            layout="@layout/item_menu_card"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/lh_space_s"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/menuEditarPlano" />
-
-        <include
             android:id="@+id/menuEditarProdutos"
             layout="@layout/item_menu_card"
             android:layout_width="0dp"
@@ -93,7 +83,7 @@
             android:layout_marginTop="@dimen/lh_space_s"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/menuRefeicoesRealizadas" />
+            app:layout_constraintTop_toBottomOf="@id/menuEditarPlano" />
 
         <include
             android:id="@+id/menuEvolucao"
