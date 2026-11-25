@@ -202,11 +202,11 @@ public class EscopoPacienteIntegrationTest {
         try (ActivityScenario<EvolucaoCorporalActivity> s =
                 ActivityScenario.launch(EvolucaoCorporalActivity.class)) {
             IntegrationTestSupport.awaitText("72.5 kg");
-            onView(withText("Ver 3 fotos")).perform(scrollTo(), click());
+            onView(withId(R.id.btnVerFotos)).perform(scrollTo(), click());
             IntegrationTestSupport.awaitDialogText("Registro de evolução");
             onView(withText("Frente")).check(matches(isDisplayed()));
             onView(withContentDescription("Próxima foto")).perform(click());
-            onView(withText("Lado")).check(matches(isDisplayed()));
+            onView(withText("Lado direito")).check(matches(isDisplayed()));
             onView(withContentDescription("Próxima foto")).perform(click());
             onView(withText("Costas")).check(matches(isDisplayed()));
             onView(withId(android.R.id.button1)).perform(click());

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Card de uma avaliação de evolução corporal: grade 2x2 (Frente | Costas / Lado direito | Lado esquerdo),
+     peso e data abaixo da grade e os botões "Ver fotos" e "Remover avaliação" (este só para o paciente). -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/LH.CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/lh_card_padding">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guiaMeio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <!-- Linha 1: Frente | Costas -->
+        <include
+            android:id="@+id/fotoFrente"
+            layout="@layout/view_foto_avaliacao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toStartOf="@id/guiaMeio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/fotoCostas"
+            layout="@layout/view_foto_avaliacao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guiaMeio"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Linha 2: Lado direito | Lado esquerdo -->
+        <include
+            android:id="@+id/fotoLadoDireito"
+            layout="@layout/view_foto_avaliacao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintEnd_toStartOf="@id/guiaMeio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fotoFrente" />
+
+        <include
+            android:id="@+id/fotoLadoEsquerdo"
+            layout="@layout/view_foto_avaliacao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guiaMeio"
+            app:layout_constraintTop_toBottomOf="@id/fotoCostas" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barreiraGrade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="fotoLadoDireito,fotoLadoEsquerdo" />
+
+        <!-- Peso e data abaixo da grade -->
+        <TextView
+            android:id="@+id/tvPesoAvaliacao"
+            style="@style/LH.Text.Section"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@id/tvDataAvaliacao"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barreiraGrade"
+            tools:text="Peso: 72.5 kg" />
+
+        <TextView
+            android:id="@+id/tvDataAvaliacao"
+            style="@style/LH.Text.Body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/lh_text_secondary"
+            app:layout_constraintBaseline_toBaselineOf="@id/tvPesoAvaliacao"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="25/11/2026 14:30" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVerFotos"
+            style="@style/LH.Button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:text="@string/ver_fotos"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvPesoAvaliacao" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRemoverAvaliacao"
+            style="@style/LH.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/remover_avaliacao"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnVerFotos"
+            tools:visibility="visible" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

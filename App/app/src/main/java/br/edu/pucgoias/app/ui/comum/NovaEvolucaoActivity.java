@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import br.edu.pucgoias.app.*;
 import br.edu.pucgoias.app.data.Sessao;
+import br.edu.pucgoias.app.databinding.ViewFotoAvaliacaoBinding;
+import br.edu.pucgoias.app.databinding.ViewGradeFotosBinding;
 import br.edu.pucgoias.app.model.Perfil;
 import br.edu.pucgoias.app.util.PatientNavigation;
 import br.edu.pucgoias.app.util.TextoAlterado;
@@ -30,6 +32,7 @@ public class NovaEvolucaoActivity extends BaseActivity {
     private UUID patient;
     private final ImageView[] previews = new ImageView[3];
     private final TextView[] labels = new TextView[3];
+    private final View[] celulas = new View[3];
     private final byte[][] displayed = new byte[3][];
     private LinearLayout weightPanel;
     private MaterialButton save;
@@ -76,33 +79,21 @@ public class NovaEvolucaoActivity extends BaseActivity {
                         "Adicione uma foto de cada posição. Depois informe seu peso para salvar"
                             + " tudo junto.",
                         14));
-        LinearLayout photos = screen.column();
-        photos.setOrientation(LinearLayout.HORIZONTAL);
-        screen.rows.addView(photos);
-        String[] names = {"Frente", "Lado", "Costas"};
-        int[] ids = {R.id.assessmentFront, R.id.assessmentSide, R.id.assessmentBack};
-        for (int i = 0; i < 3; i++) {
-            final int index = i;
-            LinearLayout cell = screen.column();
-            cell.setId(ids[i]);
-            cell.setBackgroundResource(R.drawable.bg_card);
-            cell.setPadding(screen.dp(5), screen.dp(8), screen.dp(5), screen.dp(8));
-            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1);
-            p.setMargins(screen.dp(3), screen.dp(12), screen.dp(3), screen.dp(12));
-            photos.addView(cell, p);
-            TextView title = screen.text(names[i], 16);
-            title.setGravity(17);
-            cell.addView(title);
-            previews[i] = new ImageView(this);
-            previews[i].setImageResource(R.drawable.ic_camera);
-            previews[i].setScaleType(ImageView.ScaleType.CENTER_CROP);
-            previews[i].setContentDescription("Foto de " + names[i]);
-            cell.addView(previews[i], new LinearLayout.LayoutParams(-1, screen.dp(138)));
-            labels[i] = screen.text("Adicionar foto", 12);
-            labels[i].setGravity(17);
-            cell.addView(labels[i]);
-            cell.setOnClickListener(v -> choose(index));
-        }
+        // Grade 2x2: Frente | Costas / Lado direito | Lado esquerdo.
+        // Os índices (0 = frente, 1 = lado, 2 = costas) são os que o ViewModel envia ao servidor.
+        ViewGradeFotosBinding grade =
+                ViewGradeFotosBinding.inflate(getLayoutInflater(), screen.rows, false);
+        screen.rows.addView(grade.getRoot());
+        configurarCelula(grade.fotoFrente, 0, R.string.foto_frente);
+        configurarCelula(grade.fotoLadoDireito, 1, R.string.foto_lado_direito);
+        configurarCelula(grade.fotoCostas, 2, R.string.foto_costas);
+        // 4ª foto: o servidor ainda guarda só três fotos por avaliação, então fica só visual.
+        grade.fotoLadoEsquerdo.tvRotulo.setText(R.string.foto_lado_esquerdo);
+        grade.fotoLadoEsquerdo.tvSemFoto.setText(R.string.em_breve_curto);
+        grade.fotoLadoEsquerdo.tvSemFoto.setVisibility(View.VISIBLE);
+        grade.fotoLadoEsquerdo.getRoot().setEnabled(false);
+        grade.fotoLadoEsquerdo.getRoot().setClickable(false);
+        grade.fotoLadoEsquerdo.getRoot().setAlpha(0.5f);
         weightPanel = screen.column();
         screen.rows.addView(weightPanel);
         weightPanel.addView(screen.text("Seu peso nesta avaliação", 18));
@@ -136,11 +127,11 @@ public class NovaEvolucaoActivity extends BaseActivity {
                                 ? "Salvando fotos e peso…"
                                 : vm.preparing
                                         ? "Preparando foto…"
-                                        : vm.count() + " de 3 fotos adicionadas");
+                                        : vm.count() + " de 4 fotos adicionadas");
         weightPanel.setVisibility(vm.count() == 3 ? View.VISIBLE : View.GONE);
         save.setEnabled(!vm.busy && !vm.preparing);
         for (int i = 0; i < 3; i++) {
-            ((View) previews[i].getParent()).setEnabled(!vm.busy && !vm.preparing);
+            celulas[i].setEnabled(!vm.busy && !vm.preparing);
             if (displayed[i] != vm.images[i]) {
                 displayed[i] = vm.images[i];
                 if (displayed[i] != null) {
@@ -148,11 +139,27 @@ public class NovaEvolucaoActivity extends BaseActivity {
                     o.inSampleSize = 4;
                     previews[i].setImageBitmap(
                             BitmapFactory.decodeByteArray(displayed[i], 0, displayed[i].length, o));
-                    labels[i].setText("Trocar foto");
+                    labels[i].setVisibility(View.GONE); // a própria foto aparece na célula
                 }
             }
         }
         weightPanel.getChildAt(1).setEnabled(!vm.busy && !vm.preparing);
+    }
+
+    /**
+     * Liga uma célula da grade a uma das três fotos enviadas ao servidor.
+     * O id da célula não é trocado: a grade (ConstraintLayout) usa esses ids para posicionar
+     * as linhas, e trocá-lo empilhava as células uma sobre a outra.
+     */
+    private void configurarCelula(ViewFotoAvaliacaoBinding celula, int indice, int rotulo) {
+        celula.tvRotulo.setText(rotulo);
+        celula.tvSemFoto.setText(R.string.adicionar_foto);
+        celula.tvSemFoto.setVisibility(View.VISIBLE);
+        celula.ivFoto.setContentDescription(getString(R.string.foto_de, getString(rotulo)));
+        celula.getRoot().setOnClickListener(v -> choose(indice));
+        previews[indice] = celula.ivFoto;
+        labels[indice] = celula.tvSemFoto;
+        celulas[indice] = celula.getRoot();
     }
 
     private void choose(int index) {
@@ -160,7 +167,7 @@ public class NovaEvolucaoActivity extends BaseActivity {
         registrarDialog(
                 new MaterialAlertDialogBuilder(this)
                         .setTitle(
-                                new String[] {"Foto de frente", "Foto de lado", "Foto de costas"}
+                                new String[] {"Foto de frente", "Foto do lado direito", "Foto de costas"}
                                         [index])
                         .setItems(
                                 new String[] {"Tirar foto", "Escolher da galeria"},

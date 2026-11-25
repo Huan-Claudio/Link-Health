@@ -168,6 +168,18 @@
     <string name="sair_sem_salvar_msg">Há refeições com alterações que ainda não foram salvas.</string>
     <string name="sair_sem_salvar">Sair sem salvar</string>
     <string name="continuar_editando">Continuar editando</string>
+    <!-- Evolução corporal -->
+    <string name="ver_fotos">Ver fotos</string>
+    <string name="remover_avaliacao">Remover avaliação</string>
+    <string name="peso_avaliacao">Peso: %1$s kg</string>
+    <string name="sem_foto">Sem foto</string>
+    <string name="adicionar_foto">Adicionar foto</string>
+    <string name="em_breve_curto">Em breve</string>
+    <string name="foto_frente">Frente</string>
+    <string name="foto_lado_direito">Lado direito</string>
+    <string name="foto_lado_esquerdo">Lado esquerdo</string>
+    <string name="foto_costas">Costas</string>
+    <string name="foto_de">Foto de %1$s</string>
     <string-array name="tipos_refeicao">
         <item>Café da manhã</item>
         <item>Lanche da manhã</item>

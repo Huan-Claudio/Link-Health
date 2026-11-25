@@ -2,6 +2,7 @@ package br.edu.pucgoias.app.ui.comum;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.*;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -9,6 +10,8 @@ import androidx.lifecycle.ViewModelProvider;
 import br.edu.pucgoias.app.*;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.data.remote.RecordsApi;
+import br.edu.pucgoias.app.databinding.ItemAvaliacaoEvolucaoBinding;
+import br.edu.pucgoias.app.databinding.ViewFotoAvaliacaoBinding;
 import br.edu.pucgoias.app.model.Perfil;
 import br.edu.pucgoias.app.util.PatientNavigation;
 
@@ -19,7 +22,7 @@ import org.json.*;
 
 import java.util.*;
 
-/** Uma avaliação é um card com três fotos, peso e data. */
+/** Uma avaliação é um card com quatro fotos, peso e data. */
 public class EvolucaoCorporalActivity extends BaseActivity {
     private RecordsScreen screen;
     private RecordsViewModel vm;
@@ -86,82 +89,84 @@ public class EvolucaoCorporalActivity extends BaseActivity {
             JSONObject record = records.optJSONObject(i);
             if (record == null) continue;
             weightIds.add(record.optString("weightRecordId"));
-            LinearLayout card =
-                    screen.card(
-                            record.optString("weightKg") + " kg",
-                            RecordFormatting.time(record.optString("recordedAt")));
-            LinearLayout strip = screen.column();
-            strip.setOrientation(LinearLayout.HORIZONTAL);
-            card.addView(strip);
+            // Card: grade 2x2 (Frente | Costas / Lado direito | Lado esquerdo), com peso e data abaixo.
+            ItemAvaliacaoEvolucaoBinding item =
+                    ItemAvaliacaoEvolucaoBinding.inflate(getLayoutInflater(), screen.rows, false);
+            item.tvPesoAvaliacao.setText(
+                    getString(R.string.peso_avaliacao, record.optString("weightKg")));
+            item.tvDataAvaliacao.setText(RecordFormatting.time(record.optString("recordedAt")));
+            ViewFotoAvaliacaoBinding[] celulas = {
+                item.fotoFrente, item.fotoCostas, item.fotoLadoDireito, item.fotoLadoEsquerdo
+            };
+            int[] rotulos = {
+                R.string.foto_frente,
+                R.string.foto_costas,
+                R.string.foto_lado_direito,
+                R.string.foto_lado_esquerdo
+            };
+            // Posição da foto no servidor e página dela no álbum "Ver fotos".
+            // O servidor guarda só três fotos (FRONT, SIDE, BACK): "Lado esquerdo" fica como "Sem foto".
+            String[] posicoes = {"FRONT", "BACK", "SIDE", null};
+            int[] paginas = {0, 2, 1, -1};
             JSONArray photos = record.optJSONArray("photos");
-            String[] positions = {"Frente", "Lado", "Costas"};
-            for (int j = 0; photos != null && j < photos.length(); j++) {
-                JSONObject photo = photos.optJSONObject(j);
-                if (photo == null) continue;
+            for (int j = 0; j < celulas.length; j++) {
+                ViewFotoAvaliacaoBinding celula = celulas[j];
+                celula.tvRotulo.setText(rotulos[j]);
+                celula.ivFoto.setContentDescription(
+                        getString(R.string.foto_de, getString(rotulos[j])));
+                JSONObject photo =
+                        posicoes[j] == null ? null : fotoNaPosicao(photos, posicoes[j], paginas[j]);
+                if (photo == null) {
+                    celula.tvSemFoto.setVisibility(View.VISIBLE);
+                    celula.getRoot().setEnabled(false);
+                    celula.getRoot().setClickable(false);
+                    continue;
+                }
                 String id = photo.optString("photoId");
                 photoIds.add(id);
-                final int index = j;
-                LinearLayout cell = screen.column();
-                LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, -2, 1);
-                p.setMargins(screen.dp(3), screen.dp(8), screen.dp(3), screen.dp(8));
-                strip.addView(cell, p);
-                ImageView image = new ImageView(this);
-                image.setImageResource(R.drawable.ic_image);
-                image.setBackgroundResource(R.drawable.bg_image_placeholder);
-                image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                image.setContentDescription("Foto de " + positions[j]);
-                cell.addView(image, new LinearLayout.LayoutParams(-1, screen.dp(112)));
-                TextView text = screen.text(positions[j], 12);
-                text.setGravity(17);
-                cell.addView(text);
-                cell.setOnClickListener(
-                        v ->
-                                registrarDialog(
-                                        EvolutionBook.show(
-                                                this,
-                                                patient,
-                                                Sessao.getAccessToken(),
-                                                record,
-                                                index)));
-                EvolutionBook.thumbnail(this, patient, Sessao.getAccessToken(), id, image, 360);
-            }
-            MaterialButton book =
-                    screen.button(
-                            "Ver 3 fotos",
-                            v ->
-                                    registrarDialog(
-                                            EvolutionBook.show(
-                                                    this,
-                                                    patient,
-                                                    Sessao.getAccessToken(),
-                                                    record,
-                                                    0)));
-            card.addView(book);
-            if (own) {
-                MaterialButton remove =
-                        screen.button(
-                                "Remover avaliação",
+                final int pagina = paginas[j];
+                celula.getRoot()
+                        .setOnClickListener(
                                 v ->
                                         registrarDialog(
-                                                new MaterialAlertDialogBuilder(this)
-                                                        .setTitle("Remover avaliação?")
-                                                        .setMessage(
-                                                                "As três fotos e o peso deste"
-                                                                    + " registro serão removidos"
-                                                                    + " juntos.")
-                                                        .setNegativeButton("Cancelar", null)
-                                                        .setPositiveButton(
-                                                                "Remover",
-                                                                (d, n) ->
-                                                                        vm.delete(
-                                                                                RecordsApi
-                                                                                        .ASSESSMENTS,
-                                                                                record.optString(
-                                                                                        "id")))
-                                                        .show()));
-                remove.setEnabled(vm.ready());
-                card.addView(remove);
+                                                EvolutionBook.show(
+                                                        this,
+                                                        patient,
+                                                        Sessao.getAccessToken(),
+                                                        record,
+                                                        pagina)));
+                EvolutionBook.thumbnail(
+                        this, patient, Sessao.getAccessToken(), id, celula.ivFoto, 360);
             }
+            item.btnVerFotos.setOnClickListener(
+                    v ->
+                            registrarDialog(
+                                    EvolutionBook.show(
+                                            this, patient, Sessao.getAccessToken(), record, 0)));
+            if (own) {
+                item.btnRemoverAvaliacao.setVisibility(View.VISIBLE);
+                item.btnRemoverAvaliacao.setEnabled(vm.ready());
+                item.btnRemoverAvaliacao.setOnClickListener(
+                        v ->
+                                registrarDialog(
+                                        new MaterialAlertDialogBuilder(this)
+                                                .setTitle("Remover avaliação?")
+                                                .setMessage(
+                                                        "As fotos e o peso deste"
+                                                                + " registro serão removidos"
+                                                                + " juntos.")
+                                                .setNegativeButton("Cancelar", null)
+                                                .setPositiveButton(
+                                                        "Remover",
+                                                        (d, n) ->
+                                                                vm.delete(
+                                                                        RecordsApi.ASSESSMENTS,
+                                                                        record.optString("id")))
+                                                .show()));
+            }
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+            params.setMargins(0, screen.dp(10), 0, screen.dp(4));
+            screen.rows.addView(item.getRoot(), params);
         }
         JSONArray photos = vm.items(RecordsApi.PHOTOS), weights = vm.items(RecordsApi.WEIGHT);
         boolean legacy = false;
@@ -216,5 +221,15 @@ public class EvolucaoCorporalActivity extends BaseActivity {
                 }
             }
         }
+    }
+
+    /** Foto da posição pedida (FRONT, SIDE, BACK); se o servidor não informar a posição, usa a ordem. */
+    private static JSONObject fotoNaPosicao(JSONArray photos, String posicao, int ordem) {
+        if (photos == null) return null;
+        for (int i = 0; i < photos.length(); i++) {
+            JSONObject photo = photos.optJSONObject(i);
+            if (photo != null && posicao.equals(photo.optString("position"))) return photo;
+        }
+        return photos.optJSONObject(ordem);
     }
 }
