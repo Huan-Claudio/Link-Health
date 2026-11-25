@@ -7,19 +7,49 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.databinding.ItemRefeicaoPacienteBinding;
-import br.edu.pucgoias.app.model.Refeicao;
 import br.edu.pucgoias.app.util.IconeCheck;
 
-/** Refeições do "Meu Plano Alimentar": tocar no card marca/desmarca a refeição como feita. */
+/** Refeições do "Meu Plano Alimentar": tocar no card marca/desmarca a refeição como feita hoje. */
 public class RefeicaoPacienteAdapter extends RecyclerView.Adapter<RefeicaoPacienteAdapter.ViewHolder> {
 
-    private final List<Refeicao> refeicoes;
+    /** Refeição do plano já preparada para exibir. */
+    public static final class Item {
+        public final String id;
+        public final String titulo;
+        public final String alimentos;
+        public final boolean feita;
 
-    public RefeicaoPacienteAdapter(List<Refeicao> refeicoes) {
-        this.refeicoes = refeicoes;
+        public Item(String id, String titulo, String alimentos, boolean feita) {
+            this.id = id;
+            this.titulo = titulo;
+            this.alimentos = alimentos;
+            this.feita = feita;
+        }
+    }
+
+    public interface AoAlternar {
+        void alternar(Item item);
+    }
+
+    private final List<Item> itens = new ArrayList<>();
+    private final AoAlternar acao;
+    private boolean habilitado;
+
+    public RefeicaoPacienteAdapter(AoAlternar acao) {
+        this.acao = acao;
+    }
+
+    /** Troca a lista exibida; habilitado = false enquanto o servidor responde. */
+    public void atualizar(List<Item> novos, boolean podeAlternar) {
+        itens.clear();
+        itens.addAll(novos);
+        habilitado = podeAlternar;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -30,10 +60,8 @@ public class RefeicaoPacienteAdapter extends RecyclerView.Adapter<RefeicaoPacien
         ViewHolder holder = new ViewHolder(binding);
         View.OnClickListener alternar = v -> {
             int posicao = holder.getBindingAdapterPosition();
-            if (posicao == RecyclerView.NO_POSITION) return;
-            Refeicao refeicao = refeicoes.get(posicao);
-            refeicao.setConcluida(!refeicao.isConcluida());
-            notifyItemChanged(posicao);
+            if (posicao == RecyclerView.NO_POSITION || !habilitado) return;
+            acao.alternar(itens.get(posicao));
         };
         binding.getRoot().setOnClickListener(alternar);
         binding.ivCheck.setOnClickListener(alternar);
@@ -42,20 +70,19 @@ public class RefeicaoPacienteAdapter extends RecyclerView.Adapter<RefeicaoPacien
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Refeicao refeicao = refeicoes.get(position);
-        holder.binding.tvHorario.setText(refeicao.getTitulo());
-        StringBuilder alimentos = new StringBuilder();
-        for (String a : refeicao.getAlimentos()) {
-            if (alimentos.length() > 0) alimentos.append('\n');
-            alimentos.append("• ").append(a);
-        }
-        holder.binding.tvAlimentos.setText(alimentos);
-        IconeCheck.atualizar(holder.binding.ivCheck, refeicao.isConcluida());
+        Item item = itens.get(position);
+        holder.binding.getRoot().setTag("planned-" + item.id);
+        holder.binding.tvHorario.setText(item.titulo);
+        holder.binding.tvAlimentos.setText(item.alimentos);
+        holder.binding.tvAlimentos.setVisibility(item.alimentos.isEmpty() ? View.GONE : View.VISIBLE);
+        IconeCheck.atualizar(holder.binding.ivCheck, item.feita);
+        holder.binding.ivCheck.setContentDescription(holder.itemView.getContext().getString(
+                item.feita ? R.string.desmarcar_realizacao : R.string.marcar_realizada));
     }
 
     @Override
     public int getItemCount() {
-        return refeicoes.size();
+        return itens.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

@@ -180,6 +180,25 @@
     <string name="foto_lado_esquerdo">Lado esquerdo</string>
     <string name="foto_costas">Costas</string>
     <string name="foto_de">Foto de %1$s</string>
+    <!-- Registro diário -->
+    <string name="meu_registro_diario">Meu registro diário</string>
+    <string name="registros_carregando">Carregando registros…</string>
+    <string name="registros_vazio_titulo">Nenhum registro encontrado.</string>
+    <string name="registros_vazio_msg">Os registros de água e refeições aparecem aqui, um card por dia.</string>
+    <string name="agua_sem_meta">%1$s · meta não definida</string>
+    <string name="anotacoes_dia">Anotações do dia</string>
+    <string name="sem_anotacoes">Nenhuma anotação neste dia.</string>
+    <string name="refeicao_feita">Refeição feita</string>
+    <string name="refeicao_nao_feita">Refeição não feita</string>
+    <!-- Meu Plano Alimentar -->
+    <string name="adicionar_anotacao">Adicionar anotação</string>
+    <string name="anotacao_do_dia_titulo">Anotação do dia</string>
+    <string name="anotacao_hint">Como foi a sua alimentação hoje?</string>
+    <string name="anotacao_muito_longa">A anotação pode ter até 500 caracteres.</string>
+    <string name="plano_paciente_vazio">Nenhum plano alimentar publicado</string>
+    <string name="plano_paciente_vazio_msg">Quando o seu nutricionista publicar o plano, as refeições aparecem aqui.</string>
+    <string name="marcar_realizada">Marcar como realizada</string>
+    <string name="desmarcar_realizacao">Desmarcar realização</string>
     <string-array name="tipos_refeicao">
         <item>Café da manhã</item>
         <item>Lanche da manhã</item>

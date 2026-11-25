@@ -156,21 +156,22 @@ public class EscopoVinculadoIntegrationTest {
         String id = planned.getJSONObject(0).getString("id");
         try (ActivityScenario<PlanoAlimentarActivity> scenario =
                 ActivityScenario.launch(PlanoAlimentarActivity.class)) {
-            IntegrationTestSupport.awaitEnabled(R.id.recordAddMeal);
+            // Tela no layout do Figma: tocar no check do card marca/desmarca a refeição.
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
             onView(
                             allOf(
-                                    withText("Marcar como realizada"),
+                                    withContentDescription("Marcar como realizada"),
                                     isDescendantOfA(withTagValue(is("planned-" + id)))))
-                    .perform(scrollTo(), click());
+                    .perform(click());
             count("meal-records", 1);
-            IntegrationTestSupport.awaitText("Desmarcar realização");
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
             scenario.recreate();
-            IntegrationTestSupport.awaitText("Desmarcar realização");
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
             onView(
                             allOf(
-                                    withText("Desmarcar realização"),
+                                    withContentDescription("Desmarcar realização"),
                                     isDescendantOfA(withTagValue(is("planned-" + id)))))
-                    .perform(scrollTo(), click());
+                    .perform(click());
             count("meal-records", 0);
         }
     }

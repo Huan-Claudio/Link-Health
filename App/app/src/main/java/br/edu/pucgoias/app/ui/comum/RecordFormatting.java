@@ -26,4 +26,15 @@ public final class RecordFormatting {
         catch (RuntimeException e) { return false; }
     }
     public static String value(JSONObject json, String key) { return json.isNull(key) ? "" : json.optString(key, ""); }
+
+    /**
+     * Nome do registro que guarda a "anotação do dia" do paciente (botão "Adicionar anotação" no
+     * Meu Plano Alimentar). A API não tem um recurso próprio para anotações, então ela é gravada
+     * como um registro de refeição com este nome; as telas não a tratam como refeição.
+     */
+    public static final String ANOTACAO_DO_DIA = "Anotação do dia";
+
+    public static boolean isAnotacao(JSONObject registro) {
+        return ANOTACAO_DO_DIA.equals(registro.optString("mealName"));
+    }
 }
