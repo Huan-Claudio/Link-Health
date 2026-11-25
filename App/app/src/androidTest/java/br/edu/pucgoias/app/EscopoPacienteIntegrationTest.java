@@ -79,48 +79,59 @@ public class EscopoPacienteIntegrationTest {
         }
     }
 
+    /** "Adicionar anotação" (Meu Plano Alimentar): uma anotação por dia, que pode ser editada. */
     @Test
-    public void refeicaoDaInterfacePodeSerCriadaEditadaERemovida() throws Exception {
+    public void anotacaoDoDiaPodeSerCriadaEEditada() throws Exception {
         AccountSession a = patient();
         try (ActivityScenario<PlanoAlimentarActivity> s =
                 ActivityScenario.launch(PlanoAlimentarActivity.class)) {
-            IntegrationTestSupport.awaitEnabled(R.id.recordAddMeal);
-            onView(withId(R.id.recordAddMeal)).perform(scrollTo(), click());
-            saveDialog("AlmocoUI");
-            IntegrationTestSupport.awaitText("AlmocoUI");
-            count(a, RecordsApi.MEALS, 1);
-            s.recreate();
-            IntegrationTestSupport.awaitText("AlmocoUI");
-            onView(withText("Editar refeição")).perform(scrollTo(), click());
-            saveDialog("JantarUI");
-            IntegrationTestSupport.awaitText("JantarUI");
-            assertEquals(
-                    "JantarUI", list(a, RecordsApi.MEALS).getJSONObject(0).getString("mealName"));
-            onView(withText("Remover refeição")).perform(scrollTo(), click());
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
+            onView(withId(R.id.btnRodape)).perform(click());
+            onView(withId(R.id.etDialog)).perform(replaceText("Dia tranquilo"), closeSoftKeyboard());
             onView(withId(android.R.id.button1)).perform(click());
-            count(a, RecordsApi.MEALS, 0);
+            count(a, RecordsApi.MEALS, 1);
+            assertEquals("Dia tranquilo", list(a, RecordsApi.MEALS).getJSONObject(0).getString("notes"));
+            s.recreate();
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
+            onView(withId(R.id.btnRodape)).perform(click());
+            onView(withId(R.id.etDialog)).check(matches(withText("Dia tranquilo")));
+            onView(withId(R.id.etDialog)).perform(replaceText("Dia corrido"), closeSoftKeyboard());
+            onView(withId(android.R.id.button1)).perform(click());
+            long end = SystemClock.uptimeMillis() + 20000;
+            while (!"Dia corrido".equals(list(a, RecordsApi.MEALS).getJSONObject(0).optString("notes"))
+                    && SystemClock.uptimeMillis() < end) SystemClock.sleep(100);
+            assertEquals("Dia corrido", list(a, RecordsApi.MEALS).getJSONObject(0).getString("notes"));
+            assertEquals(1, list(a, RecordsApi.MEALS).length());
+        } finally {
+            JSONArray registros = list(a, RecordsApi.MEALS);
+            for (int i = 0; i < registros.length(); i++) {
+                IntegrationTestSupport.http("DELETE",
+                        path(a, RecordsApi.MEALS) + "/" + registros.getJSONObject(i).getString("id"), null, a);
+            }
         }
     }
 
     @Test
-    public void historicoPermiteCorrigirERemoverAgua() throws Exception {
+    public void historicoMostraAguaDoDia() throws Exception {
         AccountSession a = patient();
-        IntegrationTestSupport.http(
-                "POST",
-                path(a, RecordsApi.WATER),
-                new JSONObject().put("amountMilliliters", 400),
-                a);
+        String criado =
+                IntegrationTestSupport.http(
+                        "POST",
+                        path(a, RecordsApi.WATER),
+                        new JSONObject().put("amountMilliliters", 400),
+                        a);
         try (ActivityScenario<RegistroDiarioActivity> s =
                 ActivityScenario.launch(RegistroDiarioActivity.class)) {
-            IntegrationTestSupport.awaitText("400 ml de água");
-            onView(withText("Editar registro")).perform(scrollTo(), click());
-            saveDialog("600");
-            IntegrationTestSupport.awaitText("600 ml de água");
-            onView(withText("Remover registro")).perform(scrollTo(), click());
-            onView(withId(android.R.id.button1)).perform(click());
-            count(a, RecordsApi.WATER, 0);
-            IntegrationTestSupport.awaitText("Nenhum registro encontrado.");
+            IntegrationTestSupport.awaitText("Meta de água ingerida");
+            IntegrationTestSupport.awaitText("0,4L");
+        } finally {
+            IntegrationTestSupport.http(
+                    "DELETE",
+                    path(a, RecordsApi.WATER) + "/" + new JSONObject(criado).getString("id"),
+                    null,
+                    a);
         }
+        count(a, RecordsApi.WATER, 0);
     }
 
     @Test

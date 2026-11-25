@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ConcatAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +43,8 @@ public class PlanoAlimentarActivity extends BaseActivity {
     private PlanoStatusAdapter status;
     private RefeicaoPacienteAdapter adapter;
     private boolean own;
+    /** Registros de hoje que ainda faltam apagar para desmarcar uma refeição (apagados um por vez). */
+    private final ArrayDeque<String> remocoesPendentes = new ArrayDeque<>();
 
     @Override
     protected void onCreate(Bundle state) {
@@ -93,8 +96,9 @@ public class PlanoAlimentarActivity extends BaseActivity {
             }
             String horario = meal.optString("time", "");
             if (horario.length() >= 5) horario = horario.substring(0, 5);
-            itens.add(new RefeicaoPacienteAdapter.Item(id, horario + " - " + meal.optString("name"),
-                    alimentos.toString(), registroDeHoje(id) != null));
+            String nome = meal.optString("name");
+            itens.add(new RefeicaoPacienteAdapter.Item(id, horario + " - " + nome,
+                    alimentos.toString(), !registrosDeHoje(id, nome).isEmpty()));
         }
         adapter.atualizar(itens, own && vm.ready());
         binding.btnRodape.setEnabled(vm.ready());
@@ -111,24 +115,40 @@ public class PlanoAlimentarActivity extends BaseActivity {
             status.ocultar();
         }
 
+        // Desmarcar: continua apagando os registros que faltam (o aviso aparece só no último).
+        if (!remocoesPendentes.isEmpty()) {
+            if (!vm.error.isEmpty()) {
+                remocoesPendentes.clear();
+            } else if (vm.ready()) {
+                vm.message = "";
+                vm.delete(RecordsApi.MEALS, remocoesPendentes.poll());
+                return;
+            }
+        }
+
         if (!vm.message.isEmpty()) {
             toast(vm.message);
             vm.message = "";
         }
     }
 
-    /** Toque no card: marca (cria o registro de hoje) ou desmarca (apaga o registro de hoje). */
+    /**
+     * Toque no card: marca (cria o registro de hoje) ou desmarca (apaga todos os registros de hoje
+     * que contam como esta refeição, inclusive os de versões anteriores do plano, para o histórico
+     * também mostrar a refeição como não feita).
+     */
     private void alternar(RefeicaoPacienteAdapter.Item item) {
-        if (!own || !vm.ready()) return;
-        JSONObject registro = registroDeHoje(item.id);
-        if (registro != null) {
-            vm.delete(RecordsApi.MEALS, registro.optString("id"));
+        if (!own || !vm.ready() || !remocoesPendentes.isEmpty()) return;
+        String nome = item.titulo.contains(" - ")
+                ? item.titulo.substring(item.titulo.indexOf(" - ") + 3)
+                : item.titulo;
+        List<JSONObject> registros = registrosDeHoje(item.id, nome);
+        if (!registros.isEmpty()) {
+            for (JSONObject r : registros) remocoesPendentes.add(r.optString("id"));
+            vm.delete(RecordsApi.MEALS, remocoesPendentes.poll());
             return;
         }
         try {
-            String nome = item.titulo.contains(" - ")
-                    ? item.titulo.substring(item.titulo.indexOf(" - ") + 3)
-                    : item.titulo;
             vm.save(RecordsApi.MEALS, null,
                     new JSONObject().put("mealPlanItemId", item.id).put("mealName", nome));
         } catch (JSONException e) {
@@ -168,15 +188,23 @@ public class PlanoAlimentarActivity extends BaseActivity {
         }
     }
 
-    /** Registro de hoje da refeição planejada (null se ainda não foi feita hoje). */
-    private JSONObject registroDeHoje(String mealPlanItemId) {
+    /**
+     * Registros de hoje que contam como esta refeição: mesmo id ou mesmo nome (a mesma regra do
+     * "Registro diário"). Vazio se a refeição ainda não foi feita hoje.
+     */
+    private List<JSONObject> registrosDeHoje(String mealPlanItemId, String nome) {
+        List<JSONObject> encontrados = new ArrayList<>();
         JSONArray registros = vm.items(RecordsApi.MEALS);
         for (int i = 0; i < registros.length(); i++) {
             JSONObject r = registros.optJSONObject(i);
-            if (r != null && mealPlanItemId.equals(r.optString("mealPlanItemId"))
-                    && RecordFormatting.today(r.optString("consumedAt"))) return r;
+            if (r == null || RecordFormatting.isAnotacao(r)
+                    || !RecordFormatting.today(r.optString("consumedAt"))) continue;
+            if (mealPlanItemId.equals(r.optString("mealPlanItemId"))
+                    || nome.trim().equalsIgnoreCase(r.optString("mealName").trim())) {
+                encontrados.add(r);
+            }
         }
-        return null;
+        return encontrados;
     }
 
     /** Anotação do dia já gravada hoje (null se não houver). */
