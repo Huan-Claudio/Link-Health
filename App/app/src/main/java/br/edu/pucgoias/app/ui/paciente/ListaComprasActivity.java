@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ConcatAdapter;
@@ -19,8 +18,6 @@ import br.edu.pucgoias.app.ui.adapter.ItemCompraAdapter;
 import br.edu.pucgoias.app.ui.adapter.ProdutoRecomendadoAdapter;
 import br.edu.pucgoias.app.ui.adapter.ShoppingMessageAdapter;
 import br.edu.pucgoias.app.ui.adapter.TituloSecaoAdapter;
-import br.edu.pucgoias.app.ui.nutricionista.EditarListaComprasActivity;
-import br.edu.pucgoias.app.util.PatientNavigation;
 
 /** Lista e recomendações reais do paciente autenticado. */
 public class ListaComprasActivity extends BaseActivity {
@@ -53,16 +50,6 @@ public class ListaComprasActivity extends BaseActivity {
                         new TituloSecaoAdapter(R.string.produtos_recomendados),
                         productStatus,
                         products));
-        b.btnRodape.setText("Editar minha lista");
-        b.btnRodape.setVisibility(View.VISIBLE);
-        b.btnRodape.setOnClickListener(
-                v ->
-                        startActivity(
-                                PatientNavigation.intent(
-                                        this,
-                                        EditarListaComprasActivity.class,
-                                        Sessao.getUsuarioId(),
-                                        Sessao.getNomeUsuario())));
         model.changes()
                 .observe(
                         this,
@@ -75,7 +62,6 @@ public class ListaComprasActivity extends BaseActivity {
                                             ? "Seu nutricionista ainda não cadastrou produtos"
                                                   + " recomendados para você."
                                             : "");
-                            b.btnRodape.setEnabled(!model.pending && !model.loading);
                             String message = model.takeMessage();
                             if (message != null) toast(message);
                         });
