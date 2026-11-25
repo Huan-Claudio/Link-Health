@@ -89,10 +89,6 @@ public class HomePacienteActivity extends BaseActivity {
                 R.string.menu_perfil,
                 R.string.menu_perfil_desc,
                 v -> startActivity(new Intent(this, ConfiguracoesActivity.class)));
-        binding.cardResumo
-                .getRoot()
-                .setOnClickListener(
-                        v -> startActivity(new Intent(this, RegistroDiarioActivity.class)));
         vm = new ViewModelProvider(this).get(RecordsViewModel.class);
         vm.changes.observe(this, ignored -> render());
         binding.recordsStatus.setOnClickListener(v -> vm.reload());
