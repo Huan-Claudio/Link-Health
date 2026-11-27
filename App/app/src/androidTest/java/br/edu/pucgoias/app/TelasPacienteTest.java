@@ -74,7 +74,7 @@ public class TelasPacienteTest {
         try (ActivityScenario<HomePacienteActivity> scenario = ActivityScenario.launch(HomePacienteActivity.class)) {
             onView(withId(R.id.menuConvites)).perform(scrollTo(), click());
             IntegrationTestSupport.awaitText("Nutricionista de Teste");
-            onView(withId(R.id.btnAdicionar)).perform(click());
+            onView(withId(R.id.btnAcao)).perform(click());
             IntegrationTestSupport.awaitDialogText("Aceitar");
             onView(withText("Aceitar")).perform(click());
             IntegrationTestSupport.awaitText("ATIVO");

@@ -90,6 +90,15 @@
     <string name="ola_nome">Olá, %1$s</string>
     <string name="convite_aceito">Convite de %1$s aceito!</string>
     <string name="sem_convites">Você não tem convites pendentes.</string>
+    <string name="encerrar_acompanhamento_opcao">Encerrar acompanhamento</string>
+    <string name="encerrar_acompanhamento_titulo">Encerrar acompanhamento?</string>
+    <string name="encerrar_acompanhamento_msg">O acesso aos registros de %1$s será encerrado. O histórico será preservado.</string>
+    <string name="convite_pendente_titulo">Convite pendente</string>
+    <string name="convite_pendente_msg">Aguardando %1$s aceitar o convite.</string>
+    <string name="cancelar_convite">Cancelar convite</string>
+    <string name="cancelar_convite_indisponivel">O cancelamento de convites ainda não está disponível.</string>
+    <string name="responder">Responder</string>
+    <string name="fechar">Fechar</string>
 
     <!-- Lista de compras -->
     <string name="lista_compras">Lista de Compras</string>
