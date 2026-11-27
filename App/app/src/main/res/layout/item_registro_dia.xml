@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Card de um dia no "Registro diário do paciente" (RecyclerView com lista interna de refeições) -->
+<!-- Card de um dia no "Registro diário do paciente": data, meta de água, refeições feitas/não feitas
+     (RecyclerView interna) e anotações do dia. -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -13,14 +14,14 @@
         android:layout_height="wrap_content"
         android:padding="10dp">
 
+        <!-- Data do dia: só o texto, um pouco maior -->
         <TextView
             android:id="@+id/tvData"
             style="@style/LH.Text.Body"
             android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:background="@drawable/bg_input"
-            android:gravity="center_vertical"
-            android:paddingStart="12dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textSize="17sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -59,6 +60,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    app:indicatorColor="@color/lh_green"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvTituloAgua" />
@@ -85,7 +87,48 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardAguaDia"
-            tools:itemCount="4"
-            tools:listitem="@layout/item_compra" />
+            tools:itemCount="3"
+            tools:listitem="@layout/item_refeicao_dia" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAnotacoes"
+            style="@style/LH.CardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/listaRefeicoes">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="72dp"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/tvTituloAnotacoes"
+                    style="@style/LH.Text.CardTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/anotacoes_dia"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvAnotacoes"
+                    style="@style/LH.Text.Body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="@color/lh_text_secondary"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvTituloAnotacoes"
+                    tools:text="Almoço: comi metade do prato" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

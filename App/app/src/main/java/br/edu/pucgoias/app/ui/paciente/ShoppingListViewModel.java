@@ -71,8 +71,8 @@ public final class ShoppingListViewModel extends ViewModel {
                                     loading = false;
                                     status =
                                             items.isEmpty()
-                                                    ? "Sua lista está vazia. Toque em Editar minha"
-                                                          + " lista para adicionar itens."
+                                                    ? "Sua lista está vazia. Seu nutricionista ainda"
+                                                          + " não adicionou itens."
                                                     : "Toque nos itens para marcar ou desmarcar a"
                                                           + " compra.";
                                     publish();

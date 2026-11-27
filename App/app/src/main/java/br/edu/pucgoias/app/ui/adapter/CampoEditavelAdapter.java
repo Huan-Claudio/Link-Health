@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,12 +20,26 @@ import br.edu.pucgoias.app.util.TextoAlterado;
  */
 public class CampoEditavelAdapter extends RecyclerView.Adapter<CampoEditavelAdapter.ViewHolder> {
 
+    /** Avisa quem usa o adapter que uma linha foi removida pela lixeira. */
+    public interface AoRemover {
+        void removido(CampoTexto campo);
+    }
+
     private List<? extends CampoTexto> campos;
     @StringRes private final int hint;
+    @Nullable private final AoRemover aoRemover;
+    @Nullable private Runnable aoAlterar;
+    private boolean habilitado = true;
 
     public CampoEditavelAdapter(List<? extends CampoTexto> campos, @StringRes int hint) {
+        this(campos, hint, null);
+    }
+
+    public CampoEditavelAdapter(List<? extends CampoTexto> campos, @StringRes int hint,
+                                @Nullable AoRemover aoRemover) {
         this.campos = campos;
         this.hint = hint;
+        this.aoRemover = aoRemover;
     }
 
     /** Troca a lista exibida (o card de refeição reciclado passa a mostrar outra refeição). */
@@ -32,6 +47,20 @@ public class CampoEditavelAdapter extends RecyclerView.Adapter<CampoEditavelAdap
         campos = novos;
         notifyDataSetChanged();
     }
+
+    /** Chamado sempre que o usuário digita ou apaga uma linha (o card atualiza o botão de salvar). */
+    public void setAoAlterar(@Nullable Runnable acao) {
+        aoAlterar = acao;
+    }
+
+    /** Bloqueia a edição enquanto o card está sendo salvo. */
+    public void setHabilitado(boolean valor) {
+        if (habilitado == valor) return;
+        habilitado = valor;
+        notifyItemRangeChanged(0, campos.size(), PAYLOAD_HABILITADO);
+    }
+
+    private static final Object PAYLOAD_HABILITADO = new Object();
 
     @NonNull
     @Override
@@ -42,15 +71,28 @@ public class CampoEditavelAdapter extends RecyclerView.Adapter<CampoEditavelAdap
         ViewHolder holder = new ViewHolder(binding);
         // Um único TextWatcher por ViewHolder: escreve sempre no campo que está ligado a ele agora.
         binding.etAlimento.addTextChangedListener(new TextoAlterado(texto -> {
-            if (holder.campo != null) holder.campo.texto = texto;
+            if (holder.campo == null) return; // setText do bind, não é digitação
+            holder.campo.texto = texto;
+            if (aoAlterar != null) aoAlterar.run();
         }));
         binding.btnRemoverAlimento.setOnClickListener(v -> {
             int posicao = holder.getBindingAdapterPosition();
-            if (posicao == RecyclerView.NO_POSITION) return;
-            campos.remove(posicao);
+            if (posicao == RecyclerView.NO_POSITION || !habilitado) return;
+            CampoTexto removido = campos.remove(posicao);
             notifyItemRemoved(posicao);
+            if (aoRemover != null) aoRemover.removido(removido);
+            if (aoAlterar != null) aoAlterar.run();
         });
         return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.contains(PAYLOAD_HABILITADO)) {
+            aplicarHabilitado(holder);
+            return;
+        }
+        super.onBindViewHolder(holder, position, payloads);
     }
 
     @Override
@@ -58,6 +100,12 @@ public class CampoEditavelAdapter extends RecyclerView.Adapter<CampoEditavelAdap
         holder.campo = null; // evita que o setText abaixo grave no campo anterior
         holder.binding.etAlimento.setText(campos.get(position).texto);
         holder.campo = campos.get(position);
+        aplicarHabilitado(holder);
+    }
+
+    private void aplicarHabilitado(ViewHolder holder) {
+        holder.binding.etAlimento.setEnabled(habilitado);
+        holder.binding.btnRemoverAlimento.setEnabled(habilitado);
     }
 
     @Override

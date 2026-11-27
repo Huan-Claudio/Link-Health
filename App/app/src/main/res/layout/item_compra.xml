@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Item da lista de compras (paciente) e linha de refeição do registro diário.
-     O ícone da direita é um "check" (compra) ou feito/não feito (registro). -->
+<!-- Item da lista de compras (paciente): o ícone da direita é o "check" da compra. -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"

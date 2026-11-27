@@ -90,6 +90,15 @@
     <string name="ola_nome">Olá, %1$s</string>
     <string name="convite_aceito">Convite de %1$s aceito!</string>
     <string name="sem_convites">Você não tem convites pendentes.</string>
+    <string name="encerrar_acompanhamento_opcao">Encerrar acompanhamento</string>
+    <string name="encerrar_acompanhamento_titulo">Encerrar acompanhamento?</string>
+    <string name="encerrar_acompanhamento_msg">O acesso aos registros de %1$s será encerrado. O histórico será preservado.</string>
+    <string name="convite_pendente_titulo">Convite pendente</string>
+    <string name="convite_pendente_msg">Aguardando %1$s aceitar o convite.</string>
+    <string name="cancelar_convite">Cancelar convite</string>
+    <string name="cancelar_convite_indisponivel">O cancelamento de convites ainda não está disponível.</string>
+    <string name="responder">Responder</string>
+    <string name="fechar">Fechar</string>
 
     <!-- Lista de compras -->
     <string name="lista_compras">Lista de Compras</string>
@@ -124,6 +133,7 @@
     <string name="buscar_paciente_instrucao">Digite o CPF ou o e-mail do paciente.</string>
     <string name="paciente_ja_vinculado">%1$s (já é seu paciente)</string>
     <string name="edite_meta">Edite a meta</string>
+    <string name="editar_meta">Editar meta</string>
     <string name="nova_meta_agua">Nova meta de água (litros)</string>
     <string name="menu_editar_plano">Editar Plano Alimentar</string>
     <string name="menu_editar_plano_desc">Edite a rotina alimentar do paciente</string>
@@ -141,7 +151,6 @@
     <string name="dados_pessoais">Dados Pessoais</string>
     <string name="dados_contato">Dados de Contato</string>
     <string name="alterar_dados_pessoais">Alterar Dados Pessoais</string>
-    <string name="endereco">Endereço</string>
     <string name="preferencias">Preferencias</string>
     <string name="notificacoes">Notificações</string>
     <string name="sair_do_app">Sair do app</string>
@@ -155,12 +164,56 @@
     <string name="paciente_nao_encontrado">Paciente não encontrado.</string>
     <string name="sessao_expirada">Sua sessão expirou. Entre novamente.</string>
     <string name="editar_foto">Editar foto</string>
+    <!-- Editar Plano Alimentar -->
+    <string name="salvando">Salvando…</string>
+    <string name="salvo">Salvo</string>
+    <string name="plano_carregando">Carregando plano…</string>
+    <string name="plano_status_erro">Não foi possível concluir</string>
+    <string name="toque_tentar_novamente">Toque aqui para tentar novamente.</string>
+    <string name="remover_refeicao_titulo">Remover refeição?</string>
+    <string name="remover_refeicao_msg">A refeição e os alimentos dela serão removidos do plano.</string>
+    <string name="sair_sem_salvar_titulo">Sair sem salvar?</string>
+    <string name="sair_sem_salvar_msg">Há refeições com alterações que ainda não foram salvas.</string>
+    <string name="sair_sem_salvar">Sair sem salvar</string>
+    <string name="continuar_editando">Continuar editando</string>
+    <!-- Evolução corporal -->
+    <string name="ver_fotos">Ver fotos</string>
+    <string name="remover_avaliacao">Remover avaliação</string>
+    <string name="peso_avaliacao">Peso: %1$s kg</string>
+    <string name="sem_foto">Sem foto</string>
+    <string name="adicionar_foto">Adicionar foto</string>
+    <string name="em_breve_curto">Em breve</string>
+    <string name="foto_frente">Frente</string>
+    <string name="foto_lado_direito">Lado direito</string>
+    <string name="foto_lado_esquerdo">Lado esquerdo</string>
+    <string name="foto_costas">Costas</string>
+    <string name="foto_de">Foto de %1$s</string>
+    <!-- Registro diário -->
+    <string name="meu_registro_diario">Meu registro diário</string>
+    <string name="registros_carregando">Carregando registros…</string>
+    <string name="registros_vazio_titulo">Nenhum registro encontrado.</string>
+    <string name="registros_vazio_msg">Os registros de água e refeições aparecem aqui, um card por dia.</string>
+    <string name="agua_sem_meta">%1$s · meta não definida</string>
+    <string name="anotacoes_dia">Anotações do dia</string>
+    <string name="sem_anotacoes">Nenhuma anotação neste dia.</string>
+    <string name="refeicao_feita">Refeição feita</string>
+    <string name="refeicao_nao_feita">Refeição não feita</string>
+    <!-- Meu Plano Alimentar -->
+    <string name="adicionar_anotacao">Adicionar anotação</string>
+    <string name="anotacao_do_dia_titulo">Anotação do dia</string>
+    <string name="anotacao_hint">Como foi a sua alimentação hoje?</string>
+    <string name="anotacao_muito_longa">A anotação pode ter até 500 caracteres.</string>
+    <string name="plano_paciente_vazio">Nenhum plano alimentar publicado</string>
+    <string name="plano_paciente_vazio_msg">Quando o seu nutricionista publicar o plano, as refeições aparecem aqui.</string>
+    <string name="marcar_realizada">Marcar como realizada</string>
+    <string name="desmarcar_realizacao">Desmarcar realização</string>
     <string-array name="tipos_refeicao">
         <item>Café da manhã</item>
-        <item>Colação</item>
+        <item>Lanche da manhã</item>
         <item>Almoço</item>
-        <item>Lanche</item>
+        <item>Lanche da tarde</item>
         <item>Jantar</item>
         <item>Ceia</item>
+        <item>Refeição livre</item>
     </string-array>
 </resources>

@@ -156,21 +156,22 @@ public class EscopoVinculadoIntegrationTest {
         String id = planned.getJSONObject(0).getString("id");
         try (ActivityScenario<PlanoAlimentarActivity> scenario =
                 ActivityScenario.launch(PlanoAlimentarActivity.class)) {
-            IntegrationTestSupport.awaitEnabled(R.id.recordAddMeal);
+            // Tela no layout do Figma: tocar no check do card marca/desmarca a refeição.
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
             onView(
                             allOf(
-                                    withText("Marcar como realizada"),
+                                    withContentDescription("Marcar como realizada"),
                                     isDescendantOfA(withTagValue(is("planned-" + id)))))
-                    .perform(scrollTo(), click());
+                    .perform(click());
             count("meal-records", 1);
-            IntegrationTestSupport.awaitText("Desmarcar realização");
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
             scenario.recreate();
-            IntegrationTestSupport.awaitText("Desmarcar realização");
+            IntegrationTestSupport.awaitEnabled(R.id.btnRodape);
             onView(
                             allOf(
-                                    withText("Desmarcar realização"),
+                                    withContentDescription("Desmarcar realização"),
                                     isDescendantOfA(withTagValue(is("planned-" + id)))))
-                    .perform(scrollTo(), click());
+                    .perform(click());
             count("meal-records", 0);
         }
     }
@@ -181,13 +182,21 @@ public class EscopoVinculadoIntegrationTest {
             try (ActivityScenario<HomeNutricionistaActivity> s =
                     ActivityScenario.launch(HomeNutricionistaActivity.class)) {
                 ficha();
+                // O card do objetivo edita só o objetivo.
+                onView(withId(R.id.cardObjetivo)).perform(scrollTo(), click());
+                IntegrationTestSupport.awaitDialogText(
+                        "Essas informações aparecerão na home do paciente.");
+                onView(withId(R.id.careObjectiveInput))
+                        .perform(replaceText("Ganho de massa"), closeSoftKeyboard());
+                onView(withId(android.R.id.button1)).perform(click());
+                IntegrationTestSupport.awaitText("Ganho de massa");
+                // O botão "Editar meta" edita só a meta diária de água.
                 onView(withId(R.id.btnEditarMeta)).perform(scrollTo(), click());
                 IntegrationTestSupport.awaitDialogText(
                         "Essas informações aparecerão na home do paciente.");
-                onView(withId(R.id.careObjectiveInput)).perform(replaceText("Ganho de massa"));
                 onView(withId(R.id.careGoalInput)).perform(replaceText("3"), closeSoftKeyboard());
                 onView(withId(android.R.id.button1)).perform(click());
-                IntegrationTestSupport.awaitText("Ganho de massa");
+                IntegrationTestSupport.awaitText("0 ml / 3000 ml");
             }
             IntegrationTestSupport.enter(patient);
             try (ActivityScenario<br.edu.pucgoias.app.ui.paciente.HomePacienteActivity> s =

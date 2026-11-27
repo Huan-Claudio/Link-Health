@@ -9,8 +9,8 @@ import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.data.remote.RecordsApi;
 import br.edu.pucgoias.app.databinding.ActivityFichaPacienteBinding;
+import br.edu.pucgoias.app.ui.comum.CareSettingsDialog;
 import br.edu.pucgoias.app.ui.comum.EvolucaoCorporalActivity;
-import br.edu.pucgoias.app.ui.paciente.PlanoAlimentarActivity;
 import br.edu.pucgoias.app.util.Formatador;
 import br.edu.pucgoias.app.util.PatientNavigation;
 
@@ -39,8 +39,10 @@ public class FichaPacienteActivity extends BaseActivity {
         binding.btnVoltar.setOnClickListener(v -> finish());
         binding.cardAgua.layoutBotoesAgua.setVisibility(View.GONE);
         binding.cardAgua.btnEditarMeta.setVisibility(View.VISIBLE);
-        binding.cardAgua.btnEditarMeta.setOnClickListener(v -> editarAcompanhamento());
-        binding.cardObjetivo.getRoot().setOnClickListener(v -> editarAcompanhamento());
+        binding.cardAgua.btnEditarMeta.setOnClickListener(
+                v -> editarAcompanhamento(CareSettingsDialog.Campo.META_AGUA));
+        binding.cardObjetivo.getRoot().setOnClickListener(
+                v -> editarAcompanhamento(CareSettingsDialog.Campo.OBJETIVO));
         configurarMenu(
                 binding.menuEditarPlano,
                 R.drawable.ic_restaurant,
@@ -50,10 +52,6 @@ public class FichaPacienteActivity extends BaseActivity {
         binding.menuEditarPlano.tvTitulo.setText("Planos alimentares");
         binding.menuEditarPlano.tvDescricao.setText(
                 "Criar, editar e publicar planos alimentares");
-        configurarMenu(binding.menuRefeicoesRealizadas, R.drawable.ic_restaurant, R.string.menu_editar_plano,
-                R.string.menu_editar_plano_desc, v -> abrir(PlanoAlimentarActivity.class));
-        binding.menuRefeicoesRealizadas.tvTitulo.setText("Refeições realizadas");
-        binding.menuRefeicoesRealizadas.tvDescricao.setText("Consultar as refeições e os registros do paciente");
         configurarMenu(
                 binding.menuEditarProdutos,
                 R.drawable.ic_bag,
@@ -150,9 +148,8 @@ public class FichaPacienteActivity extends BaseActivity {
         startActivity(PatientNavigation.intent(this, screen, patient, name));
     }
 
-    private void editarAcompanhamento() {
-        registrarDialog(
-                br.edu.pucgoias.app.ui.comum.CareSettingsDialog.show(
-                        this, patient, this::carregar));
+    /** Abre o diálogo que edita só o objetivo ou só a meta diária de água. */
+    private void editarAcompanhamento(CareSettingsDialog.Campo campo) {
+        registrarDialog(CareSettingsDialog.show(this, patient, campo, this::carregar));
     }
 }

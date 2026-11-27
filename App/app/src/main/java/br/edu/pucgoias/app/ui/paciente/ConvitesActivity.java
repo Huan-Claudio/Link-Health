@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import br.edu.pucgoias.app.BaseActivity;
+import br.edu.pucgoias.app.R;
 import br.edu.pucgoias.app.data.Sessao;
 import br.edu.pucgoias.app.model.Perfil;
 import br.edu.pucgoias.app.databinding.ActivityConvitesBinding;
@@ -16,7 +17,12 @@ import br.edu.pucgoias.app.databinding.ItemConviteBinding;
 import br.edu.pucgoias.app.ui.comum.FollowUpsViewModel;
 import org.json.JSONObject;
 
-/** Convites recebidos/enviados e estado dos acompanhamentos reais. */
+/**
+ * Convites recebidos/enviados e estado dos acompanhamentos reais.
+ * Nutricionista: o card do paciente (avatar + nome) é o próprio botão; tocar abre "Encerrar
+ * acompanhamento" (vinculado) ou "Cancelar convite" (convite ainda não aceito).
+ * Paciente: botão "Responder" nos convites pendentes.
+ */
 public class ConvitesActivity extends BaseActivity {
     private FollowUpsViewModel model;
     private ActivityConvitesBinding binding;
@@ -55,10 +61,17 @@ public class ConvitesActivity extends BaseActivity {
                     .setPositiveButton("Aceitar", (d, w) -> model.respond(id, true))
                     .setNegativeButton("Recusar", (d, w) -> model.respond(id, false))
                     .setNeutralButton("Voltar", null).show());
+        } else if (nutritionist && status.equals("PENDENTE")) {
+            // O servidor ainda não permite cancelar um convite: por enquanto a opção só avisa.
+            registrarDialog(new MaterialAlertDialogBuilder(this).setTitle(R.string.convite_pendente_titulo)
+                    .setMessage(getString(R.string.convite_pendente_msg, name))
+                    .setPositiveButton(R.string.cancelar_convite, (d, w) -> toast(R.string.cancelar_convite_indisponivel))
+                    .setNegativeButton(R.string.fechar, null).show());
         } else if (nutritionist && status.equals("ATIVO")) {
-            registrarDialog(new MaterialAlertDialogBuilder(this).setTitle("Encerrar acompanhamento?")
-                    .setMessage("O acesso aos registros de " + name + " será encerrado. O histórico será preservado.")
-                    .setPositiveButton("Encerrar", (d, w) -> model.deactivate(id)).setNegativeButton("Cancelar", null).show());
+            registrarDialog(new MaterialAlertDialogBuilder(this).setTitle(R.string.encerrar_acompanhamento_titulo)
+                    .setMessage(getString(R.string.encerrar_acompanhamento_msg, name))
+                    .setPositiveButton(R.string.encerrar_acompanhamento_opcao, (d, w) -> model.deactivate(id))
+                    .setNegativeButton(R.string.fechar, null).show());
         }
     }
     private class LinksAdapter extends RecyclerView.Adapter<Holder> {
@@ -68,12 +81,22 @@ public class ConvitesActivity extends BaseActivity {
             String name = link.optString(nutritionist ? "patientName" : "nutritionistName"), status = link.optString("status");
             h.b.tvNome.setText(name + " · " + status);
             h.b.tvAvatar.setText(name.isEmpty() ? "" : name.substring(0, 1));
-            boolean actionable = nutritionist ? status.equals("ATIVO") : status.equals("PENDENTE");
-            h.b.btnAdicionar.setVisibility(actionable ? View.VISIBLE : View.GONE);
-            h.b.btnAdicionar.setEnabled(!model.pending && !model.loading);
-            h.b.btnAdicionar.setContentDescription(nutritionist ? "Encerrar acompanhamento de " + name : "Responder convite de " + name);
-            h.b.btnAdicionar.setOnClickListener(v -> select(link));
-            h.itemView.setOnClickListener(v -> { if (!model.pending && !model.loading) select(link); });
+            boolean livre = !model.pending && !model.loading;
+            // O "+" fica só para a busca de pacientes.
+            h.b.btnAdicionar.setVisibility(View.GONE);
+            // Paciente: botão "Responder" no convite pendente.
+            boolean responder = !nutritionist && status.equals("PENDENTE");
+            h.b.btnAcao.setVisibility(responder ? View.VISIBLE : View.GONE);
+            h.b.btnAcao.setEnabled(livre);
+            h.b.btnAcao.setContentDescription("Responder convite de " + name);
+            h.b.btnAcao.setOnClickListener(v -> select(link));
+            // Nutricionista: o card do paciente é o botão (encerrar acompanhamento / cancelar convite).
+            boolean clicavel = nutritionist ? status.equals("ATIVO") || status.equals("PENDENTE") : responder;
+            h.itemView.setContentDescription(nutritionist && status.equals("ATIVO")
+                    ? name + ". Toque para encerrar o acompanhamento"
+                    : nutritionist && status.equals("PENDENTE") ? name + ". Convite aguardando resposta" : null);
+            h.itemView.setOnClickListener(clicavel ? v -> { if (!model.pending && !model.loading) select(link); } : null);
+            h.itemView.setClickable(clicavel);
         }
         @Override public int getItemCount() { return model.links.length(); }
     }

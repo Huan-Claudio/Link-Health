@@ -1,26 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Item editável da lista de compras: nome, quantidade e unidade de medida lado a lado,
+     e os botões "Salvar item" e "Remover item". -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/LH.CardView" android:layout_width="match_parent" android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/LH.CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="16dp">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:padding="16dp">
-        <TextView android:id="@+id/tvShoppingStatus" style="@style/LH.Text.Caption"
-            android:layout_width="match_parent" android:layout_height="wrap_content" />
-        <EditText android:id="@+id/etShoppingName" style="@style/LH.Input"
-            android:layout_marginTop="8dp" android:hint="Nome do item" android:maxLength="120"
-            android:importantForAutofill="no" android:inputType="textCapSentences" />
-        <EditText android:id="@+id/etShoppingQuantity" style="@style/LH.Input"
-            android:layout_marginTop="8dp" android:hint="Quantidade" android:maxLength="13"
-            android:importantForAutofill="no" android:inputType="numberDecimal" />
-        <TextView style="@style/LH.Text.Label" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:text="Unidade" />
-        <Spinner android:id="@+id/spShoppingUnit" android:layout_width="match_parent"
-            android:layout_height="48dp" android:contentDescription="Unidade de medida" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/btnShoppingSave"
-            style="@style/LH.Button" android:layout_width="match_parent" android:layout_marginTop="8dp"
-            android:text="Salvar item" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/btnShoppingDelete"
-            style="@style/LH.Button.Outlined" android:layout_width="match_parent" android:layout_marginTop="8dp"
-            android:text="Remover item" />
-    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvShoppingStatus"
+            style="@style/LH.Text.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/etShoppingName"
+            style="@style/LH.Input"
+            android:layout_width="0dp"
+            android:layout_marginTop="8dp"
+            android:hint="Nome do item"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences"
+            android:maxLength="120"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvShoppingStatus" />
+
+        <!-- Quantidade e unidade de medida na mesma linha (metade da largura cada) -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guiaMeio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <TextView
+            android:id="@+id/tvLabelQuantidade"
+            style="@style/LH.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="Quantidade"
+            app:layout_constraintEnd_toStartOf="@id/guiaMeio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etShoppingName" />
+
+        <TextView
+            android:id="@+id/tvLabelUnidade"
+            style="@style/LH.Text.Label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Unidade de medida"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guiaMeio"
+            app:layout_constraintTop_toBottomOf="@id/etShoppingName" />
+
+        <EditText
+            android:id="@+id/etShoppingQuantity"
+            style="@style/LH.Input"
+            android:layout_width="0dp"
+            android:layout_marginEnd="4dp"
+            android:hint="Quantidade"
+            android:importantForAutofill="no"
+            android:inputType="numberDecimal"
+            android:maxLength="13"
+            app:layout_constraintEnd_toStartOf="@id/guiaMeio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvLabelQuantidade" />
+
+        <!-- Fundo de campo atrás do Spinner, para ficar com a mesma aparência do campo de quantidade -->
+        <View
+            android:id="@+id/fundoUnidade"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_input"
+            app:layout_constraintBottom_toBottomOf="@id/etShoppingQuantity"
+            app:layout_constraintEnd_toEndOf="@id/spShoppingUnit"
+            app:layout_constraintStart_toStartOf="@id/spShoppingUnit"
+            app:layout_constraintTop_toTopOf="@id/etShoppingQuantity" />
+
+        <Spinner
+            android:id="@+id/spShoppingUnit"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="4dp"
+            android:contentDescription="Unidade de medida"
+            app:layout_constraintBottom_toBottomOf="@id/etShoppingQuantity"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guiaMeio"
+            app:layout_constraintTop_toTopOf="@id/etShoppingQuantity" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnShoppingSave"
+            style="@style/LH.Button"
+            android:layout_width="0dp"
+            android:layout_marginTop="12dp"
+            android:text="Salvar item"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etShoppingQuantity" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnShoppingDelete"
+            style="@style/LH.Button.Outlined"
+            android:layout_width="0dp"
+            android:layout_marginTop="8dp"
+            android:text="Remover item"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnShoppingSave" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

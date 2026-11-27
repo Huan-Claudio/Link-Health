@@ -41,11 +41,11 @@
             app:layout_constraintTop_toBottomOf="@id/progressAgua" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnEditarMeta"
-            style="@style/LH.Button.Outlined"
+            style="@style/LH.Button"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Editar meta"
-            android:textSize="11sp"
+            android:layout_height="36dp"
+            android:layout_marginTop="14dp"
+            android:text="@string/editar_meta"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/progressAgua" />

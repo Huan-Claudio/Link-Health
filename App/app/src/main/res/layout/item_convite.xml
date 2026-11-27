@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Item com avatar + nome + botão "+" (convites do paciente / busca de paciente) -->
+<!-- Item com avatar + nome.
+     Busca de paciente: botão "+" (btnAdicionar) para convidar.
+     Acompanhamentos e convites: o nutricionista toca no próprio card; o paciente tem o botão
+     "Responder" (btnAcao) nos convites pendentes. -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/LH.CardView"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="wrap_content"
+    android:minHeight="56dp"
     android:layout_marginBottom="@dimen/lh_space_s">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp">
 
@@ -34,9 +39,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnAdicionar"
+            app:layout_constraintEnd_toStartOf="@id/barreiraBotoes"
             app:layout_constraintStart_toEndOf="@id/tvAvatar"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Dr. Welington" />
@@ -55,5 +62,27 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- "Responder" (paciente, convite pendente) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAcao"
+            style="@style/LH.Button.Small"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/responder"
+            tools:visibility="visible" />
+
+        <!-- Borda esquerda do botão visível. Botões ocultos (gone) ficam no fim do card, então sem
+             nenhum botão o nome usa a largura toda (não pode usar barrierAllowsGoneWidgets="false":
+             com todos ocultos a barreira ia para o início do card e o nome sumia). -->
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barreiraBotoes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="btnAdicionar,btnAcao" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

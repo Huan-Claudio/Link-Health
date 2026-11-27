@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import br.edu.pucgoias.app.data.remote.RecordsApi;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.*;
@@ -64,6 +65,27 @@ public final class EvolutionBook {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o);
     }
 
+    /** Botão contornado só com o ícone de seta, centralizado. */
+    private static MaterialButton seta(Activity a, int icone, String descricao) {
+        MaterialButton botao =
+                new MaterialButton(
+                        a, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+        botao.setIconResource(icone);
+        botao.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+        botao.setIconPadding(0);
+        botao.setIconSize((int) (24 * a.getResources().getDisplayMetrics().density));
+        botao.setIconTint(
+                android.content.res.ColorStateList.valueOf(
+                        a.getColor(br.edu.pucgoias.app.R.color.lh_primary_light)));
+        botao.setPadding(0, 0, 0, 0);
+        botao.setInsetTop(0);
+        botao.setInsetBottom(0);
+        botao.setMinWidth(0);
+        botao.setMinimumWidth(0);
+        botao.setContentDescription(descricao);
+        return botao;
+    }
+
     public static AlertDialog show(
             Activity a, UUID patient, String token, JSONObject record, int initial) {
         int pad = (int) (16 * a.getResources().getDisplayMetrics().density);
@@ -80,7 +102,7 @@ public final class EvolutionBook {
                 new LinearLayout.LayoutParams(
                         -1, (int) (300 * a.getResources().getDisplayMetrics().density)));
         JSONArray photos = record.optJSONArray("photos");
-        String[] names = {"Frente", "Lado", "Costas"};
+        String[] names = {"Frente", "Lado direito", "Costas"};
         ImageView[] images = new ImageView[3];
         TextView[] messages = new TextView[3];
         for (int i = 0; i < 3; i++) {
@@ -98,18 +120,13 @@ public final class EvolutionBook {
         LinearLayout nav = new LinearLayout(a);
         nav.setGravity(17);
         body.addView(nav);
-        Button previous = new com.google.android.material.button.MaterialButton(a,null,com.google.android.material.R.attr.materialButtonOutlinedStyle);
-        previous.setText("‹");
-        previous.setContentDescription("Foto anterior");
-        previous.setMinWidth(0);
+        // Botões de navegação com setas: esquerda (foto anterior) e direita (próxima foto).
+        Button previous = seta(a, br.edu.pucgoias.app.R.drawable.ic_arrow_back, "Foto anterior");
         nav.addView(previous,new LinearLayout.LayoutParams(pad*3,pad*3));
         TextView number = new TextView(a);
         number.setGravity(17);
         nav.addView(number, new LinearLayout.LayoutParams(0, -2, 1));
-        Button next = new com.google.android.material.button.MaterialButton(a,null,com.google.android.material.R.attr.materialButtonOutlinedStyle);
-        next.setText("›");
-        next.setContentDescription("Próxima foto");
-        next.setMinWidth(0);
+        Button next = seta(a, br.edu.pucgoias.app.R.drawable.ic_arrow_forward, "Próxima foto");
         nav.addView(next,new LinearLayout.LayoutParams(pad*3,pad*3));
         TextView hint=new TextView(a);
         hint.setText("Deslize para ver as outras posições");
